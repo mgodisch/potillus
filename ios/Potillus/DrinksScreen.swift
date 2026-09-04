@@ -170,11 +170,15 @@ struct DrinksScreen: View {
                 EntrySheet(
                     drinks: [drink], preselected: drink, now: logger.now(),
                     capacity: capacity.capacity, useSymbols: capacity.useSymbols,
-                    logicalDay: logger.logicalDay.isEmpty ? nil : logger.logicalDay,
+                    logicalDay: logger.logicalDay,
+                    // The drinks list logs a drink as it happens, exactly as the
+                    // Today screen does, so it follows the same rule.
+                    origin: .now,
                     dayChangeHour: logger.dayChangeHour, dayChangeMinute: logger.dayChangeMinute
-                ) { chosen, volume, millis, note in
+                ) { chosen, volume, millis, offset, note in
                     await logger.log(
-                        drink: chosen, volumeMl: volume, timestampMillis: millis, note: note
+                        drink: chosen, volumeMl: volume,
+                        timestampMillis: millis, utcOffsetSeconds: offset, note: note
                     )
                 }
             }

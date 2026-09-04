@@ -124,6 +124,7 @@ class EntityMappingTest {
             timestampMillis = 1_700_000_000_000L,
             logicalDate = "2025-05-26",
             note = "after work",
+            utcOffsetSeconds = 0,
         )
         assertEquals(original, original.toEntity().toDomain())
     }
@@ -140,6 +141,7 @@ class EntityMappingTest {
             timestampMillis = 1_700_000_500_000L,
             logicalDate = "2025-05-27",
             note = "",
+            utcOffsetSeconds = 0,
         )
         assertEquals(entity, entity.toDomain().toEntity())
     }

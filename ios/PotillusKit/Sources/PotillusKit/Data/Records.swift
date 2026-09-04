@@ -139,13 +139,27 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
     public var timestampMillis: Int64
 
     /// The UTC offset in force where and when the drink was logged, which is the
-    /// frame its clock time is read in. `nil` for rows written before the column
-    /// existed; see `DayResolver.displayTimeZone` for what that falls back to.
-    public var utcOffsetSeconds: Int?
+    /// frame its clock time is read in. NOT NULL from schema 4 on: the
+    /// `v4-entry-offset-not-null` step backfilled every row that predated the
+    /// column with the offset the device zone had at that row's instant, then
+    /// rebuilt the table with the constraint.
+    public var utcOffsetSeconds: Int
 
-    /// The LOGICAL day this entry belongs to (`yyyy-MM-dd`), as decided by
-    /// `DayResolver`. Stored, not derived, because the user may move the
-    /// day-change time later and history must not silently re-bucket.
+    /// The LOGICAL day this entry belongs to (`yyyy-MM-dd`), DERIVED from
+    /// `timestampMillis` and `utcOffsetSeconds`.
+    ///
+    /// THE INVARIANT THIS COLUMN IS BOUND BY. Whenever the single row of
+    /// `logical_day_key` holds a day-change time, every row of this table
+    /// satisfies
+    ///
+    ///     logicalDate == DayResolver.resolve(timestampMillis, utcOffsetSeconds,
+    ///                                        key.changeHour, key.changeMinute)
+    ///
+    /// The key records WHICH boundary the column was last computed under, so a
+    /// half-finished rewrite is recognisable instead of silent, and a changed
+    /// setting is answered by recomputing rather than by guessing. A key of nil
+    /// means "not computed yet" and is what a migration or an import leaves
+    /// behind; the next realignment picks it up.
     public var logicalDate: String
 
     /// Optional user note. Empty string, never NULL, so `notNull` holds and
@@ -162,7 +176,7 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
         timestampMillis: Int64,
         logicalDate: String,
         note: String = "",
-        utcOffsetSeconds: Int? = nil
+        utcOffsetSeconds: Int
     ) {
         self.id = id
         self.drinkId = drinkId
@@ -183,4 +197,49 @@ extension Entry: FetchableRecord, MutablePersistableRecord {
     public mutating func didInsert(_ inserted: InsertionSuccess) {
         id = inserted.rowID
     }
+}
+
+/// The day-change time `entries.logicalDate` was last derived under.
+///
+/// Mirrors Android's `LogicalDayKeyEntity`, and the table it maps onto is part
+/// of the shared schema contract.
+///
+/// WHY A TABLE AND NOT A PREFERENCE
+///   The key must be written in the SAME TRANSACTION as the rows it describes.
+///   A value in the encrypted preferences file could not be: the two stores
+///   commit independently, so a process death between them would leave a key
+///   claiming something about rows that were never rewritten. Inside SQLite the
+///   two writes are one, which is the point — an interrupted realignment rolls
+///   back, the key keeps its old value, and the next comparison starts over.
+///
+/// WHY THE COLUMNS ARE OPTIONAL
+///   Both nil means "not derived yet", the state a finished migration and a
+///   finished import both leave behind. They are written together and read
+///   together; a half-set key is treated as no key at all.
+///
+/// WHY ONE ROW WITH A FIXED KEY
+///   The table is a variable, not a log. Pinning the id to `singletonID` makes a
+///   second row impossible.
+public struct LogicalDayKey: Codable, Sendable, Equatable {
+
+    /// The primary key of the one row this table is allowed to hold.
+    public static let singletonID: Int64 = 1
+
+    public var id: Int64
+    public var changeHour: Int?
+    public var changeMinute: Int?
+
+    public init(
+        id: Int64 = LogicalDayKey.singletonID,
+        changeHour: Int? = nil,
+        changeMinute: Int? = nil
+    ) {
+        self.id = id
+        self.changeHour = changeHour
+        self.changeMinute = changeMinute
+    }
+}
+
+extension LogicalDayKey: FetchableRecord, PersistableRecord {
+    public static let databaseTableName = "logical_day_key"
 }

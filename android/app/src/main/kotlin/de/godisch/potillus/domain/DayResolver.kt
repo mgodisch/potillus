@@ -54,26 +54,37 @@ object DayResolver {
     val DATE_FORMATTER: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     /**
-     * Determines the logical date of a Unix timestamp.
+     * Determines the logical date of a Unix timestamp read in a recorded frame.
      *
      * Timestamps BEFORE the configured day-change time are attributed to the
      * previous calendar day (e.g. 02:30 AM with a 04:00 boundary → yesterday).
      *
+     * THE FRAME IS THE ENTRY'S, NOT THE DEVICE'S. [utcOffsetSeconds] is the
+     * offset that was recorded when the drink was logged, so the wall-clock
+     * reading this function works from is the one the user made. A later flight
+     * or a daylight-saving switch moves the device zone, not the reading, and the
+     * entry keeps the day it was drunk on. Nothing here is looked up in a zone:
+     * the offset is all the frame there is, which is why two readings of the same
+     * instant can land on two different logical days.
+     *
+     * For "which logical day is it right now", where the device zone IS the
+     * answer, use [today].
+     *
      * @param timestampMillis  Unix timestamp in milliseconds (UTC).
+     * @param utcOffsetSeconds The offset the reading was taken in, in seconds.
      * @param changeHour       Hour of the day-change boundary (0–23).
      * @param changeMinute     Minute of the day-change boundary (0–59).
-     * @param zoneId           Timezone for conversion. Defaults to system timezone.
      * @return Logical date as "YYYY-MM-DD".
      */
     fun resolve(
         timestampMillis: Long,
+        utcOffsetSeconds: Int,
         changeHour: Int,
         changeMinute: Int,
-        zoneId: ZoneId = ZoneId.systemDefault(),
     ): String {
         val localDateTime = LocalDateTime.ofInstant(
             Instant.ofEpochMilli(timestampMillis),
-            zoneId,
+            ZoneOffset.ofTotalSeconds(utcOffsetSeconds),
         )
         val isBeforeChangeTime =
             localDateTime.hour < changeHour ||
@@ -88,83 +99,33 @@ object DayResolver {
     }
 
     /**
-     * The inverse of [resolve]: the instant a wall-clock time on a logical date
-     * falls on.
+     * Whether a reading counts toward a logical day other than [logicalDay].
      *
-     * A logical day runs from the day-change time to the next one, so a time
-     * BEFORE the boundary belongs to the following calendar day: with a 04:00
-     * boundary, 01:00 on the logical 30th is 01:00 on the calendar 31st. Reading
-     * the calendar day off the logical date alone is what put an entry logged for
-     * a past evening on today's clock.
+     * The entry sheet is opened on one logical day — today's on the Today screen,
+     * the tapped cell's in the calendar — and the date and time in it can be
+     * moved anywhere. When the two part company, the entry is still correct, it
+     * just belongs elsewhere, and the sheet says which day it is going to.
+     * When they agree there is nothing to say.
      *
-     * @param logicalDate  The logical day as "YYYY-MM-DD".
-     * @param hour         Wall-clock hour on that logical day (0–23).
-     * @param minute       Wall-clock minute (0–59).
-     * @param changeHour   Hour of the day-change boundary (0–23).
-     * @param changeMinute Minute of the day-change boundary (0–59).
-     * @param zoneId       Timezone the wall clock is read in.
-     * @return The instant in milliseconds, or null when [logicalDate] is not a
-     *   canonical date. A wall-clock time that does not exist in the zone (the
-     *   spring-forward gap) resolves to the instant the zone offers instead,
-     *   which is what `ZonedDateTime` does with a gap.
+     * ONE CONDITION, NO SPECIAL CASES. Adding, editing, typing a time, picking a
+     * date, arriving from the calendar: all of them end in a reading and a day
+     * the sheet was opened on, and this compares the two. The sheet decides
+     * nothing itself, which is what keeps the note from appearing on one screen
+     * and not on the other for the same entry.
+     *
+     * @param timestampMillis  The composed instant of date and time.
+     * @param utcOffsetSeconds The frame that instant is read in.
+     * @param changeHour       Hour of the day-change boundary (0–23).
+     * @param changeMinute     Minute of the day-change boundary (0–59).
+     * @param logicalDay       The logical day the sheet was opened on.
      */
-    fun instantOnLogicalDate(
-        logicalDate: String,
-        hour: Int,
-        minute: Int,
-        changeHour: Int,
-        changeMinute: Int,
-        zoneId: ZoneId = ZoneId.systemDefault(),
-    ): Long? {
-        val day = try {
-            LocalDate.parse(logicalDate, DATE_FORMATTER)
-        } catch (_: DateTimeParseException) {
-            return null
-        }
-
-        val isBeforeChangeTime = hour < changeHour || (hour == changeHour && minute < changeMinute)
-        val calendarDay = if (isBeforeChangeTime) day.plusDays(1) else day
-
-        return calendarDay.atTime(hour, minute).atZone(zoneId).toInstant().toEpochMilli()
-    }
-
-    /**
-     * The same, taking the wall-clock time from an existing instant.
-     *
-     * The entry dialog offers hours and minutes only, so the instant it returns
-     * carries the date of the day it was opened on. The calendar needs the time
-     * off it and the day from elsewhere.
-     */
-    fun instantOnLogicalDate(
-        logicalDate: String,
+    fun logicalDayDiffers(
         timestampMillis: Long,
+        utcOffsetSeconds: Int,
         changeHour: Int,
         changeMinute: Int,
-        zoneId: ZoneId = ZoneId.systemDefault(),
-    ): Long? {
-        val clockTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), zoneId)
-        return instantOnLogicalDate(
-            logicalDate = logicalDate,
-            hour = clockTime.hour,
-            minute = clockTime.minute,
-            changeHour = changeHour,
-            changeMinute = changeMinute,
-            zoneId = zoneId,
-        )
-    }
-
-    /**
-     * The CALENDAR date an instant falls on, "YYYY-MM-DD", read in [zoneId].
-     *
-     * Not the logical date — [resolve] answers that. The entry dialog shows this
-     * beside the time it is about to store when the two dates differ: a
-     * drink typed as "02:00" on the logical 10th is placed on the calendar 11th
-     * by [instantOnLogicalDate], and the dialog says so, so what the user sees
-     * is what the row will read. Pinned with iOS by `day-resolver.json`
-     * (`calendarDate`).
-     */
-    fun calendarDate(timestampMillis: Long, zoneId: ZoneId = ZoneId.systemDefault()): String =
-        formatDate(LocalDateTime.ofInstant(Instant.ofEpochMilli(timestampMillis), zoneId).toLocalDate())
+        logicalDay: String,
+    ): Boolean = resolve(timestampMillis, utcOffsetSeconds, changeHour, changeMinute) != logicalDay
 
     /**
      * Test-only override for the wall clock that [today] reads.
@@ -208,8 +169,18 @@ object DayResolver {
      * The wall-clock reading comes from [clock] (the pinned test clock when set,
      * otherwise the real device clock); the resulting instant is then run through
      * [resolve] so the configured day-change boundary is honoured either way.
+     *
+     * THIS IS THE ONE PLACE THE DEVICE ZONE STILL DECIDES. The frame comes from
+     * [utcOffsetSeconds] for the current instant, because "today" is a question
+     * about where the user is now, not about where an entry was written. Mixing
+     * the two is deliberate and its consequence is known: after a flight, entries
+     * can drop out of the Today screen or appear on it (see the comment at the
+     * call site that determines the screen's day).
      */
-    fun today(changeHour: Int, changeMinute: Int): String = resolve(clock().millis(), changeHour, changeMinute)
+    fun today(changeHour: Int, changeMinute: Int): String {
+        val now = clock().millis()
+        return resolve(now, utcOffsetSeconds(now), changeHour, changeMinute)
+    }
 
     // ── The recorded local frame ─────────────────────────────────────────────
     //
@@ -237,6 +208,19 @@ object DayResolver {
      * logged in winter records the winter offset even if it is written from a
      * summer clock.
      *
+     * AN OFFSET, NOT A ZONE NAME, AND THAT IS A PRIVACY DECISION. A name like
+     * `Europe/Berlin` is an address at country level; `+01:00` covers a strip
+     * from the North Cape to Lagos. For an app that calls itself
+     * privacy-friendly, that difference decides it.
+     *
+     * WHAT FOLLOWS FROM IT. An offset says how the clock ran at the moment of the
+     * reading; only a name would say how it ran on another day. So a date moved
+     * across a daylight-saving boundary cannot be kept in its own frame, and the
+     * app reads the DEVICE zone for the new instant — on the assumption that the
+     * phone is where its owner is, the same assumption logging an entry makes.
+     * Move a Berlin entry's date while standing in Tokyo and you get the Tokyo
+     * offset, with the instant jumping eight hours. That is accepted.
+     *
      * @param timestampMillis Unix timestamp in milliseconds (UTC).
      * @param zoneId          Timezone to read the offset from. Defaults to the
      *                        device zone, which is what a live log wants.
@@ -247,28 +231,20 @@ object DayResolver {
     /**
      * The local wall-clock time of [timestampMillis] in the frame [utcOffsetSeconds].
      *
-     * NULL MEANS "NOT RECORDED", NOT "UTC". Entries written before the offset
-     * existed, and entries read from a backup that predates it, carry no frame.
-     * They fall back to what the app did for all of them until now: the device
-     * zone's rules for that instant. For anyone who has not changed zones that
-     * reproduces the previous display exactly, and it gets past daylight-saving
-     * switches right, because the rules are historical rather than current.
+     * NO FALLBACK, AND NO ZONE. Until schema 4 the offset could be `null` —
+     * "written before the column existed" — and this function derived a
+     * replacement from the device zone on every read. `MIGRATION_3_4` wrote that
+     * same replacement into the rows once and made the column `NOT NULL`, so the
+     * second code path had nothing left to answer for and is gone. What remains
+     * is the reading the entry recorded, read back as it was taken.
      *
      * @param timestampMillis  Unix timestamp in milliseconds (UTC).
-     * @param utcOffsetSeconds The recorded offset, or `null` when the entry
-     *                         predates the column.
-     * @param zoneId           Zone used for the fallback only.
+     * @param utcOffsetSeconds The offset the reading was taken in, in seconds.
      */
-    fun localDateTime(
-        timestampMillis: Long,
-        utcOffsetSeconds: Int?,
-        zoneId: ZoneId = ZoneId.systemDefault(),
-    ): LocalDateTime {
-        val instant = Instant.ofEpochMilli(timestampMillis)
-        val offset = utcOffsetSeconds?.let(ZoneOffset::ofTotalSeconds)
-            ?: zoneId.rules.getOffset(instant)
-        return LocalDateTime.ofInstant(instant, offset)
-    }
+    fun localDateTime(timestampMillis: Long, utcOffsetSeconds: Int): LocalDateTime = LocalDateTime.ofInstant(
+        Instant.ofEpochMilli(timestampMillis),
+        ZoneOffset.ofTotalSeconds(utcOffsetSeconds),
+    )
 
     /**
      * Parses a canonical `"YYYY-MM-DD"` date.

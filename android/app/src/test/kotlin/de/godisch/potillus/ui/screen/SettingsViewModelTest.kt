@@ -54,6 +54,7 @@ package de.godisch.potillus.ui.screen
 // =============================================================================
 
 import app.cash.turbine.test
+import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.data.repository.ImportStats
 import de.godisch.potillus.domain.SharedTestVectors
 import de.godisch.potillus.domain.model.*
@@ -211,14 +212,14 @@ class SettingsViewModelTest {
 
         backupRepo.replaceResult = ImportStats(imported = 5, skipped = 0)
         // Call importReplace directly on the fake to simulate the path.
-        backupRepo.importReplace(emptyList(), emptyList())
+        backupRepo.importReplace(emptyList(), emptyList(), BackupDayChange(hour = 4, minute = 0))
         assertEquals(5, backupRepo.replaceResult.imported)
         assertNotNull(backupRepo.lastReplaceCall)
     }
 
     @Test fun `importBackup MERGE calls backupRepo importMerge`() = runTest(dispatcher) {
         backupRepo.mergeResult = ImportStats(imported = 3, skipped = 2)
-        backupRepo.importMerge(emptyList(), emptyList())
+        backupRepo.importMerge(emptyList(), emptyList(), BackupDayChange(hour = 4, minute = 0))
         assertEquals(3, backupRepo.mergeResult.imported)
         assertEquals(2, backupRepo.mergeResult.skipped)
         assertNotNull(backupRepo.lastMergeCall)
@@ -235,7 +236,7 @@ class SettingsViewModelTest {
             awaitItem()
             // Trigger directly – simulates the repository failure path
             try {
-                backupRepo.importReplace(emptyList(), emptyList())
+                backupRepo.importReplace(emptyList(), emptyList(), BackupDayChange(hour = 4, minute = 0))
             } catch (_: RuntimeException) { /* expected */ }
             cancelAndIgnoreRemainingEvents()
         }

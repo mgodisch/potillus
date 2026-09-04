@@ -231,11 +231,18 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
     public var gramsAlcohol: Double
     public var timestampMillis: Int64
 
-    /// The UTC offset in force where and when the drink was logged, which is the
-    /// frame its clock time is read in. `nil` for entries written before the
-    /// field existed and for backups that predate it; see
-    /// `DayResolver.displayTimeZone`.
-    public var utcOffsetSeconds: Int?
+    /// The UTC offset in force where and when the drink was logged. Together with
+    /// `timestampMillis` it is the WALL-CLOCK READING the user made, and it is
+    /// the frame both the displayed time and `logicalDate` are derived in. Every
+    /// entry carries one: schema 4 backfilled the rows written before the column
+    /// existed and made it NOT NULL, and an import fills it from the device zone
+    /// for a backup file that predates the field.
+    public var utcOffsetSeconds: Int
+
+    /// The LOGICAL day this entry belongs to (`yyyy-MM-dd`), DERIVED from the two
+    /// values above through `DayResolver.resolve`. Stored rather than recomputed
+    /// on every read, and rewritten from the reading whenever the day-change time
+    /// moves — see `logical_day_key` and `EntryRepositoryProtocol.realignDays`.
     public var logicalDate: String
     public var note: String
 
@@ -249,7 +256,7 @@ public struct ConsumptionEntry: Sendable, Equatable, Identifiable {
         timestampMillis: Int64,
         logicalDate: String,
         note: String = "",
-        utcOffsetSeconds: Int? = nil
+        utcOffsetSeconds: Int
     ) {
         self.id = id
         self.drinkId = drinkId
@@ -306,6 +313,15 @@ public struct AppSettings: Sendable, Equatable, Codable {
     public var weeklyLimitGrams: Double
     public var maxDrinkDaysPerWeek: Int
 
+    /// A LOGICAL day, like every other date it is compared against: an entry is
+    /// in or out of the evaluations by the day it counts toward, not by the
+    /// calendar day its reading falls on.
+    ///
+    /// MOVING `dayChangeHour` THEREFORE MOVES ENTRIES ACROSS THIS FLOOR, and can
+    /// lengthen or shorten a past abstinence streak. That is intended: the
+    /// figures answer under the boundary the user has set, not under the one they
+    /// had when they logged.
+    ///
     /// Statistics start here, `yyyy-MM-dd`. Empty means NO lower bound at all —
     /// not "from the first entry": every period still runs from its own start
     /// (the 1st for a month, January for a year), so days before any data exists

@@ -40,7 +40,7 @@
  *   So a broken or missing migration fails this test instead of crashing a
  *   user's app on first launch after an update.
  *
- * WHEN YOU ADD A NEW MIGRATION (e.g. v2 → v3)
+ * WHEN YOU ADD A NEW MIGRATION (e.g. v3 → v4)
  *   1. Bump AppDatabase.version and add a Migration(2, 3) (registered in
  *      Room.databaseBuilder().addMigrations(...)).
  *   2. Build once so Room exports app/schemas/.../3.json — commit it.
@@ -158,6 +158,63 @@ class MigrationTest {
             assertTrue("a pre-migration row records no frame", c.isNull(0))
             assertEquals("2026-05-30", c.getString(1))
         }
+        db.close()
+    }
+
+    /**
+     * v3 → v4 backfills the offset, makes it `NOT NULL` and adds the key table
+     * (see [MIGRATION_3_4]).
+     *
+     * Three things are pinned here, and the third is the one that is easy to get
+     * wrong: `logicalDate` must come through UNTOUCHED. The migration does not
+     * read the day-change time and does not re-derive a single day; the first
+     * realignment in the repository does that, and it needs the old value to
+     * recognise a pre-0.85.0 calendar entry. A migration that helpfully
+     * recomputed the column here would destroy exactly that evidence.
+     *
+     * The backfilled offset is asserted as a RANGE rather than a number: it comes
+     * from the zone the emulator happens to be in, which is the point of doing it
+     * on the device instead of in SQL, and naming a value would tie the test to a
+     * particular emulator image.
+     */
+    @Test
+    @Throws(IOException::class)
+    fun migrate3To4_backfillsTheOffset_andLeavesTheDayAlone() {
+        helper.createDatabase(TEST_DB, 3).apply {
+            execSQL(
+                "INSERT INTO drinks (id, name, volumeMl, alcoholPercent, isPreset, isFavorite, category) " +
+                    "VALUES (1, 'Test Lager', 500, 5.0, 0, 0, 'BEER')",
+            )
+            // No utcOffsetSeconds: a row from before the column existed. The
+            // logical date deliberately contradicts the timestamp by five days,
+            // the signature of a calendar entry booked before v0.85.0.
+            execSQL(
+                "INSERT INTO entries " +
+                    "(id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol, timestampMillis, logicalDate, note) " +
+                    "VALUES (1, 1, 'Test Lager', 500, 5.0, 19.7, 1773183600000, '2026-03-05', '')",
+            )
+            close()
+        }
+
+        val db = helper.runMigrationsAndValidate(TEST_DB, 4, true, MIGRATION_3_4)
+
+        db.query("SELECT utcOffsetSeconds, logicalDate, timestampMillis FROM entries WHERE id = 1").use { c ->
+            assertTrue("the seeded entry must survive the migration", c.moveToFirst())
+            assertTrue("every row carries a frame afterwards", !c.isNull(0))
+            assertTrue("and it is a real offset", c.getInt(0) in -12 * 3600..14 * 3600)
+            assertEquals("the stored day is not re-derived here", "2026-03-05", c.getString(1))
+            assertEquals("nor is the instant moved here", 1773183600000L, c.getLong(2))
+        }
+
+        db.query("SELECT changeHour, changeMinute FROM logical_day_key").use { c ->
+            assertTrue("the key table holds exactly one row", c.moveToFirst())
+            assertTrue("and it says 'not derived yet'", c.isNull(0) && c.isNull(1))
+            assertEquals(1, c.count)
+        }
+
+        // The indices are recreated after the table rebuild, not inherited.
+        assertTrue(hasIndex(db, "entries", "index_entries_logicalDate"))
+        assertTrue(hasIndex(db, "entries", "index_entries_drinkId"))
         db.close()
     }
 

@@ -68,6 +68,7 @@ class PdfReportDataTest {
         gramsAlcohol = grams,
         timestampMillis = 0L,
         logicalDate = date,
+        utcOffsetSeconds = 0,
     )
 
     /** Two months of data: one over-limit day (25 g > 20 g) in January, one quiet day in February. */

@@ -78,11 +78,12 @@ import androidx.room.PrimaryKey
  * @param gramsAlcohol    Pre-calculated pure alcohol in grams (avoids re-computing
  *                        in SQL aggregate queries like SUM).
  * @param timestampMillis Unix epoch milliseconds (UTC) of the consumption.
- * @param utcOffsetSeconds UTC offset the entry was logged at, or `null` for an
- *                        entry written before this column existed. See
- *                        [de.godisch.potillus.domain.DayResolver.localDateTime]
- *                        for what `null` falls back to.
- * @param logicalDate     ISO-8601 "YYYY-MM-DD" as resolved by [de.godisch.potillus.domain.DayResolver].
+ * @param utcOffsetSeconds UTC offset the entry was logged at. NOT NULL since
+ *                        schema 4: `MIGRATION_3_4` backfilled every row that
+ *                        predated the column and rebuilt the table with the
+ *                        constraint, so no reader needs a fallback any more.
+ * @param logicalDate     ISO-8601 "YYYY-MM-DD", DERIVED from the two columns
+ *                        above. See the invariant below.
  * @param note            Optional free-text annotation.
  */
 @Entity(
@@ -106,12 +107,26 @@ data class EntryEntity(
     val alcoholPercent: Double,
     val gramsAlcohol: Double,
     val timestampMillis: Long,
+    // THE INVARIANT THIS COLUMN IS BOUND BY
+    //   `logicalDate` is not an independent fact. Whenever the key row in
+    //   `logical_day_key` is set, every row of this table satisfies
+    //
+    //       logicalDate == DayResolver.resolve(
+    //           timestampMillis, utcOffsetSeconds, key.changeHour, key.changeMinute)
+    //
+    //   The key records WHICH day-change time the column was last computed
+    //   under, so a half-finished rewrite is recognisable instead of silent, and
+    //   a changed setting can be answered by recomputing rather than by guessing.
+    //   A NULL key means "not computed yet" and is what a migration or an import
+    //   leaves behind; the next realignment picks it up. See
+    //   [de.godisch.potillus.data.repository.EntryRepository.realignDays].
     val logicalDate: String,
     val note: String = "",
-    // LAST, deliberately: `ALTER TABLE … ADD COLUMN` appends, so declaring it
-    // here makes a freshly created table and a migrated one carry their columns
-    // in the same order. Room validates the column SET rather than its order,
-    // but a database that differs depending on when it was created is a trap for
-    // the next person reading `PRAGMA table_info`.
-    val utcOffsetSeconds: Int? = null,
+    // LAST, still, but no longer for the original reason: that one appealed to
+    // `ALTER TABLE … ADD COLUMN` appending, which made a migrated table differ
+    // from a freshly created one unless the declaration matched. `MIGRATION_3_4`
+    // rebuilds the table, so both are now created the same way and the order is
+    // free. It is left untouched because moving it would churn the schema export
+    // and the shared contract for nothing.
+    val utcOffsetSeconds: Int,
 )

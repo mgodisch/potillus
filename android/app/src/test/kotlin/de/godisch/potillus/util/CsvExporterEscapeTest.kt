@@ -77,8 +77,9 @@ class CsvExporterEscapeTest {
             timestampMillis = 1_700_000_000_000L,
             logicalDate = "2026-01-01",
             note = "=danger",
+            utcOffsetSeconds = 0,
         )
-        val header = listOf("d", "t", "drink", "cat", "v", "a", "g", "n")
+        val header = listOf("d", "t", "drink", "cat", "v", "a", "g", "n", "ld")
         val csv = CsvExporter.buildCsv(header, listOf(entry), emptyList())
 
         assertTrue("must end with CRLF", csv.endsWith("\r\n"))

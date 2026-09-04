@@ -36,10 +36,11 @@ import Observation
 //
 // WHAT IS DERIVED, AND WHY THE CALLER MUST NOT PASS IT
 //   `gramsAlcohol` follows from volume and strength; `logicalDate` follows from
-//   the timestamp and the user's day-change hour. A view that COULD pass its own
-//   would eventually pass a wrong one — and a drink logged at 02:00 would stop
-//   counting towards the evening it belongs to. Only the facts the user actually
-//   chose (which drink, how much, when, a note) cross this boundary.
+//   the reading — the timestamp and the frame it was taken in — and the user's
+//   day-change hour. A view that COULD pass its own would eventually pass a wrong
+//   one, and a drink logged at 02:00 would stop counting towards the evening it
+//   belongs to. Only the facts the user actually chose cross this boundary: which
+//   drink, how much, the reading, a note.
 // =============================================================================
 
 /// Builds and stores consumption entries.
@@ -71,29 +72,21 @@ public struct EntryLogger: Sendable {
     ///
     /// Pure: no I/O, so the derivation can be tested without a database.
     ///
-    /// - Parameter logicalDate: The day the entry BELONGS TO, `yyyy-MM-dd`. Nil —
-    ///   the default, and what the Today screen passes — derives it from
-    ///   `timestampMillis` through the user's day-change boundary, which is right
-    ///   when the entry is being logged as it happens.
+    /// THE DAY IS NOT A PARAMETER. It used to be, because the sheet offered hours
+    /// and minutes and someone had to say which day a bare time belonged to. The
+    /// sheet composes the whole reading now, and the repository derives the day
+    /// from it, so the only day this can produce is the one the reading falls on.
     ///
-    ///   The Calendar screen passes a date, because there the two genuinely differ:
-    ///   the user picks a day in the past and records a drink they had then, so the
-    ///   TIMESTAMP is the moment of typing while the DAY is the one they chose. The
-    ///   fields exist separately on `ConsumptionEntry` for exactly this, and Android
-    ///   has always used them so — `CalendarViewModel.addEntry` hands the selected
-    ///   date to `entryRepo.addFromDrinkWithDate`, and its `updateEntry` documents
-    ///   that calendar entries "are deliberately assigned to a specific date that
-    ///   may differ from the wall-clock date of the timestamp". iOS could not say
-    ///   that until now: the derivation was unconditional, so an entry booked for
-    ///   the 12th would have landed on today.
+    /// - Parameter utcOffsetSeconds: The frame the reading was taken in, as the
+    ///   sheet determined it — which is not always the device's current one: an
+    ///   edit that leaves the date alone keeps the frame it was recorded in.
     public static func makeEntry(
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Int64,
+        utcOffsetSeconds: Int,
         note: String,
-        settings: AppSettings,
-        timeZone: TimeZone,
-        logicalDate: String? = nil
+        settings: AppSettings
     ) -> ConsumptionEntry {
         ConsumptionEntry(
             drinkId: drink.id,
@@ -104,63 +97,45 @@ public struct EntryLogger: Sendable {
                 volumeMl: volumeMl, alcoholPercent: drink.alcoholPercent
             ),
             timestampMillis: timestampMillis,
-            logicalDate: logicalDate ?? DayResolver.resolve(
+            logicalDate: DayResolver.resolve(
                 timestampMillis: timestampMillis,
+                utcOffsetSeconds: utcOffsetSeconds,
                 changeHour: settings.dayChangeHour,
-                changeMinute: settings.dayChangeMinute,
-                timeZone: timeZone
+                changeMinute: settings.dayChangeMinute
             ),
             note: note,
-            // The local frame is recorded here, beside the logical date and for
-            // the same reason: both are facts about where and when the drink was
-            // logged, and neither survives being re-derived later. Recorded even
-            // when the DATE comes from a calendar selection — the time of day is
-            // still a wall-clock reading the user made here and now.
-            utcOffsetSeconds: DayResolver.utcOffsetSeconds(
-                timestampMillis: timestampMillis, timeZone: timeZone
-            )
+            utcOffsetSeconds: utcOffsetSeconds
         )
     }
 
-    /// Stores a new entry, defaulting the instant to now.
+    /// Stores a new entry.
     ///
-    /// - Parameter logicalDate: See `makeEntry`. Nil derives the day from the
-    ///   instant; the Calendar screen passes the day the user selected.
+    /// - Parameters:
+    ///   - timestampMillis: The reading the sheet composed; `nil` defaults to now.
+    ///   - utcOffsetSeconds: The frame it is read in; `nil` reads the device zone
+    ///     for that instant, which is what a caller without a sheet means.
     @discardableResult
     public func log(
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Int64? = nil,
-        note: String = "",
-        logicalDate: String? = nil
+        utcOffsetSeconds: Int? = nil,
+        note: String = ""
     ) async throws -> ConsumptionEntry {
         let settings = await preferences.load()
-        // The day is the screen's, the time is the user's (v0.86.0): without an
-        // explicit day the entry belongs to TODAY — the logical day now — and
-        // the typed time is placed on the calendar day that keeps it there, so
-        // "02:00" typed in the evening is stored on the next calendar day and
-        // still counts for tonight. `TodayModel.addEntry` applies the same rule.
-        let day = logicalDate ?? DayResolver.resolve(
-            timestampMillis: nowMillis(),
-            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
-            timeZone: timeZone
+        let instant = timestampMillis ?? nowMillis()
+        let offset = utcOffsetSeconds ?? DayResolver.utcOffsetSeconds(
+            timestampMillis: instant, timeZone: timeZone
         )
-        let typed = timestampMillis ?? nowMillis()
-        let placed = DayResolver.instant(
-            logicalDate: day, matchingTimeOf: typed,
-            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
-            timeZone: timeZone
-        ) ?? typed
         let entry = Self.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: placed,
+            timestampMillis: instant,
+            utcOffsetSeconds: offset,
             note: note,
-            settings: settings,
-            timeZone: timeZone,
-            logicalDate: day
+            settings: settings
         )
-        _ = try entries.add(entry)
+        _ = try entries.add(entry, settings: settings)
         return entry
     }
 
@@ -170,8 +145,8 @@ public struct EntryLogger: Sendable {
     public func todayContext() async -> LoggingDay {
         let settings = await preferences.load()
         return LoggingDay(
-            logical: DayResolver.resolve(
-                timestampMillis: nowMillis(),
+            logical: DayResolver.today(
+                now: nowMillis(),
                 changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
                 timeZone: timeZone
             ),
@@ -234,8 +209,8 @@ public final class EntryLogModel {
         drink: DrinkDefinition,
         volumeMl: Int,
         timestampMillis: Int64? = nil,
-        note: String = "",
-        logicalDate: String? = nil
+        utcOffsetSeconds: Int? = nil,
+        note: String = ""
     ) async -> Bool {
         failure = nil
         do {
@@ -243,8 +218,8 @@ public final class EntryLogModel {
                 drink: drink,
                 volumeMl: volumeMl,
                 timestampMillis: timestampMillis,
-                note: note,
-                logicalDate: logicalDate
+                utcOffsetSeconds: utcOffsetSeconds,
+                note: note
             )
             return true
         } catch {

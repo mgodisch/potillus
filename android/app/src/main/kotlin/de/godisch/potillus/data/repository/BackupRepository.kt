@@ -60,14 +60,70 @@ import androidx.room.withTransaction
 import de.godisch.potillus.data.db.AppDatabase
 import de.godisch.potillus.data.db.dao.DrinkDao
 import de.godisch.potillus.data.db.dao.EntryDao
+import de.godisch.potillus.data.db.dao.LogicalDayKeyDao
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
+
+// =============================================================================
+// WHAT AN IMPORT DOES TO THE DERIVED LOGICAL DAY
+// =============================================================================
+//
+// This class writes rows into `entries` without deriving their day — it inserts
+// what the file holds, remapped ids and all. That is exactly the situation the
+// key in `logical_day_key` exists for, and the rule is stated once, here:
+//
+//   ANY PATH THAT INSERTS ROWS OR MOVES THEIR READING WITHOUT DERIVING THE DAY
+//   INVALIDATES THE KEY.
+//
+// So both import modes end by setting it back to "not computed yet". The next
+// realignment — one settings emission away — then derives every day in the table
+// under THIS device's boundary, which is what makes a backup written under a
+// different day-change time land on the days that hold here.
+//
+// The one thing taken from the file's own boundary is the repair of pre-0.85.0
+// calendar entries: it has to put a wall-clock time back onto the day the file
+// names, and only the file's boundary says where that day started. Without the
+// repair an old backup would import precisely the damage the realignment
+// removes from local rows.
+// =============================================================================
 
 class BackupRepository(
     private val entryDao: EntryDao,
     private val drinkDao: DrinkDao,
+    private val keyDao: LogicalDayKeyDao,
     private val db: AppDatabase,
 ) : IBackupRepository {
+
+    /**
+     * The backup's entries with the pre-0.85.0 calendar damage undone.
+     *
+     * Applied before the rows are inserted, and NOT inside the transaction on
+     * purpose: it is pure arithmetic over values already in memory, and holding
+     * a write transaction open across it would lock the database for no reason.
+     *
+     * The MERGE duplicate check runs on the repaired timestamps, which is what
+     * lets a re-import recognise a row it repaired the first time round — as long
+     * as the two runs compute the same repair, i.e. same file boundary and same
+     * device zone. Under a changed zone the instants differ and the row comes in
+     * twice; the alternative, matching on the unrepaired timestamp, would fail
+     * against local rows that the realignment repaired instead.
+     */
+    private fun repaired(
+        backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
+    ): List<ConsumptionEntry> = backupEntries.map { entry ->
+        val fixed = LegacyDayRepair.repair(
+            timestampMillis = entry.timestampMillis,
+            utcOffsetSeconds = entry.utcOffsetSeconds,
+            logicalDate = entry.logicalDate,
+            changeHour = dayChange.hour,
+            changeMinute = dayChange.minute,
+        ) ?: return@map entry
+        entry.copy(
+            timestampMillis = fixed.timestampMillis,
+            utcOffsetSeconds = fixed.utcOffsetSeconds,
+        )
+    }
 
     /**
      * REPLACE import: wipes all entries and ALL drinks (presets included), then
@@ -83,8 +139,10 @@ class BackupRepository(
     override suspend fun importReplace(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats {
         var imported = 0
+        val incoming = repaired(backupEntries, dayChange)
         db.withTransaction {
             entryDao.deleteAll()
             drinkDao.deleteAllDrinks()
@@ -108,7 +166,7 @@ class BackupRepository(
 
             val idMap = buildIdMap(backupDrinks, existingByName)
 
-            backupEntries.forEach { entry ->
+            incoming.forEach { entry ->
                 // Use insertOrReplace (REPLACE strategy) here because backup
                 // entries are re-inserted with id=0 (remapped), which means Room will
                 // auto-generate a fresh primary key anyway. REPLACE is semantically
@@ -118,6 +176,8 @@ class BackupRepository(
                 entryDao.insertOrReplace(remapped.toEntity())
                 imported++
             }
+            // Rows went in without a derived day; see the file header.
+            keyDao.invalidate()
         }
         return ImportStats(imported, skipped = 0)
     }
@@ -133,9 +193,11 @@ class BackupRepository(
     override suspend fun importMerge(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats {
         var imported = 0
         var skipped = 0
+        val incoming = repaired(backupEntries, dayChange)
         db.withTransaction {
             // Build the name → id map INSIDE the transaction (mirroring
             // importReplace), so this read is part of the same atomic unit as the
@@ -148,7 +210,7 @@ class BackupRepository(
 
             val idMap = buildIdMap(backupDrinks, existingByName)
 
-            backupEntries.forEach { entry ->
+            incoming.forEach { entry ->
                 val remapped = entry.copy(id = 0, drinkId = requireMapped(idMap, entry.drinkId))
                 if (entryDao.countByTimestampAndDrink(remapped.timestampMillis, remapped.drinkId) > 0) {
                     skipped++
@@ -159,6 +221,8 @@ class BackupRepository(
                     imported++
                 }
             }
+            // Rows went in without a derived day; see the file header.
+            keyDao.invalidate()
         }
         return ImportStats(imported, skipped)
     }

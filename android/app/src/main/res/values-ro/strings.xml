@@ -79,6 +79,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Selectați o băutură …</string>
     <string name="volume_ml">Cantitate</string>
     <string name="time">Oră</string>
+    <string name="date">Dată</string>
+    <string name="entry_counts_toward">Se contabilizează la %1$s</string>
     <string name="pure_alcohol">g alcool pur</string>
     <string name="note">Notă (opțional)</string>
 
@@ -245,6 +247,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alcool_procent</string>
     <string name="csv_col_grams">Grame_alcool</string>
     <string name="csv_col_note">Notă</string>
+    <string name="csv_col_logical_date">Zi_logică</string>
     <string name="pdf_unit_g_per_day">g/zi</string>
     <!-- Drinking-days and weekly gram mode -->
     <string name="drink_days_label">zile de consum (ultimele 7 zile)</string>

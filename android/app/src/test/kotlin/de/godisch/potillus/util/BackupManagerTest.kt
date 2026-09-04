@@ -40,6 +40,7 @@ package de.godisch.potillus.util
 //   version (2). Tests that need invalid values override specific fields.
 // =============================================================================
 
+import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.util.BackupManager.ImportError
@@ -260,16 +261,23 @@ class BackupManagerTest {
         assertEquals(19.7, result.entries.first().gramsAlcohol, 0.001)
     }
 
-    @Test fun `utcOffsetSeconds is optional and absent means null`() {
-        // Every file written before the field existed lacks it. Its absence is
-        // not an error; the entry simply records no frame.
+    @Test fun `utcOffsetSeconds is optional on the wire and filled when absent`() {
+        // Every file written before the field existed lacks it, and that is not an
+        // error. It is no longer carried as "unknown" either: the column is NOT
+        // NULL from schema 4 on, so the parser fills the frame from the device
+        // zone for that instant — the same replacement every read derived while
+        // the column was nullable.
         val json = buildBackupJson(
             drinks = listOf(drinkJson(id = 1)),
             entries = listOf(entryJson(drinkId = 1)),
         )
         val result = BackupManager.parseBackupJson(json)
         assertNull(result.error)
-        assertNull(result.entries.first().utcOffsetSeconds)
+        val entry = result.entries.first()
+        assertEquals(
+            DayResolver.utcOffsetSeconds(entry.timestampMillis),
+            entry.utcOffsetSeconds,
+        )
     }
 
     @Test fun `utcOffsetSeconds survives the round trip`() {

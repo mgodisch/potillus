@@ -139,33 +139,47 @@ class TodayViewModelTest {
         // the drink sits on yesterday's logical day two hours ago; the screen's
         // own figures must stay at zero and the estimate must not.
         prefs = FakeAppPreferences(AppSettings(weightKg = 75.0, dayChangeHour = 4))
-        val now = System.currentTimeMillis()
-        val yesterday = DayResolver.formatDate(
-            DayResolver.parseDate(DayResolver.today(4, 0)).minusDays(1),
-        )
-        entryRepo.add(
-            ConsumptionEntry(
-                drinkId = 1,
-                drinkName = "Lager",
-                volumeMl = 500,
-                alcoholPercent = 5.0,
-                gramsAlcohol = 19.7,
-                timestampMillis = now - 2 * AlcoholCalculator.MILLIS_PER_HOUR.toLong(),
-                logicalDate = yesterday,
-            ),
-        )
-        val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
-
-        vm.uiState.test {
-            val state = awaitItem()
-            assertTrue("yesterday's drink must not appear in today's list", state.entries.isEmpty())
-            assertEquals("today's total must stay at zero", 0.0, state.totalGrams, 0.0)
-            val bac = state.bacPermille
-            assertTrue(
-                "the estimate must not vanish at the day boundary",
-                bac != null && bac > 0.0,
+        // THE CLOCK IS PINNED, and it has to be. "Two hours ago" and "yesterday"
+        // used to be independent facts a test could just assert side by side;
+        // since the logical day is DERIVED from the reading, the situation only
+        // arises in the small hours. So now is 05:00 local and the drink sits at
+        // 03:00 — two hours back for the estimate, and before the 04:00 boundary,
+        // so it belongs to the day before.
+        val zone = java.time.ZoneId.systemDefault()
+        val justAfterTheBoundary =
+            java.time.LocalDate.of(2026, 6, 10).atTime(5, 0).atZone(zone).toInstant()
+        DayResolver.clockOverride = java.time.Clock.fixed(justAfterTheBoundary, zone)
+        try {
+            val loggedAt = justAfterTheBoundary.toEpochMilli() -
+                2 * AlcoholCalculator.MILLIS_PER_HOUR.toLong()
+            entryRepo.add(
+                ConsumptionEntry(
+                    drinkId = 1,
+                    drinkName = "Lager",
+                    volumeMl = 500,
+                    alcoholPercent = 5.0,
+                    gramsAlcohol = 19.7,
+                    timestampMillis = loggedAt,
+                    logicalDate = "",
+                    utcOffsetSeconds = DayResolver.utcOffsetSeconds(loggedAt),
+                ),
+                AppSettings(dayChangeHour = 4),
             )
-            cancelAndIgnoreRemainingEvents()
+            val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
+
+            vm.uiState.test {
+                val state = awaitItem()
+                assertTrue("yesterday's drink must not appear in today's list", state.entries.isEmpty())
+                assertEquals("today's total must stay at zero", 0.0, state.totalGrams, 0.0)
+                val bac = state.bacPermille
+                assertTrue(
+                    "the estimate must not vanish at the day boundary",
+                    bac != null && bac > 0.0,
+                )
+                cancelAndIgnoreRemainingEvents()
+            }
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
         }
     }
 
@@ -184,33 +198,45 @@ class TodayViewModelTest {
     }
 
     /**
-     * The day is the screen's, the time is the user's: a time typed before the
-     * day-change boundary is placed on the calendar day that keeps the entry on
-     * TODAY. Until v0.86.0 "02:00" logged in the small hours resolved to yesterday
-     * and vanished from the screen it was logged on.
+     * THE READING IS PASSED THROUGH, NOT PLACED. The sheet composes an instant
+     * from its own date and time fields and the view model stores it as given;
+     * the day follows from it. Until the sheet had a date, this method moved a
+     * night-hour time onto the calendar day that kept the entry on today, because
+     * a bare time had to be filed somewhere.
      */
-    @Test fun `addEntry keeps a night-hour time on today`() = runTest(dispatcher) {
+    @Test fun `addEntry stores the instant the sheet composed`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
         val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
         val today = DayResolver.today(4, 0)
-        // 02:00 on today's CALENDAR date — which, resolved, would be yesterday.
+        // 02:00 on today's CALENDAR date, which counts toward YESTERDAY. That is
+        // what the sheet would have said before the user saved.
         val typed = java.time.LocalDate.parse(today).atTime(2, 0)
             .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
 
         vm.addEntry(beer, 500, typed, "")
 
         val stored = entryRepo.allEntries.single()
-        assertEquals(today, stored.logicalDate)
-        assertEquals(today, DayResolver.resolve(stored.timestampMillis, 4, 0))
-        assertEquals(java.time.LocalDate.parse(today).plusDays(1).toString(), DayResolver.calendarDate(stored.timestampMillis))
+        assertEquals("the instant is stored untouched", typed, stored.timestampMillis)
+        assertEquals(
+            "and the day follows from it",
+            DayResolver.resolve(typed, stored.utcOffsetSeconds, 4, 0),
+            stored.logicalDate,
+        )
+        assertEquals(
+            "which for a 02:00 reading is the day before today",
+            java.time.LocalDate.parse(today).minusDays(1).toString(),
+            stored.logicalDate,
+        )
     }
 
     /**
-     * Editing keeps the entry on its logical day: 05:00 corrected to 02:00 stays
-     * today, placed on the next calendar day. Until v0.86.0 the day was re-resolved
-     * from the new time and the entry moved to yesterday.
+     * An edit that crosses the boundary MOVES the entry, and that is the point.
+     * 05:00 corrected to 02:00 counts toward the day before; the sheet named that
+     * day before the save. Until the sheet had a date, this method placed the new
+     * time on whatever calendar day kept the entry where it was, so correcting a
+     * time silently changed the calendar day the row sat on.
      */
-    @Test fun `updateEntry keeps the entry on its logical day`() = runTest(dispatcher) {
+    @Test fun `updateEntry lets an edited time move the entry`() = runTest(dispatcher) {
         val beer = DrinkDefinition(id = 1, name = "Lager", volumeMl = 500, alcoholPercent = 5.0)
         val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
         val today = DayResolver.today(4, 0)
@@ -225,8 +251,11 @@ class TodayViewModelTest {
         vm.updateEntry(stored.copy(timestampMillis = twoAm))
 
         val edited = entryRepo.allEntries.single()
-        assertEquals(today, edited.logicalDate)
-        assertEquals(today, DayResolver.resolve(edited.timestampMillis, 4, 0))
+        assertEquals(twoAm, edited.timestampMillis)
+        assertEquals(
+            java.time.LocalDate.parse(today).minusDays(1).toString(),
+            edited.logicalDate,
+        )
         assertEquals(2, DayResolver.localDateTime(edited.timestampMillis, edited.utcOffsetSeconds).hour)
     }
 
@@ -299,9 +328,9 @@ class TodayViewModelTest {
                 AppSettings(dayChangeHour = 4, dayChangeMinute = 0, statsFromDate = floor),
             )
             // Pre-floor grams that must NOT enter the monthly average …
-            entryRepo.add(monthEntry(id = 1, date = preFloorDay, grams = 60.0))
+            entryRepo.add(monthEntry(id = 1, date = preFloorDay, grams = 60.0), AppSettings())
             // … and the in-range grams that alone define it.
-            entryRepo.add(monthEntry(id = 2, date = inRangeDay, grams = 10.0))
+            entryRepo.add(monthEntry(id = 2, date = inRangeDay, grams = 10.0), AppSettings())
 
             val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
             vm.uiState.test {
@@ -339,8 +368,8 @@ class TodayViewModelTest {
         )
         try {
             val today = java.time.LocalDate.parse(DayResolver.today(4, 0))
-            entryRepo.add(monthEntry(id = 1, date = today.minusDays(4).toString(), grams = 20.0))
-            entryRepo.add(monthEntry(id = 2, date = today.minusDays(2).toString(), grams = 0.0))
+            entryRepo.add(monthEntry(id = 1, date = today.minusDays(4).toString(), grams = 20.0), AppSettings())
+            entryRepo.add(monthEntry(id = 2, date = today.minusDays(2).toString(), grams = 0.0), AppSettings())
 
             val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
             vm.uiState.test {
@@ -368,8 +397,8 @@ class TodayViewModelTest {
         )
         try {
             val today = java.time.LocalDate.parse(DayResolver.today(4, 0))
-            entryRepo.add(monthEntry(id = 1, date = today.minusDays(6).toString(), grams = 20.0))
-            entryRepo.add(monthEntry(id = 2, date = today.toString(), grams = 12.0))
+            entryRepo.add(monthEntry(id = 1, date = today.minusDays(6).toString(), grams = 20.0), AppSettings())
+            entryRepo.add(monthEntry(id = 2, date = today.toString(), grams = 12.0), AppSettings())
 
             val vm = TodayViewModel(entryRepo, drinkRepo, prefs)
             vm.uiState.test {
@@ -390,9 +419,13 @@ class TodayViewModelTest {
         volumeMl = 500,
         alcoholPercent = 5.0,
         gramsAlcohol = grams,
+        // NOON, not midnight, and read at +00:00. The repository derives the day
+        // from the reading, and midnight is before the 04:00 boundary — every
+        // seeded entry would land on the day before the one the case names.
         timestampMillis = java.time.LocalDate.parse(date)
-            .atStartOfDay(java.time.ZoneOffset.UTC).toInstant().toEpochMilli(),
+            .atTime(12, 0).toInstant(java.time.ZoneOffset.UTC).toEpochMilli(),
         logicalDate = date,
+        utcOffsetSeconds = 0,
     )
 
     // ── Logical-day rollover while subscribed (v0.79.0 QA regression) ─────────

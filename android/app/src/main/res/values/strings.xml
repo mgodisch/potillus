@@ -113,6 +113,12 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="volume_ml">Amount</string>
     <!-- Entry dialog: 'Time' field label and the time-picker dialog title. -->
     <string name="time">Time</string>
+    <!-- Entry dialog: 'Date' field label and the date-picker dialog title. -->
+    <string name="date">Date</string>
+    <!-- Entry dialog: shown under the date and time when the reading falls on a
+         logical day other than the one the dialog was opened on. %1$s is that day,
+         formatted medium-length in the app's language. -->
+    <string name="entry_counts_toward">Counts toward %1$s</string>
     <!-- Suffix after the computed grams preview ('g Pure Alcohol') in entry/drink dialogs. -->
     <string name="pure_alcohol">g Pure Alcohol</string>
     <!-- Entry dialog: optional note field label. -->
@@ -380,6 +386,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alcohol_Percent</string>
     <string name="csv_col_grams">Grams_Alcohol</string>
     <string name="csv_col_note">Note</string>
+    <string name="csv_col_logical_date">Logical_Day</string>
     <!-- Unit used inside the PDF ('g/day'). -->
     <string name="pdf_unit_g_per_day">g/day</string>
     <!-- Today/Components: 'Drinking Days (last 7 days)' bar label. -->

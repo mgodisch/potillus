@@ -42,6 +42,16 @@ import kotlinx.coroutines.flow.Flow
 // MULTILINE SQL:
 //   Kotlin's triple-quoted strings ("""…""") let you write readable,
 //   indented SQL. Room strips leading whitespace and newlines at compile time.
+//
+// THE LOGICAL DAY IS NEVER EXPRESSED IN SQL
+//   `entries.logicalDate` is a DERIVATION (see EntryEntity), so a query could in
+//   principle compute it from `timestampMillis + utcOffsetSeconds * 1000` and
+//   drop the column. It must not. The rule lives in `DayResolver.resolve`,
+//   pinned across both platforms by `test-vectors/day-resolver.json`; an SQL
+//   expression would be a second copy of it in a third language, with its own
+//   integer arithmetic, its own behaviour on negative values and no vectors.
+//   Every query below therefore filters and groups on the stored column, and a
+//   query that computes the day itself is a defect however fast it runs.
 // =============================================================================
 
 /**
@@ -177,6 +187,19 @@ interface EntryDao {
     /** Updates all columns of an existing entry. */
     @Update
     suspend fun update(entry: EntryEntity)
+
+    /**
+     * Updates every entry in [entries], in one statement batch.
+     *
+     * For the realignment, which rewrites `logicalDate` on rows it has just read
+     * back. Room binds a prepared statement once and executes it per element,
+     * which is what makes a whole-table rewrite a single round trip through the
+     * driver instead of one per row. The caller is responsible for the enclosing
+     * transaction; without one, SQLite would open and commit a transaction per
+     * statement and a crash could stop the rewrite halfway.
+     */
+    @Update
+    suspend fun updateAll(entries: List<EntryEntity>)
 
     /** Deletes the given entry row. */
     @Delete

@@ -96,29 +96,34 @@ public enum CsvExporter {
     ///   - headerCells: The localised column captions, in column order.
     ///   - entries: The consumption entries to serialise, one row each.
     ///   - drinks: The drink catalogue, used to resolve each entry's category.
-    ///   - timeZone: The zone the `HH:mm` column is rendered in.
     /// - Returns: The complete CSV text, CRLF-terminated per RFC 4180.
     public static func buildCsv(
         headerCells: [String],
         entries: [ConsumptionEntry],
-        drinks: [DrinkDefinition],
-        timeZone: TimeZone = .current
+        drinks: [DrinkDefinition]
     ) -> String {
         // O(1) category lookups.
         var categoryById: [Int64: DrinkCategory] = [:]
         for drink in drinks { categoryById[drink.id] = drink.category }
 
         // One formatter per frame, not per row: an export is almost always a
-        // single frame, and building a DateFormatter is the expensive part.
-        // `timeZone` is the fallback for entries that recorded none.
-        var formatters: [Int: DateFormatter] = [:]
+        // single frame, and building a DateFormatter is the expensive part. There
+        // is no fallback zone any more — schema 4 gave every row a frame — so
+        // this function no longer needs a zone of its own.
+        var timeFormatters: [Int: DateFormatter] = [:]
         func timeFormatter(for entry: ConsumptionEntry) -> DateFormatter {
-            let zone = DayResolver.displayTimeZone(
-                utcOffsetSeconds: entry.utcOffsetSeconds, fallback: timeZone
-            )
-            if let cached = formatters[zone.secondsFromGMT()] { return cached }
+            let zone = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
+            if let cached = timeFormatters[zone.secondsFromGMT()] { return cached }
             let made = Self.timeFormatter(for: zone)
-            formatters[zone.secondsFromGMT()] = made
+            timeFormatters[zone.secondsFromGMT()] = made
+            return made
+        }
+        var dateFormatters: [Int: DateFormatter] = [:]
+        func dateFormatter(for entry: ConsumptionEntry) -> DateFormatter {
+            let zone = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
+            if let cached = dateFormatters[zone.secondsFromGMT()] { return cached }
+            let made = Self.dateFormatter(for: zone)
+            dateFormatters[zone.secondsFromGMT()] = made
             return made
         }
 
@@ -132,7 +137,13 @@ public enum CsvExporter {
             let category = categoryById[entry.drinkId] ?? .other
 
             return [
-                entry.logicalDate,
+                // THE CALENDAR DAY OF THE READING, not the logical one. Columns 1
+                // and 2 describe the same moment: an entry read at 01:00 exports
+                // its own date beside its own time. The logical day it counts
+                // toward has a column of its own at the end. Before v0.87.0 column
+                // 1 held the logical day, so a night entry's date and time
+                // contradicted each other and nothing in the file said why.
+                dateFormatter(for: entry).string(from: instant),
                 timeFormatter(for: entry).string(from: instant),
                 escapeField(entry.drinkName),
                 category.rawValue,
@@ -145,6 +156,11 @@ public enum CsvExporter {
                 // conventions, i.e. always a '.' separator.
                 String(format: "%.2f", entry.gramsAlcohol),
                 escapeField(entry.note),
+                // LAST, AND THE ONLY PLACE THE USER TAKES THE RULE WITH THEM. The
+                // day-change time is not in the file, and rebuilding it in a
+                // spreadsheet is not something to ask of someone whose whole app
+                // is built on this attribution.
+                entry.logicalDate,
             ].joined(separator: ",")
         }
 
@@ -214,6 +230,21 @@ public enum CsvExporter {
         guard needsQuoting else { return value }
         let doubled = value.replacingOccurrences(of: "\"", with: "\"\"", options: .literal)
         return "\"" + doubled + "\""
+    }
+
+    /// `yyyy-MM-dd` in the given zone — the calendar day a reading falls on,
+    /// which is column 1.
+    ///
+    /// Pinned to `en_US_POSIX` and the Gregorian calendar for the same reason as
+    /// the time formatter below: a machine-readable export must not pick up an
+    /// alternate calendar from the device locale.
+    private static func dateFormatter(for timeZone: TimeZone) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
     }
 
     /// `HH:mm` in the given zone.

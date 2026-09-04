@@ -88,8 +88,8 @@ final class PreferencesStoreTests: XCTestCase {
     // abstinent. These pin the fix.
 
     func testAFirstLaunchSeedsTheStatisticsFloorWithTheInstallDate() async {
-        let expected = DayResolver.resolve(
-            timestampMillis: 1_766_000_000_000, changeHour: 0, changeMinute: 0
+        let expected = DayResolver.today(
+            now: 1_766_000_000_000, changeHour: 0, changeMinute: 0
         )
         let settings = await makeSeedingStore(millis: 1_766_000_000_000).load()
         XCTAssertEqual(settings.statsFromDate, expected)
@@ -109,8 +109,8 @@ final class PreferencesStoreTests: XCTestCase {
         XCTAssertTrue(FileManager.default.fileExists(atPath: fileURL.path))
 
         // A later launch, a later clock, the same stored date.
-        let firstDate = DayResolver.resolve(
-            timestampMillis: 1_766_000_000_000, changeHour: 0, changeMinute: 0
+        let firstDate = DayResolver.today(
+            now: 1_766_000_000_000, changeHour: 0, changeMinute: 0
         )
         let reopened = await makeSeedingStore(millis: 1_768_000_000_000).load()
         XCTAssertEqual(reopened.statsFromDate, firstDate)

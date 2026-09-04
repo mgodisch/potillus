@@ -222,6 +222,15 @@ class TodayViewModel(
      *   subscriber count dropped to zero for > 5 s (WhileSubscribed) or the
      *   settings changed.
      */
+    // TWO CLOCKS MEET HERE, and the seam is deliberate. The screen's "today"
+    // comes from the device zone as it is right now; which day an entry counts
+    // toward comes from the frame that entry recorded. Both are right, and after
+    // a flight they disagree: eastwards, entries drop off the list; westwards,
+    // entries appear that are not yet drunk by the local clock. The alternative
+    // — reading the entries in the current zone — would move every historical
+    // time by the length of the flight and is what the recorded offset exists to
+    // prevent. The case needs a plane, so it is accepted rather than papered
+    // over; this note is here so the next reader does not take it for a defect.
     val uiState: StateFlow<TodayUiState> = combine(prefs.settingsFlow, ticker) { settings, _ ->
         settings to DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
     }.distinctUntilChanged().flatMapLatest { (settings, today) ->
@@ -338,7 +347,13 @@ class TodayViewModel(
             // alcohol-free doses itself, so nothing needs pre-filtering here; it
             // also drops doses that lie in the future, which a retroactively
             // entered drink can be.
-            val nowMillis = System.currentTimeMillis()
+            // THE SAME CLOCK THE PIPELINE READS ITS DAY FROM. In production this is
+            // `System.currentTimeMillis()` and nothing changes. Under a pinned
+            // clock — the screenshot suite, a test that needs a reproducible hour
+            // — reading the real one instead measured the elapsed time between a
+            // dated entry and the actual present, and the estimate came out at
+            // zero however the capture was staged.
+            val nowMillis = DayResolver.clock().millis()
             val bac: Double? = if (settings.weightKg > 0) {
                 AlcoholCalculator.calculateBAC(
                     doses = recentEntries.map { AlcoholDose(it.timestampMillis, it.gramsAlcohol) },
@@ -417,7 +432,7 @@ class TodayViewModel(
      * 02:00 on the calendar 12th, still logically the 11th. Before v0.86.0 the
      * instant was today's calendar date plus the time, and the entry then
      * resolved to YESTERDAY and vanished from the screen it was logged on. The
-     * calendar has always placed its entries this way (`instantOnLogicalDate`);
+     * calendar has always placed its entries this way;
      * the dialog shows the calendar date it is about to store when it differs.
      *
      * Invalid input (non-positive volume or timestamp) is rejected as a
@@ -448,38 +463,29 @@ class TodayViewModel(
             // costs one short extra DataStore collection per button tap and is
             // always correct; CalendarViewModel.addEntry uses the same approach.
             val settings = prefs.settingsFlow.first()
-            val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
-            val onToday = DayResolver.instantOnLogicalDate(
-                logicalDate = today,
-                timestampMillis = timestampMillis,
-                changeHour = settings.dayChangeHour,
-                changeMinute = settings.dayChangeMinute,
-            ) ?: timestampMillis
-            entryRepo.addFromDrinkWithDate(drink, volumeMl, onToday, note, today)
+            // THE INSTANT IS PASSED THROUGH, NOT PLACED. The sheet composes it
+            // from its own date and time fields, and the repository derives the
+            // day from it. This method used to move the timestamp onto whatever
+            // calendar day kept the entry on today, because the sheet offered
+            // hours and minutes alone and someone had to decide the date.
+            entryRepo.addFromDrink(drink, volumeMl, timestampMillis, note, settings)
         }
     }
 
     /**
-     * Persists edits to an existing [entry], keeping it on its logical day.
+     * Persists edits to an existing [entry], as the sheet composed them.
      *
-     * The edited time is placed on the calendar day that keeps the entry on
-     * [ConsumptionEntry.logicalDate] — the same rule as [addEntry] and as the
-     * calendar's edit, so an edit never moves an entry off the screen it was
-     * edited on. Before v0.86.0 this recomputed the logical day from the new
-     * time, and 05:00 corrected to 02:00 sent the entry to yesterday. Moving an
-     * entry to another day is the calendar's job: pick the day there.
+     * NOTHING IS PLACED HERE ANY MORE. The sheet carries a date beside its time,
+     * so a correction that crosses the day-change boundary moves the entry to
+     * another day — in the user's sight, with the sheet naming the day it is
+     * going to. Until the sheet had a date, this method moved the timestamp onto
+     * whatever calendar day kept the entry where it was, which is why editing a
+     * time could silently change the calendar day the row sat on.
      */
     fun updateEntry(entry: ConsumptionEntry) {
         // Same rationale as addEntry – read the authoritative settings snapshot.
         viewModelScope.launch {
-            val settings = prefs.settingsFlow.first()
-            val onItsDay = DayResolver.instantOnLogicalDate(
-                logicalDate = entry.logicalDate,
-                timestampMillis = entry.timestampMillis,
-                changeHour = settings.dayChangeHour,
-                changeMinute = settings.dayChangeMinute,
-            ) ?: entry.timestampMillis
-            entryRepo.update(entry.copy(timestampMillis = onItsDay))
+            entryRepo.update(entry, prefs.settingsFlow.first())
         }
     }
 

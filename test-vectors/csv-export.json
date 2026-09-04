@@ -8,7 +8,8 @@
     "Only free-text cells (headers, drinkName, note) are escaped; generated cells",
     "(logicalDate, time, category, numbers) are not, exactly as on Android.",
     "The UTF-8 BOM is added when writing the file, not by buildCsv.",
-    "zoneId renders the HH:mm column; the same instant is a different clock time per zone."
+    "utcOffsetSeconds renders the HH:mm column: the entry carries the frame its clock time was read in, and the same instant is a different clock time in a different frame. The cases used to name a zoneId instead, which stood in for entries that recorded no offset; schema 4 gave every row one, so the offset is stated per entry. Each value is mechanically the offset Europe/Berlin had at that instant, so every expected string is unchanged.",
+    "From v0.87.0 column 1 is the CALENDAR day of the reading and a ninth column at the end carries the logical day. The two agree for every entry outside the small hours; where they differ, the row's date and time now describe the same moment and the attribution has a column of its own."
   ],
   "escapeField": [
     {
@@ -78,8 +79,8 @@
     },
     {
       "description": "a quote is doubled even when a combining mark follows it",
-      "input": "say \"\u0301 now",
-      "expected": "\"say \"\"\u0301 now\""
+      "input": "say \"́ now",
+      "expected": "\"say \"\"́ now\""
     },
     {
       "description": "hyperlink attack is neutralised",
@@ -108,7 +109,8 @@
         "Volume (ml)",
         "Alcohol (%)",
         "Grams",
-        "Note"
+        "Note",
+        "Logical_Day"
       ],
       "entries": [],
       "drinks": [
@@ -121,8 +123,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "Europe/Berlin",
-      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n"
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note,Logical_Day\r\n"
     },
     {
       "description": "one plain row",
@@ -134,7 +135,8 @@
         "Volume (ml)",
         "Alcohol (%)",
         "Grams",
-        "Note"
+        "Note",
+        "Logical_Day"
       ],
       "entries": [
         {
@@ -145,7 +147,8 @@
           "gramsAlcohol": 19.3,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": ""
+          "note": "",
+          "utcOffsetSeconds": 3600
         }
       ],
       "drinks": [
@@ -158,8 +161,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "Europe/Berlin",
-      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note,Logical_Day\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,,2026-01-02\r\n"
     },
     {
       "description": "quoting, formula guard and unknown drink fall back to OTHER",
@@ -171,7 +173,8 @@
         "Volume (ml)",
         "Alcohol (%)",
         "Grams",
-        "Note"
+        "Note",
+        "Logical_Day"
       ],
       "entries": [
         {
@@ -182,7 +185,8 @@
           "gramsAlcohol": 19.3,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": ""
+          "note": "",
+          "utcOffsetSeconds": 3600
         },
         {
           "drinkId": 2,
@@ -192,7 +196,8 @@
           "gramsAlcohol": 20.5,
           "timestampMillis": 1767398400000,
           "logicalDate": "2026-01-02",
-          "note": "=1+1"
+          "note": "=1+1",
+          "utcOffsetSeconds": 3600
         },
         {
           "drinkId": 99,
@@ -202,7 +207,8 @@
           "gramsAlcohol": 31.56,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": "a\"b"
+          "note": "a\"b",
+          "utcOffsetSeconds": 3600
         }
       ],
       "drinks": [
@@ -215,8 +221,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "Europe/Berlin",
-      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n2026-01-02,01:00,\"Wine, red\",WINE,200,13.0,20.50,'=1+1\r\n2026-01-02,20:14,Ghost,OTHER,100,40.0,31.56,\"a\"\"b\"\r\n"
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note,Logical_Day\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,,2026-01-02\r\n2026-01-03,01:00,\"Wine, red\",WINE,200,13.0,20.50,'=1+1,2026-01-02\r\n2026-01-02,20:14,Ghost,OTHER,100,40.0,31.56,\"a\"\"b\",2026-01-02\r\n"
     },
     {
       "description": "localised headers are escaped too",
@@ -228,7 +233,8 @@
         "Volume (ml)",
         "Alcohol (%)",
         "Grams",
-        "Note"
+        "Note",
+        "Logical_Day"
       ],
       "entries": [
         {
@@ -239,7 +245,8 @@
           "gramsAlcohol": 19.3,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": ""
+          "note": "",
+          "utcOffsetSeconds": 3600
         }
       ],
       "drinks": [
@@ -252,8 +259,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "Europe/Berlin",
-      "expected": "Date,Time,\"Drink, name\",Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+      "expected": "Date,Time,\"Drink, name\",Category,Volume (ml),Alcohol (%),Grams,Note,Logical_Day\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,,2026-01-02\r\n"
     },
     {
       "description": "German headers, same data",
@@ -265,7 +271,8 @@
         "Menge (ml)",
         "Alkohol (%)",
         "Gramm",
-        "Notiz"
+        "Notiz",
+        "Logischer_Tag"
       ],
       "entries": [
         {
@@ -276,7 +283,8 @@
           "gramsAlcohol": 19.3,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": ""
+          "note": "",
+          "utcOffsetSeconds": 3600
         }
       ],
       "drinks": [
@@ -289,8 +297,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "Europe/Berlin",
-      "expected": "Datum,Uhrzeit,Getränk,Kategorie,Menge (ml),Alkohol (%),Gramm,Notiz\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,\r\n"
+      "expected": "Datum,Uhrzeit,Getränk,Kategorie,Menge (ml),Alkohol (%),Gramm,Notiz,Logischer_Tag\r\n2026-01-02,20:14,Pils,BEER,500,4.9,19.30,,2026-01-02\r\n"
     },
     {
       "description": "time is rendered in the given zone",
@@ -302,7 +309,8 @@
         "Volume (ml)",
         "Alcohol (%)",
         "Grams",
-        "Note"
+        "Note",
+        "Logical_Day"
       ],
       "entries": [
         {
@@ -313,7 +321,8 @@
           "gramsAlcohol": 19.3,
           "timestampMillis": 1767381240000,
           "logicalDate": "2026-01-02",
-          "note": ""
+          "note": "",
+          "utcOffsetSeconds": -18000
         }
       ],
       "drinks": [
@@ -326,8 +335,7 @@
           "category": "WINE"
         }
       ],
-      "zoneId": "America/New_York",
-      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note\r\n2026-01-02,14:14,Pils,BEER,500,4.9,19.30,\r\n"
+      "expected": "Date,Time,Drink,Category,Volume (ml),Alcohol (%),Grams,Note,Logical_Day\r\n2026-01-02,14:14,Pils,BEER,500,4.9,19.30,,2026-01-02\r\n"
     }
   ]
 }

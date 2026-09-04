@@ -51,6 +51,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Välj en dryck …</string>
     <string name="volume_ml">Mängd</string>
     <string name="time">Tid</string>
+    <string name="date">Datum</string>
+    <string name="entry_counts_toward">Räknas till %1$s</string>
     <string name="pure_alcohol">g ren alkohol</string>
     <string name="note">Anteckning (valfritt)</string>
     <string name="add_drink">Lägg till dryck</string>
@@ -193,6 +195,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alkohol_procent</string>
     <string name="csv_col_grams">Gram_alkohol</string>
     <string name="csv_col_note">Anteckning</string>
+    <string name="csv_col_logical_date">Logisk_dag</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">dryckesdagar (senaste 7 dagarna)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

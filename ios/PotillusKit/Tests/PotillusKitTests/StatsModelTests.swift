@@ -77,8 +77,10 @@ final class StatsModelTests: XCTestCase {
         return try environment.entries.add(
             ConsumptionEntry(
                 drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
-            )
+                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date,
+                utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
     }
 

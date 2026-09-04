@@ -230,7 +230,6 @@ public struct ReportData: Sendable, Equatable {
     ///     It anchors the abstinence streaks and bounds the window; see below.
     ///   - today: The current logical day. Passed in rather than read from a clock,
     ///     so the figures are reproducible in a test and in a screenshot.
-    ///   - timeZone: The zone whose wall clock decides the hour-of-day bucket.
     ///   - locale: Decides which weekday a week starts on. Callers pass the
     ///     REPORT locale — the one `ReportRenderer.Context` gets for labels and
     ///     numbers (`Loc.locale(for: settings.language)`) — so the column order
@@ -253,7 +252,6 @@ public struct ReportData: Sendable, Equatable {
         periodStart: String? = nil,
         periodEnd: String? = nil,
         today: String,
-        timeZone: TimeZone = .current,
         locale: Locale = .current
     ) -> ReportData? {
         guard !entries.isEmpty else { return nil }
@@ -363,7 +361,7 @@ public struct ReportData: Sendable, Equatable {
             categories: categoryStats(
                 entries: entries, categoryById: categoryById, totalGrams: totalGrams
             ),
-            hourlyGrams: hourlyGrams(entries: entries, timeZone: timeZone),
+            hourlyGrams: hourlyGrams(entries: entries),
             weekdayOrder: StatsAggregator.weekdayOrder(firstDayOfWeekIso: firstWeekday),
             weekdayAverages: StatsAggregator.weekdayAverages(
                 summaries: daySummaries, from: firstDate, to: lastDate,
@@ -491,18 +489,16 @@ extension ReportData {
     /// Bucketed by the WALL CLOCK, not by the logical day: a drink at 01:00 belongs
     /// in hour 1, however the day-change hour assigns it. The hour-of-day chart is
     /// about when a person drinks, not which day the app books it to.
-    static func hourlyGrams(entries: [ConsumptionEntry], timeZone: TimeZone) -> [Double] {
+    static func hourlyGrams(entries: [ConsumptionEntry]) -> [Double] {
         var calendar = Calendar(identifier: .gregorian)
 
         // The hour a drink was logged at, in the frame it was logged in. Reading
         // every entry in the CURRENT frame moved every bar of a travelled or
-        // daylight-saving-crossed history by an hour. `timeZone` is the fallback
-        // for entries that recorded no frame.
+        // daylight-saving-crossed history by an hour. There is no fallback zone
+        // any more: schema 4 gave every row a frame.
         var hours = [Double](repeating: 0.0, count: 24)
         for entry in entries {
-            calendar.timeZone = DayResolver.displayTimeZone(
-                utcOffsetSeconds: entry.utcOffsetSeconds, fallback: timeZone
-            )
+            calendar.timeZone = DayResolver.displayTimeZone(utcOffsetSeconds: entry.utcOffsetSeconds)
             let date = Date(timeIntervalSince1970: Double(entry.timestampMillis) / 1000.0)
             let hour = calendar.component(.hour, from: date)
             hours[hour] += entry.gramsAlcohol

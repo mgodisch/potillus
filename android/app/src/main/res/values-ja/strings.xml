@@ -78,6 +78,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">飲み物を選択…</string>
     <string name="volume_ml">量</string>
     <string name="time">時刻</string>
+    <string name="date">日付</string>
+    <string name="entry_counts_toward">%1$s に加算されます</string>
     <string name="pure_alcohol">g 純アルコール</string>
     <string name="note">メモ（任意）</string>
 
@@ -238,6 +240,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">アルコール_パーセント</string>
     <string name="csv_col_grams">グラム_アルコール</string>
     <string name="csv_col_note">メモ</string>
+    <string name="csv_col_logical_date">論理日</string>
     <string name="pdf_unit_g_per_day">g／日</string>
     <string name="drink_days_label">飲酒日数（直近7日間）</string>
     <string name="a11y_caption_value">%1$s：%2$s</string>

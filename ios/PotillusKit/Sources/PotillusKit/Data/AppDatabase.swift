@@ -57,11 +57,11 @@ import GRDB
 /// Owns the database connection and its schema.
 public final class AppDatabase: Sendable {
 
-    /// The schema version this code expects, mirroring Room's `version = 2`.
+    /// The schema version this code expects, mirroring Room's `version = 4`.
     ///
     /// Kept as a plain constant for the parity test to assert against; GRDB
     /// itself tracks applied steps by name in `grdb_migrations`.
-    public static let schemaVersion = 3
+    public static let schemaVersion = 4
 
     /// The write-serialising connection. A queue (not a pool) because the app is
     /// single-user and offline: correctness and simplicity beat read concurrency.
@@ -276,8 +276,139 @@ public final class AppDatabase: Sendable {
             }
         }
 
+        // The twin of Room's MIGRATION_3_4, in three steps.
+        //
+        // SUPERSEDES THE REASONING ABOVE. The step before this one left existing
+        // rows without an offset and every reader derived a replacement from the
+        // device zone, on every read. That replacement is written into the rows
+        // here, once, and the column becomes NOT NULL — which removes a second
+        // code path from four places rather than carrying it into the first
+        // production release. What is given up is the self-healing property of a
+        // per-read guess: someone who installs this update while abroad freezes
+        // their pre-0.86.0 history at the wrong offset. That needs entries from
+        // before the column AND an update taken while travelling, and it is
+        // accepted.
+        //
+        // 1. BACKFILL, in Swift and not in SQL, because SQLite carries no
+        //    timezone database: its `localtime` modifier answers for the CURRENT
+        //    rules, not for the rules in force when the row was written.
+        //
+        // 2. REBUILD. SQLite cannot add NOT NULL to an existing column, so the
+        //    table is recreated with the constraint and the rows are copied. The
+        //    column order, the index names and the foreign key match Room's own
+        //    output, because `test-vectors/db-schema.json` compares both sides
+        //    literally.
+        //
+        // 3. THE KEY TABLE, created holding nil, i.e. "the logical day has not
+        //    been derived yet". This migration deliberately does NOT read the
+        //    day-change setting and does NOT touch `logicalDate`: everything that
+        //    needs the setting happens in the first realignment, which is what
+        //    lets the database open before the preferences are readable.
+        //
+        // The zone is read through a private helper rather than through
+        // `DayResolver`, so a later change there cannot reinterpret a database
+        // that has already migrated against one that has not.
+        migrator.registerMigration("v4-entry-offset-not-null") { db in
+            try backfillUtcOffsets(db)
+            try rebuildEntriesWithNotNullOffset(db)
+            try createLogicalDayKey(db)
+        }
+
         return migrator
     }
+}
+
+// =============================================================================
+// The v4 migration, step by step
+// =============================================================================
+//
+// FILE-SCOPE FUNCTIONS, NOT METHODS. They are called from the `migrator` static
+// property and from nowhere else, and keeping them out of the type body is also
+// what `check-swift-length` wants: an extension or file scope is not counted
+// against SwiftLint's `type_body_length`.
+// =============================================================================
+
+/// Step 1: writes an offset into every row that has none.
+///
+/// Rows are read first and written afterwards rather than updated while a cursor
+/// is open. SQLite permits the interleaving, but walking a table that is being
+/// written under you is a well-known way to see a row twice or not at all. The
+/// row count here is one person's drink history, so holding the ids in memory
+/// costs nothing worth optimising.
+private func backfillUtcOffsets(_ db: Database) throws {
+    let zone = TimeZone.current
+    let rows = try Row.fetchAll(
+        db, sql: "SELECT id, timestampMillis FROM entries WHERE utcOffsetSeconds IS NULL"
+    )
+    for row in rows {
+        let id: Int64 = row["id"]
+        let timestampMillis: Int64 = row["timestampMillis"]
+        let offset = zone.secondsFromGMT(
+            for: Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
+        )
+        try db.execute(
+            sql: "UPDATE entries SET utcOffsetSeconds = ? WHERE id = ?",
+            arguments: [offset, id]
+        )
+    }
+}
+
+/// Step 2: the table rebuild SQLite requires for a new NOT NULL constraint.
+///
+/// The order is the one SQLite's own documentation prescribes: create the
+/// replacement, copy, drop, rename, recreate the indices. The foreign key lives
+/// on `entries` and is re-declared verbatim below.
+///
+/// GRDB runs each migration step inside a transaction and, by default, defers
+/// foreign-key checking to its end, so dropping the child table mid-step is
+/// safe. Raw SQL is used rather than the query builder because the statements
+/// have to match Room's output character for character where the parity test
+/// looks — column order, index names, and the `ON UPDATE NO ACTION` the Room
+/// export spells out even though it is the default.
+private func rebuildEntriesWithNotNullOffset(_ db: Database) throws {
+    try db.execute(sql: """
+        CREATE TABLE IF NOT EXISTS "entries_new" (
+            "id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            "drinkId" INTEGER NOT NULL
+                REFERENCES "drinks"("id") ON UPDATE NO ACTION ON DELETE RESTRICT,
+            "drinkName" TEXT NOT NULL,
+            "volumeMl" INTEGER NOT NULL,
+            "alcoholPercent" DOUBLE NOT NULL,
+            "gramsAlcohol" DOUBLE NOT NULL,
+            "timestampMillis" INTEGER NOT NULL,
+            "logicalDate" TEXT NOT NULL,
+            "note" TEXT NOT NULL,
+            "utcOffsetSeconds" INTEGER NOT NULL
+        )
+        """)
+    try db.execute(sql: """
+        INSERT INTO "entries_new"
+            (id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol,
+             timestampMillis, logicalDate, note, utcOffsetSeconds)
+        SELECT id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol,
+               timestampMillis, logicalDate, note, utcOffsetSeconds
+        FROM "entries"
+        """)
+    try db.execute(sql: "DROP TABLE \"entries\"")
+    try db.execute(sql: "ALTER TABLE \"entries_new\" RENAME TO \"entries\"")
+    try db.create(index: "index_entries_drinkId", on: "entries", columns: ["drinkId"])
+    try db.create(index: "index_entries_logicalDate", on: "entries", columns: ["logicalDate"])
+}
+
+/// Step 3: creates `logical_day_key` and puts its one row in, holding nil.
+///
+/// Inserting the row here rather than lazily means every reader can rely on it
+/// existing, and "no row" never has to mean anything of its own.
+private func createLogicalDayKey(_ db: Database) throws {
+    try db.create(table: "logical_day_key") { table in
+        // See the note on `drinks.id` in the initial schema for why `.notNull()`
+        // is spelled out beside a primary key: SQLite reports the constraint in
+        // `PRAGMA table_info` only when it was declared, and Room declares it.
+        table.primaryKey("id", .integer).notNull()
+        table.column("changeHour", .integer)
+        table.column("changeMinute", .integer)
+    }
+    try LogicalDayKey().insert(db)
 }
 
 // =============================================================================

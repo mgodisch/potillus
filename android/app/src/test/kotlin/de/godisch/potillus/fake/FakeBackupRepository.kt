@@ -25,6 +25,7 @@
  */
 package de.godisch.potillus.fake
 
+import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.ImportStats
 import de.godisch.potillus.domain.model.ConsumptionEntry
@@ -38,6 +39,9 @@ class FakeBackupRepository : IBackupRepository {
     var lastReplaceCall: Pair<List<DrinkDefinition>, List<ConsumptionEntry>>? = null
     var lastMergeCall: Pair<List<DrinkDefinition>, List<ConsumptionEntry>>? = null
 
+    /** The boundary the caller said the file's dates were written under. */
+    var lastDayChange: BackupDayChange? = null
+
     // Configurable return values for tests.
     var replaceResult: ImportStats = ImportStats(imported = 0, skipped = 0)
     var mergeResult: ImportStats = ImportStats(imported = 0, skipped = 0)
@@ -48,18 +52,22 @@ class FakeBackupRepository : IBackupRepository {
     override suspend fun importReplace(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats {
         throwOnImport?.let { throw it }
         lastReplaceCall = backupDrinks to backupEntries
+        lastDayChange = dayChange
         return replaceResult
     }
 
     override suspend fun importMerge(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats {
         throwOnImport?.let { throw it }
         lastMergeCall = backupDrinks to backupEntries
+        lastDayChange = dayChange
         return mergeResult
     }
 }

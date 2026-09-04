@@ -55,6 +55,7 @@ class PdfReportDataBranchTest {
         timestampMillis = LocalDate.parse(date).atTime(hour, 0)
             .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli(),
         logicalDate = date,
+        utcOffsetSeconds = 0,
     )
 
     @Test fun `binge day above threshold and unknown category fall back are handled`() {

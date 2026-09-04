@@ -56,6 +56,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Choisir une boisson…</string>
     <string name="volume_ml">Quantité</string>
     <string name="time">Heure</string>
+    <string name="date">Date</string>
+    <string name="entry_counts_toward">Compte pour le %1$s</string>
     <string name="pure_alcohol">g d’alcool pur</string>
     <string name="note">Note (facultatif)</string>
 
@@ -211,6 +213,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alcool_pourcentage</string>
     <string name="csv_col_grams">Grammes_alcool</string>
     <string name="csv_col_note">Note</string>
+    <string name="csv_col_logical_date">Jour_logique</string>
     <string name="pdf_unit_g_per_day">g/jour</string>
     <string name="drink_days_label">jours de conso. (7 derniers jours)</string>
     <string name="a11y_caption_value">%1$s : %2$s</string>

@@ -263,8 +263,8 @@ public final class StatsModel {
                     do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     let settings = await self.preferences.load()
                     let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
-                    let today = DayResolver.resolve(
-                        timestampMillis: nowMillis,
+                    let today = DayResolver.today(
+                        now: nowMillis,
                         changeHour: settings.dayChangeHour,
                         changeMinute: settings.dayChangeMinute,
                         timeZone: self.timeZone
@@ -295,8 +295,8 @@ public final class StatsModel {
     private func reload() async throws {
         let settings = await preferences.load()
         let nowMillis = Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
-        let today = DayResolver.resolve(
-            timestampMillis: nowMillis,
+        let today = DayResolver.today(
+            now: nowMillis,
             changeHour: settings.dayChangeHour,
             changeMinute: settings.dayChangeMinute,
             timeZone: timeZone
@@ -430,7 +430,7 @@ public final class StatsModel {
             entries: periodEntries, drinks: catalogue
         )
         next.hourBucketAverages = StatsAggregator.hourBucketAverages(
-            entries: periodEntries, effectivePeriodDays: periodDays, timeZone: timeZone
+            entries: periodEntries, effectivePeriodDays: periodDays
         )
         next.weekdayOrder = StatsAggregator.weekdayOrder(firstDayOfWeekIso: firstDayOfWeekIso)
         next.weekdayAverages = StatsAggregator.weekdayAverages(

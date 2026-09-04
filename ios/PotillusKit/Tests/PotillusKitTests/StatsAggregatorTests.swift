@@ -38,14 +38,13 @@ import XCTest
 
 final class StatsAggregatorTests: XCTestCase {
 
-    private let utc = TimeZone(identifier: "UTC")!
-
     private func entry(
         drinkId: Int64 = 1, grams: Double, at millis: Int64, date: String = "2026-01-02"
     ) -> ConsumptionEntry {
         ConsumptionEntry(
             drinkId: drinkId, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
+            gramsAlcohol: grams, timestampMillis: millis, logicalDate: date,
+            utcOffsetSeconds: 0
         )
     }
 
@@ -97,7 +96,7 @@ final class StatsAggregatorTests: XCTestCase {
     /// at one in the morning. The histogram must say so.
     func testTheHistogramBucketsByWallClockNotByLogicalDay() {
         let atOne = entry(grams: 10.0, at: midnight + hour, date: "2026-01-01")
-        let hours = StatsAggregator.hourlyGrams(entries: [atOne], timeZone: utc)
+        let hours = StatsAggregator.hourlyGrams(entries: [atOne])
 
         XCTAssertEqual(hours[1], 10.0, accuracy: 1e-9, "01:00, though the day is the 1st")
         XCTAssertEqual(hours.reduce(0, +), 10.0, accuracy: 1e-9)
@@ -109,18 +108,21 @@ final class StatsAggregatorTests: XCTestCase {
     func testTheHistogramReadsAnEntryInItsRecordedFrame() {
         var berlinEvening = entry(grams: 10.0, at: midnight + 19 * hour)
         berlinEvening.utcOffsetSeconds = 3600
-        let hours = StatsAggregator.hourlyGrams(entries: [berlinEvening], timeZone: utc)
+        let hours = StatsAggregator.hourlyGrams(entries: [berlinEvening])
 
         XCTAssertEqual(hours[20], 10.0, accuracy: 1e-9, "20:00 in the recorded frame")
         XCTAssertEqual(hours[19], 0.0, accuracy: 1e-9, "not the hour the reader is in")
     }
 
-    /// Without a recorded frame the fallback applies, which is what every entry
-    /// written before the column existed relies on.
-    func testTheHistogramFallsBackWhenNoFrameWasRecorded() {
-        let noFrame = entry(grams: 10.0, at: midnight + 19 * hour)
-        XCTAssertNil(noFrame.utcOffsetSeconds)
-        let hours = StatsAggregator.hourlyGrams(entries: [noFrame], timeZone: utc)
+    /// Every entry has a frame, so there is nothing to fall back to. This used to
+    /// pin the fallback for rows written before the column existed; schema 4 gave
+    /// them one and the second code path went away. What is left worth pinning is
+    /// that a frame of UTC is read as UTC and not as the device's zone — the
+    /// mistake the fallback made easy.
+    func testAUtcFrameIsReadAsUtc() {
+        var atUtc = entry(grams: 10.0, at: midnight + 19 * hour)
+        atUtc.utcOffsetSeconds = 0
+        let hours = StatsAggregator.hourlyGrams(entries: [atUtc])
 
         XCTAssertEqual(hours[19], 10.0, accuracy: 1e-9)
     }
@@ -133,7 +135,7 @@ final class StatsAggregatorTests: XCTestCase {
             entry(grams: 9.0, at: midnight + 23 * hour),   // 23:00 → bucket 7
         ]
         let buckets = StatsAggregator.hourBucketAverages(
-            entries: entries, effectivePeriodDays: 1, timeZone: utc
+            entries: entries, effectivePeriodDays: 1
         )
         XCTAssertEqual(buckets[0], 6.0, accuracy: 1e-9)
         XCTAssertEqual(buckets[1], 6.0, accuracy: 1e-9)
@@ -150,7 +152,7 @@ final class StatsAggregatorTests: XCTestCase {
         ]
         let periodDays = 7
         let buckets = StatsAggregator.hourBucketAverages(
-            entries: entries, effectivePeriodDays: periodDays, timeZone: utc
+            entries: entries, effectivePeriodDays: periodDays
         )
         let average = StatsAggregator.averagePerDay(totalGrams: 30.0, effectivePeriodDays: periodDays)
 
@@ -159,19 +161,23 @@ final class StatsAggregatorTests: XCTestCase {
 
     func testAnEmptyPeriodYieldsZerosRatherThanADivisionByZero() {
         let buckets = StatsAggregator.hourBucketAverages(
-            entries: [], effectivePeriodDays: 0, timeZone: utc
+            entries: [], effectivePeriodDays: 0
         )
         XCTAssertEqual(buckets, [Double](repeating: 0.0, count: 8))
     }
 
-    /// The zone is a parameter: the same instant is 01:00 in UTC and 02:00 in
-    /// Berlin, and the histogram belongs to the user's wall clock.
-    func testTheZoneDecidesTheBucket() {
-        let berlin = TimeZone(identifier: "Europe/Berlin")!
-        let atOneUtc = entry(grams: 5.0, at: midnight + hour)
+    /// The RECORDED FRAME decides the bucket, and nothing else: the same instant
+    /// is 01:00 read at +00:00 and 02:00 read at +01:00. The zone the reader
+    /// happens to be in no longer enters it — there is no parameter for it, which
+    /// is what stopped a travelled history from shifting every bar by an hour.
+    func testTheRecordedFrameDecidesTheBucket() {
+        var atUtc = entry(grams: 5.0, at: midnight + hour)
+        atUtc.utcOffsetSeconds = 0
+        var atBerlin = atUtc
+        atBerlin.utcOffsetSeconds = 3600
 
-        XCTAssertEqual(StatsAggregator.hourlyGrams(entries: [atOneUtc], timeZone: utc)[1], 5.0)
-        XCTAssertEqual(StatsAggregator.hourlyGrams(entries: [atOneUtc], timeZone: berlin)[2], 5.0)
+        XCTAssertEqual(StatsAggregator.hourlyGrams(entries: [atUtc])[1], 5.0)
+        XCTAssertEqual(StatsAggregator.hourlyGrams(entries: [atBerlin])[2], 5.0)
     }
 
     // ── Weekday profile ──────────────────────────────────────────────────────

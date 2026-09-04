@@ -40,26 +40,32 @@ import Foundation
 //   iOS disagreed by one day, a backup exported on one platform would produce
 //   different statistics on the other, silently.
 //
-//   Two traps make that easy to get wrong:
+//   Two traps used to make that easy to get wrong. `resolve` now takes the
+//   offset the reading was recorded in, so neither reaches it any more; both
+//   still apply to `today`, which asks the device zone where the user is now:
 //
-//   1. TIME ZONES. `resolve` takes an *absolute* instant (epoch milliseconds)
-//      plus the zone it should be interpreted in. The same instant is a
-//      different logical day in different zones — 23:00 in New York is already
-//      05:00 the next day in Berlin. The zone is therefore an explicit
-//      parameter, never an implicit global.
+//   1. TIME ZONES. The same instant is a different logical day in different
+//      frames — 23:00 at -04:00 is already 05:00 the next day at +02:00. For a
+//      stored entry the frame is the one it recorded, which is why `resolve`
+//      takes an offset and looks nothing up. `today` reads the device zone,
+//      and that is the whole of the jump described at the Today screen's call
+//      site: its "today" moves with the traveller, the entries do not.
 //
 //   2. DAYLIGHT SAVING TIME. On the spring-forward day the local wall clock
 //      jumps 02:00 -> 03:00, so 02:30 does not exist; on the fall-back day
-//      01:30 occurs twice. Deriving the wall-clock hour from the instant *via
-//      the zone* (as both platforms do) handles this correctly, whereas naive
-//      millisecond arithmetic would not. The shared vectors cover both edges.
+//      01:30 occurs twice. A zone lookup handles both, and `today` gets one.
+//      A fixed offset cannot: it knows no switch. That is not a gap in
+//      `resolve` but its point — the reading was taken on one side of the
+//      switch and keeps that side. The shared vectors read each instant around
+//      a switch in both offsets to pin it.
 //
 // PLATFORM SEAMS NOT PORTED
-//   The Android object also carries `clockOverride` / `clock()` / `today()` and
-//   `firstDayOfWeekIso()`. The first three are a test seam for pinning the wall
-//   clock during screenshot capture; the last is a locale-driven *visual* detail
-//   (which weekday heads the calendar grid). Both are platform concerns and are
-//   reintroduced on the iOS side when the corresponding UI is built, not here.
+//   The Android object also carries `clockOverride` / `clock()` and
+//   `firstDayOfWeekIso()`. The first two are a test seam for pinning the wall
+//   clock during screenshot capture — `today` here takes the instant as a
+//   parameter instead, because the callers already hold an injected clock; the
+//   last is a locale-driven *visual* detail (which weekday heads the calendar
+//   grid) and is reintroduced when the corresponding UI is built, not here.
 // =============================================================================
 
 public enum DayResolver {
@@ -100,146 +106,133 @@ public enum DayResolver {
 
     // ── Core resolution ──────────────────────────────────────────────────────
 
-    /// Determines the logical date of a Unix timestamp.
+    /// Determines the logical date of a Unix timestamp read in a recorded frame.
     ///
     /// Timestamps *before* the configured day-change time are attributed to the
     /// previous calendar day (02:30 with a 04:00 boundary becomes yesterday).
     ///
+    /// THE FRAME IS THE ENTRY'S, NOT THE DEVICE'S. `utcOffsetSeconds` is the
+    /// offset recorded when the drink was logged, so the wall-clock reading this
+    /// works from is the one the user made. A later flight or a daylight-saving
+    /// switch moves the device zone, not the reading, and the entry keeps the day
+    /// it was drunk on. Nothing here is looked up in a zone: the offset is all
+    /// the frame there is, which is why two readings of the same instant can land
+    /// on two different logical days.
+    ///
+    /// For "which logical day is it right now", where the device zone IS the
+    /// answer, use `today(now:changeHour:changeMinute:timeZone:)`.
+    ///
     /// - Parameters:
     ///   - timestampMillis: Unix timestamp in milliseconds since the epoch (UTC).
+    ///   - utcOffsetSeconds: The offset the reading was taken in, in seconds.
     ///   - changeHour: Hour of the day-change boundary, 0...23.
     ///   - changeMinute: Minute of the day-change boundary, 0...59.
-    ///   - timeZone: Zone the instant is interpreted in. Defaults to the device
-    ///     zone, mirroring the Kotlin default of `ZoneId.systemDefault()`.
     /// - Returns: The logical date as `yyyy-MM-dd`.
     public static func resolve(
         timestampMillis: Int64,
+        utcOffsetSeconds: Int,
         changeHour: Int,
-        changeMinute: Int,
-        timeZone: TimeZone = .current
+        changeMinute: Int
     ) -> String {
-        let instant = Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
-
-        // Read the wall clock *in the given zone*. This is what makes DST work:
-        // Foundation resolves the instant against the zone's offset rules, so a
-        // spring-forward gap or a fall-back repetition is handled for us.
-        var zoned = Calendar(identifier: .gregorian)
-        zoned.timeZone = timeZone
-        let parts = zoned.dateComponents([.year, .month, .day, .hour, .minute], from: instant)
+        // The reading is the instant shifted into its own frame. With a fixed
+        // offset that is arithmetic, not a lookup, and the components read off it
+        // in UTC afterwards ARE the wall clock the user saw. Kotlin does the same
+        // through `ZoneOffset.ofTotalSeconds`.
+        let reading = Date(
+            timeIntervalSince1970: Double(timestampMillis) / 1000.0 + Double(utcOffsetSeconds)
+        )
+        let parts = utcCalendar.dateComponents([.year, .month, .day, .hour, .minute], from: reading)
 
         guard let hour = parts.hour, let minute = parts.minute else {
             // Unreachable for the requested components, but Foundation's API is
             // optional-typed; fall back to the raw calendar day.
-            return format(instant, in: timeZone)
+            return formatDate(reading)
         }
 
         let isBeforeChangeTime = hour < changeHour || (hour == changeHour && minute < changeMinute)
 
         // Build the calendar day as a zone-free value, then step back one day if
-        // the instant falls before the boundary.
+        // the reading falls before the boundary.
         var day = DateComponents()
         day.year = parts.year
         day.month = parts.month
         day.day = parts.day
-        day.hour = 12  // noon: DST-proof anchor for the subsequent day arithmetic
+        day.hour = 12  // noon: keeps the day arithmetic clear of any boundary
 
         guard let anchored = utcCalendar.date(from: day) else {
-            return format(instant, in: timeZone)
+            return formatDate(reading)
         }
         let logical = isBeforeChangeTime ? addingDays(-1, to: anchored) : anchored
         return formatDate(logical)
     }
 
-    /// The inverse of `resolve`: the instant a wall-clock time on a logical date
-    /// falls on.
+    /// The logical day that is running right now, in the device zone.
     ///
-    /// A logical day runs from the day-change time to the next one, so a time
-    /// BEFORE the boundary belongs to the following calendar day: with a 04:00
-    /// boundary, 01:00 on the logical 30th is 01:00 on the calendar 31st. Reading
-    /// the calendar day off the logical date alone is what put an entry logged
-    /// for a past evening on today's clock.
+    /// THE ONE PLACE THE DEVICE ZONE STILL DECIDES. `resolve` reads an entry in
+    /// the frame the entry recorded; this asks where the user is now, so the
+    /// frame comes from `timeZone` for the current instant. Mixing the two is
+    /// deliberate and its consequence is known: after a flight, entries can drop
+    /// out of the Today screen or appear on it.
     ///
-    /// - Returns: The instant in milliseconds, or nil if `logicalDate` is not a
-    ///   canonical `yyyy-MM-dd` day or the wall-clock time does not exist in the
-    ///   zone (the spring-forward gap).
-    public static func instant(
-        logicalDate: String,
-        hour: Int,
-        minute: Int,
+    /// THE INSTANT IS A PARAMETER, not a reading of the system clock, because
+    /// every caller already has a clock of its own — the models take one by
+    /// injection and the tests pin it. A `today` that read the wall clock itself
+    /// would quietly bypass that and tie those tests to the hour the suite runs
+    /// at. The Kotlin twin owns its clock seam instead (`DayResolver.clock`),
+    /// which is the same decision on a platform where the seam already exists.
+    ///
+    /// - Parameters:
+    ///   - timestampMillis: The current instant, from the caller's clock.
+    ///   - changeHour: Hour of the day-change boundary, 0...23.
+    ///   - changeMinute: Minute of the day-change boundary, 0...59.
+    ///   - timeZone: The device zone. Defaults to `.current`.
+    public static func today(
+        now timestampMillis: Int64,
         changeHour: Int,
         changeMinute: Int,
         timeZone: TimeZone = .current
-    ) -> Int64? {
-        guard let day = parseDate(logicalDate) else { return nil }
-
-        let isBeforeChangeTime = hour < changeHour || (hour == changeHour && minute < changeMinute)
-        let calendarDay = isBeforeChangeTime ? addingDays(1, to: day) : day
-
-        var zoned = Calendar(identifier: .gregorian)
-        zoned.timeZone = timeZone
-        let parts = utcCalendar.dateComponents([.year, .month, .day], from: calendarDay)
-
-        var wanted = DateComponents()
-        wanted.year = parts.year
-        wanted.month = parts.month
-        wanted.day = parts.day
-        wanted.hour = hour
-        wanted.minute = minute
-        guard let instant = zoned.date(from: wanted) else { return nil }
-        return Int64((instant.timeIntervalSince1970 * 1000).rounded())
-    }
-
-    /// The same, taking the wall-clock time from an existing instant.
-    ///
-    /// The entry sheet offers hours and minutes only, so the instant it returns
-    /// carries the date of the day it was opened on. The calendar needs the time
-    /// off it and the day from elsewhere.
-    public static func instant(
-        logicalDate: String,
-        matchingTimeOf timestampMillis: Int64,
-        changeHour: Int,
-        changeMinute: Int,
-        timeZone: TimeZone = .current
-    ) -> Int64? {
-        var zoned = Calendar(identifier: .gregorian)
-        zoned.timeZone = timeZone
-        let parts = zoned.dateComponents(
-            [.hour, .minute],
-            from: Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
-        )
-        return instant(
-            logicalDate: logicalDate,
-            hour: parts.hour ?? 0,
-            minute: parts.minute ?? 0,
+    ) -> String {
+        resolve(
+            timestampMillis: timestampMillis,
+            utcOffsetSeconds: utcOffsetSeconds(timestampMillis: timestampMillis, timeZone: timeZone),
             changeHour: changeHour,
-            changeMinute: changeMinute,
-            timeZone: timeZone
+            changeMinute: changeMinute
         )
     }
 
-    /// The CALENDAR date an instant falls on, "YYYY-MM-DD", read in `timeZone`.
+    /// Whether a reading counts toward a logical day other than `logicalDay`.
     ///
-    /// Not the logical date — `resolve` answers that. The entry sheet shows this
-    /// beside the time it is about to store when the two dates differ: a drink
-    /// typed as "02:00" on the logical 10th is placed on the calendar 11th by
-    /// `instant(logicalDate:matchingTimeOf:…)`, and the sheet says so, so what
-    /// the user sees is what the row will read. Pinned with Android by
-    /// `day-resolver.json` (`calendarDate`).
-    public static func calendarDate(timestampMillis: Int64, timeZone: TimeZone = .current) -> String {
-        var zoned = Calendar(identifier: .gregorian)
-        zoned.timeZone = timeZone
-        let date = Date(timeIntervalSince1970: Double(timestampMillis) / 1000.0)
-        let parts = zoned.dateComponents([.year, .month, .day], from: date)
-        return String(format: "%04d-%02d-%02d", parts.year ?? 0, parts.month ?? 0, parts.day ?? 0)
-    }
-
-    /// Formats an instant as `yyyy-MM-dd` in the given zone. Fallback path only.
-    private static func format(_ instant: Date, in timeZone: TimeZone) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = timeZone
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: instant)
+    /// The entry sheet is opened on one logical day — today's on the Today
+    /// screen, the tapped cell's in the calendar — and the date and time in it
+    /// can be moved anywhere. When the two part company, the entry is still
+    /// correct, it just belongs elsewhere, and the sheet says which day it is
+    /// going to. When they agree there is nothing to say.
+    ///
+    /// ONE CONDITION, NO SPECIAL CASES. Adding, editing, typing a time, picking a
+    /// date, arriving from the calendar: all of them end in a reading and a day
+    /// the sheet was opened on, and this compares the two. The sheet decides
+    /// nothing itself, which is what keeps the note from appearing on one screen
+    /// and not on the other for the same entry.
+    ///
+    /// - Parameters:
+    ///   - timestampMillis: The composed instant of date and time.
+    ///   - utcOffsetSeconds: The frame that instant is read in.
+    ///   - changeHour: Hour of the day-change boundary, 0...23.
+    ///   - changeMinute: Minute of the day-change boundary, 0...59.
+    ///   - logicalDay: The logical day the sheet was opened on.
+    public static func logicalDayDiffers(
+        timestampMillis: Int64,
+        utcOffsetSeconds: Int,
+        changeHour: Int,
+        changeMinute: Int,
+        logicalDay: String
+    ) -> Bool {
+        resolve(
+            timestampMillis: timestampMillis,
+            utcOffsetSeconds: utcOffsetSeconds,
+            changeHour: changeHour,
+            changeMinute: changeMinute
+        ) != logicalDay
     }
 
     // ── Date-string helpers ──────────────────────────────────────────────────
@@ -326,6 +319,19 @@ public enum DayResolver {
     /// historical rules are consulted for the instant in question, so an entry
     /// logged in winter records the winter offset even if it is written from a
     /// summer clock.
+    ///
+    /// AN OFFSET, NOT A ZONE NAME, AND THAT IS A PRIVACY DECISION. A name like
+    /// `Europe/Berlin` is an address at country level; `+01:00` covers a strip
+    /// from the North Cape to Lagos. For an app that calls itself
+    /// privacy-friendly, that difference decides it.
+    ///
+    /// WHAT FOLLOWS FROM IT. An offset says how the clock ran at the moment of
+    /// the reading; only a name would say how it ran on another day. So a date
+    /// moved across a daylight-saving boundary cannot be kept in its own frame,
+    /// and the app reads the DEVICE zone for the new instant — on the assumption
+    /// that the phone is where its owner is, the same assumption logging an entry
+    /// makes. Move a Berlin entry's date while standing in Tokyo and you get the
+    /// Tokyo offset, with the instant jumping eight hours. That is accepted.
     public static func utcOffsetSeconds(
         timestampMillis: Int64, timeZone: TimeZone = .current
     ) -> Int {
@@ -334,23 +340,24 @@ public enum DayResolver {
 
     /// The `TimeZone` an entry's clock time should be read in.
     ///
-    /// NIL MEANS "NOT RECORDED", NOT "UTC". Entries written before the offset
-    /// existed, and entries read from a backup that predates it, carry no frame.
-    /// They fall back to what the app did for all of them until now: the device
-    /// zone, whose historical rules a formatter then applies to that instant. For
-    /// anyone who has not changed zones that reproduces the previous display
-    /// exactly, and it gets past daylight-saving switches right.
+    /// NO FALLBACK, AND NO DEVICE ZONE. Until schema 4 the offset could be nil —
+    /// "written before the column existed" — and this derived a replacement from
+    /// the device zone on every read. The v4 migration wrote that same
+    /// replacement into the rows once and made the column NOT NULL, so the second
+    /// code path had nothing left to answer for and is gone. What remains is the
+    /// reading the entry recorded, read back as it was taken.
     ///
     /// Returned as a `TimeZone` rather than a `Date`, because every caller on
     /// this side hands the zone to a `DateFormatter` or a `Calendar` instead of
     /// building a wall-clock value itself — the shape Foundation wants, holding
     /// the same fact Kotlin's `localDateTime` returns.
-    public static func displayTimeZone(
-        utcOffsetSeconds: Int?, fallback: TimeZone = .current
-    ) -> TimeZone {
-        guard let seconds = utcOffsetSeconds,
-              let zone = TimeZone(secondsFromGMT: seconds) else { return fallback }
-        return zone
+    ///
+    /// The `??` is not a fallback in disguise: `TimeZone(secondsFromGMT:)` is
+    /// failable and rejects an offset outside ±18 hours, which the backup gate
+    /// and the database both refuse long before a value gets here. UTC is what an
+    /// impossible number resolves to; nothing in the app can produce one.
+    public static func displayTimeZone(utcOffsetSeconds: Int) -> TimeZone {
+        TimeZone(secondsFromGMT: utcOffsetSeconds) ?? TimeZone(secondsFromGMT: 0)!
     }
 
     /// Returns the date `days` calendar days from `date` (negative to go back).
@@ -467,9 +474,21 @@ public enum DayResolver {
         guard start <= end else { return 0 }
         return daysUntil(start, end) + 1  // [from, to] — inclusive
     }
+}
 
-    // ── Abstinence streaks ───────────────────────────────────────────────────
+// =============================================================================
+// Abstinence streaks
+// =============================================================================
+//
+// IN AN EXTENSION, NOT IN THE TYPE BODY. Two reasons, and the second is the
+// one that would keep it here anyway: `check-swift-length` holds the type body
+// to what SwiftLint's `type_body_length` allows, and an extension is not
+// counted; and these three are day COUNTING rather than day RESOLUTION — they
+// take logical dates that the rest of this file produced and measure gaps
+// between them. Nothing above calls them. The Kotlin twin keeps them in the
+// object, which has no such limit, under the same section heading.
 
+extension DayResolver {
     /// Completed, alcohol-free days since the most recent drink — or since
     /// `statsFrom` when there is no drink history yet.
     ///

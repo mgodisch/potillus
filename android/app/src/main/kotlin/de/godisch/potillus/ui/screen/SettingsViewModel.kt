@@ -67,6 +67,7 @@ import androidx.lifecycle.viewModelScope
 import de.godisch.potillus.BuildConfig
 import de.godisch.potillus.R
 import de.godisch.potillus.data.prefs.IAppPreferences
+import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
@@ -299,12 +300,25 @@ class SettingsViewModel(
                 return@launch
             }
 
+            // The boundary the file's dates were derived under: the file's own
+            // when it carries a settings block, this device's otherwise. Only
+            // the repair of pre-0.85.0 calendar entries uses it; the days
+            // themselves are re-derived after the import, under whatever is set
+            // here. Read from the flow rather than from the UI state, for the
+            // reason TodayViewModel.addEntry spells out: the state holds the
+            // defaults until the first emission.
+            val local = prefs.settingsFlow.first()
+            val dayChange = BackupDayChange(
+                hour = result.settings?.dayChangeHour ?: local.dayChangeHour,
+                minute = result.settings?.dayChangeMinute ?: local.dayChangeMinute,
+            )
+
             // the transaction that spans entries + drinks is owned
             // by BackupRepository, keeping this ViewModel free of AppDatabase.
             try {
                 val stats = when (mode) {
-                    ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries)
-                    ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries)
+                    ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries, dayChange)
+                    ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries, dayChange)
                 }
 
                 // Restore the preferences from the backup — but only for a full

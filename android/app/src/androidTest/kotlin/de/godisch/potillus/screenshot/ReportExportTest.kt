@@ -94,7 +94,9 @@ import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until
 import de.godisch.potillus.MainActivity
 import de.godisch.potillus.PotillusApp
+import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.domain.LocaleDetector
+import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.PdfReportBuilder
@@ -163,7 +165,15 @@ class ReportExportTest {
             withTimeout(READY_TIMEOUT_MS) {
                 app.drinkRepository.drinks.first { it.size >= parsed.drinks.size }
             }
-            app.backupRepository.importReplace(parsed.drinks, parsed.entries)
+            // The boundary the fixture's `logicalDate` values were written under.
+            // Only the repair of pre-0.85.0 calendar entries reads it; the days
+            // themselves are re-derived after the import. The fixture carries a
+            // settings block, so the fall-back arm is a guard, not a path.
+            val fixtureDayChange = BackupDayChange(
+                hour = parsed.settings?.dayChangeHour ?: AppSettings().dayChangeHour,
+                minute = parsed.settings?.dayChangeMinute ?: AppSettings().dayChangeMinute,
+            )
+            app.backupRepository.importReplace(parsed.drinks, parsed.entries, fixtureDayChange)
 
             // Apply the fixture's settings. Until 0.84.0 the fixture carried none
             // and this step did not exist, so the report and the screens showed

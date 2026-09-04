@@ -52,7 +52,6 @@ struct CsvVectors: Decodable {
         let headers: [String]
         let entries: [VectorEntry]
         let drinks: [VectorDrink]
-        let zoneId: String
         let expected: String
     }
 
@@ -65,12 +64,14 @@ struct CsvVectors: Decodable {
         let timestampMillis: Int64
         let logicalDate: String
         let note: String
+        let utcOffsetSeconds: Int
 
         var domain: ConsumptionEntry {
             ConsumptionEntry(
                 drinkId: drinkId, drinkName: drinkName, volumeMl: volumeMl,
                 alcoholPercent: alcoholPercent, gramsAlcohol: gramsAlcohol,
-                timestampMillis: timestampMillis, logicalDate: logicalDate, note: note
+                timestampMillis: timestampMillis, logicalDate: logicalDate, note: note,
+                utcOffsetSeconds: utcOffsetSeconds
             )
         }
     }
@@ -116,16 +117,12 @@ final class CsvExporterTests: XCTestCase {
 
     // ── buildCsv ─────────────────────────────────────────────────────────────
 
-    func testBuildCsvAgainstSharedVectors() throws {
+    func testBuildCsvAgainstSharedVectors() {
         for testCase in vectors.buildCsv {
-            let zone = try XCTUnwrap(
-                TimeZone(identifier: testCase.zoneId), "unknown zone \(testCase.zoneId)"
-            )
             let actual = CsvExporter.buildCsv(
                 headerCells: testCase.headers,
                 entries: testCase.entries.map(\.domain),
-                drinks: testCase.drinks.map(\.domain),
-                timeZone: zone
+                drinks: testCase.drinks.map(\.domain)
             )
             XCTAssertEqual(actual, testCase.expected, "buildCsv: \(testCase.description)")
         }
@@ -147,11 +144,12 @@ final class CsvExporterTests: XCTestCase {
     func testGramsUseADotDecimalSeparator() {
         let entry = ConsumptionEntry(
             drinkId: 1, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: 19.6, timestampMillis: 0, logicalDate: "2026-01-01"
+            gramsAlcohol: 19.6, timestampMillis: 0, logicalDate: "2026-01-01",
+            utcOffsetSeconds: 0
         )
         let csv = CsvExporter.buildCsv(
-            headerCells: ["d", "t", "n", "c", "v", "a", "g", "note"],
-            entries: [entry], drinks: [], timeZone: TimeZone(identifier: "UTC")!
+            headerCells: ["d", "t", "n", "c", "v", "a", "g", "note", "ld"],
+            entries: [entry], drinks: []
         )
         XCTAssertTrue(csv.contains(",19.60,"), "expected a dot separator, got: \(csv)")
         XCTAssertFalse(csv.contains("19,60"))
@@ -170,37 +168,39 @@ final class CsvExporterTests: XCTestCase {
     func testAnEntryWhoseDrinkIsGoneFallsBackToOther() {
         let entry = ConsumptionEntry(
             drinkId: 404, drinkName: "Ghost", volumeMl: 100, alcoholPercent: 40.0,
-            gramsAlcohol: 31.56, timestampMillis: 0, logicalDate: "2026-01-01"
+            gramsAlcohol: 31.56, timestampMillis: 0, logicalDate: "2026-01-01",
+            utcOffsetSeconds: 0
         )
         let csv = CsvExporter.buildCsv(
-            headerCells: ["d", "t", "n", "c", "v", "a", "g", "note"],
-            entries: [entry], drinks: [], timeZone: TimeZone(identifier: "UTC")!
+            headerCells: ["d", "t", "n", "c", "v", "a", "g", "note", "ld"],
+            entries: [entry], drinks: []
         )
         XCTAssertTrue(csv.contains(",OTHER,"))
     }
 
-    /// The time column shows wall-clock time in the given zone; `logicalDate` is
-    /// the stored logical day. Around the day-change hour the two disagree, and
-    /// that is correct.
-    func testTimeColumnFollowsTheGivenZone() {
-        let entry = ConsumptionEntry(
-            drinkId: 1, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: 19.3, timestampMillis: 1_767_381_240_000,
-            logicalDate: "2026-01-02"
-        )
-        let headers = ["d", "t", "n", "c", "v", "a", "g", "note"]
+    /// The time column shows wall-clock time in the frame THE ENTRY RECORDS;
+    /// `logicalDate` is the stored logical day. Around the day-change hour the two
+    /// disagree, and that is correct.
+    ///
+    /// The same instant, recorded in two frames, prints two clock times — and no
+    /// zone is passed in any more, which is the point: the export reads each row
+    /// in the frame it was written in, not in the exporter's.
+    func testTimeColumnFollowsTheRecordedFrame() {
+        let headers = ["d", "t", "n", "c", "v", "a", "g", "note", "ld"]
+        func row(offsetSeconds: Int) -> String {
+            CsvExporter.buildCsv(
+                headerCells: headers,
+                entries: [ConsumptionEntry(
+                    drinkId: 1, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
+                    gramsAlcohol: 19.3, timestampMillis: 1_767_381_240_000,
+                    logicalDate: "2026-01-02", utcOffsetSeconds: offsetSeconds
+                )],
+                drinks: []
+            )
+        }
 
-        let berlin = CsvExporter.buildCsv(
-            headerCells: headers, entries: [entry], drinks: [],
-            timeZone: TimeZone(identifier: "Europe/Berlin")!
-        )
-        let newYork = CsvExporter.buildCsv(
-            headerCells: headers, entries: [entry], drinks: [],
-            timeZone: TimeZone(identifier: "America/New_York")!
-        )
-
-        XCTAssertTrue(berlin.contains(",20:14,"))
-        XCTAssertTrue(newYork.contains(",14:14,"))
+        XCTAssertTrue(row(offsetSeconds: 3600).contains(",20:14,"))
+        XCTAssertTrue(row(offsetSeconds: -5 * 3600).contains(",14:14,"))
     }
 
     /// The formula guard must not fire on a character that merely appears later
@@ -230,12 +230,12 @@ final class CsvExporterTests: XCTestCase {
         )
         let entry = ConsumptionEntry(
             drinkId: 1, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: 19.3, timestampMillis: 1_767_384_840_000, logicalDate: "2026-01-02"
+            gramsAlcohol: 19.3, timestampMillis: 1_767_384_840_000,
+            logicalDate: "2026-01-02", utcOffsetSeconds: 0
         )
         let csv = CsvExporter.buildCsv(
             headerCells: CsvExporter.englishHeaderCells,
-            entries: [entry], drinks: [drink],
-            timeZone: TimeZone(identifier: "UTC")!
+            entries: [entry], drinks: [drink]
         )
 
         let lines = csv.components(separatedBy: "\r\n").filter { !$0.isEmpty }
@@ -245,7 +245,7 @@ final class CsvExporterTests: XCTestCase {
             lines[1].components(separatedBy: ",").count,
             "header and row must have the same number of columns"
         )
-        XCTAssertEqual(CsvExporter.englishHeaderCells.count, 8)
+        XCTAssertEqual(CsvExporter.englishHeaderCells.count, 9)
     }
 
     // ── Localized headers (Android csv_col_* parity) ─────────────────────────
@@ -255,7 +255,7 @@ final class CsvExporterTests: XCTestCase {
         XCTAssertEqual(
             CsvHeaderLabels.cells(language: "de"),
             ["Datum", "Uhrzeit", "Getränk", "Kategorie",
-             "Menge_ml", "Alkohol_Prozent", "Gramm_Alkohol", "Notiz"])
+             "Menge_ml", "Alkohol_Prozent", "Gramm_Alkohol", "Notiz", "Logischer_Tag"])
     }
 
     func testHeaderCellsFallBackToEnglish() {
@@ -269,7 +269,7 @@ final class CsvExporterTests: XCTestCase {
         let tags = ["", "de", "da", "nl", "nb", "sv", "es", "fr", "it", "pt", "pt-BR",
                     "ro", "cs", "pl", "ru", "uk", "el", "ja", "ko", "zh-Hans", "zh-Hant"]
         for tag in tags {
-            XCTAssertEqual(CsvHeaderLabels.cells(language: tag).count, 8, "language \(tag)")
+            XCTAssertEqual(CsvHeaderLabels.cells(language: tag).count, 9, "language \(tag)")
         }
     }
 }

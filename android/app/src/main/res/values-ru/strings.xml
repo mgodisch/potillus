@@ -51,6 +51,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Выберите напиток …</string>
     <string name="volume_ml">Объём</string>
     <string name="time">Время</string>
+    <string name="date">Дата</string>
+    <string name="entry_counts_toward">Засчитывается в %1$s</string>
     <string name="pure_alcohol">г чистого алкоголя</string>
     <string name="note">Заметка (необязательно)</string>
     <string name="add_drink">Добавить напиток</string>
@@ -197,6 +199,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Алкоголь_процент</string>
     <string name="csv_col_grams">Граммы_алкоголя</string>
     <string name="csv_col_note">Заметка</string>
+    <string name="csv_col_logical_date">Логический_день</string>
     <string name="pdf_unit_g_per_day">г/день</string>
     <string name="drink_days_label">дней с алкоголем (последние 7 дней)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

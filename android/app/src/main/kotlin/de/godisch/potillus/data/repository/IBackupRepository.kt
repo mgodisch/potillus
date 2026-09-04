@@ -43,6 +43,29 @@ import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkDefinition
 
 /**
+ * The day-change boundary the `logicalDate` values in a backup file were written
+ * under.
+ *
+ * A named type rather than two loose `Int` parameters: the pair is meaningless
+ * apart, and two adjacent integers at a call site are the classic place to swap
+ * hour and minute without the compiler noticing.
+ *
+ * WHERE IT COMES FROM. The file's own `settings` block when it has one (format 3
+ * carries `dayChangeHour` and `dayChangeMinute`), because that is the boundary
+ * the file's dates were derived under and it may differ from this device's.
+ * Otherwise — formats 1 and 2 — the device's own setting, which is the best
+ * guess available and the one the app made anyway before it recorded the
+ * setting in backups at all.
+ *
+ * WHAT IT IS FOR. Only the repair of pre-0.85.0 calendar entries (see
+ * [LegacyDayRepair]), which has to place a wall-clock time back onto the logical
+ * day the file names. The days themselves are NOT taken from the file: the
+ * import invalidates the key, and the realignment derives every day afresh under
+ * the setting in force on this device.
+ */
+data class BackupDayChange(val hour: Int, val minute: Int)
+
+/**
  * Counts of rows affected by a single backup import operation.
  *
  * @param imported  Number of entries successfully written to the database.
@@ -67,11 +90,14 @@ interface IBackupRepository {
      *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.
+     * @param dayChange      The boundary the file's dates were written under; see
+     *                       [BackupDayChange].
      * @return [ImportStats] with [ImportStats.imported] = total entries inserted.
      */
     suspend fun importReplace(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats
 
     /**
@@ -91,11 +117,14 @@ interface IBackupRepository {
      *
      * @param backupDrinks   Drink definitions from the parsed backup.
      * @param backupEntries  Consumption entries from the parsed backup.
+     * @param dayChange      The boundary the file's dates were written under; see
+     *                       [BackupDayChange].
      * @return [ImportStats] with both [ImportStats.imported] and
      *                       [ImportStats.skipped] populated.
      */
     suspend fun importMerge(
         backupDrinks: List<DrinkDefinition>,
         backupEntries: List<ConsumptionEntry>,
+        dayChange: BackupDayChange,
     ): ImportStats
 }

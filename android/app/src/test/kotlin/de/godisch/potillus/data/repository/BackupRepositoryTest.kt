@@ -76,7 +76,7 @@ class BackupRepositoryTest {
         val drinks = listOf(drink(1))
         val entries = listOf(entry(1), entry(2), entry(3))
 
-        val stats = fake.importReplace(drinks, entries)
+        val stats = fake.importReplace(drinks, entries, BackupDayChange(hour = 4, minute = 0))
 
         assertEquals(3, stats.imported)
         assertEquals(0, stats.skipped)
@@ -93,7 +93,7 @@ class BackupRepositoryTest {
         val drinks = listOf(drink(1))
         val entries = listOf(entry(1), entry(2), entry(3))
 
-        val stats = fake.importMerge(drinks, entries)
+        val stats = fake.importMerge(drinks, entries, BackupDayChange(hour = 4, minute = 0))
 
         assertEquals(2, stats.imported)
         assertEquals(1, stats.skipped)
@@ -110,7 +110,7 @@ class BackupRepositoryTest {
         val fake = FakeBackupRepository().also {
             it.throwOnImport = RuntimeException("simulated DB failure")
         }
-        val result = runCatching { fake.importReplace(emptyList(), emptyList()) }
+        val result = runCatching { fake.importReplace(emptyList(), emptyList(), BackupDayChange(hour = 4, minute = 0)) }
         assertTrue("Expected exception", result.isFailure)
         assertEquals("simulated DB failure", result.exceptionOrNull()?.message)
     }
@@ -287,5 +287,6 @@ class BackupRepositoryTest {
         gramsAlcohol = 19.73,
         timestampMillis = 1_736_935_200_000L,
         logicalDate = "2026-01-15",
+        utcOffsetSeconds = 0,
     )
 }

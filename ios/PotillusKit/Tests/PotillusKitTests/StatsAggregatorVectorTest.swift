@@ -30,12 +30,12 @@ import XCTest
 /// `hourBucketAverages` from the shared `stats-aggregator.json` vectors — the
 /// file Android's `StatsAggregatorVectorTest.kt` feeds to its new
 /// `domain/StatsAggregator.kt`. Every vector entry carries `utcOffsetSeconds`,
-/// so the fallback zone passed below never decides an hour.
+/// which is now the only thing that decides an hour: the reader's zone is not a
+/// parameter any more.
 final class StatsAggregatorVectorTest: XCTestCase {
 
     func testTheThreeAggregationsMatchTheVectors() throws {
         let vectors = try TestVectors.load("stats-aggregator", as: StatsAggregatorVectors.self)
-        let fallback = TimeZone(identifier: "UTC")!
         for testCase in vectors.cases {
             let drinks = testCase.drinks.map { pair -> DrinkDefinition in
                 DrinkDefinition(
@@ -64,12 +64,12 @@ final class StatsAggregatorVectorTest: XCTestCase {
                 )
             }
             assertDoubles(
-                StatsAggregator.hourlyGrams(entries: entries, timeZone: fallback),
+                StatsAggregator.hourlyGrams(entries: entries),
                 testCase.expected.hourlyGrams, "\(testCase.description): hourlyGrams"
             )
             assertDoubles(
                 StatsAggregator.hourBucketAverages(
-                    entries: entries, effectivePeriodDays: testCase.effectivePeriodDays, timeZone: fallback
+                    entries: entries, effectivePeriodDays: testCase.effectivePeriodDays
                 ),
                 testCase.expected.hourBucketAverages, "\(testCase.description): hourBucketAverages"
             )

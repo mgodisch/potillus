@@ -51,6 +51,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Vyberte nápoj …</string>
     <string name="volume_ml">Množství</string>
     <string name="time">Čas</string>
+    <string name="date">Datum</string>
+    <string name="entry_counts_toward">Počítá se ke dni %1$s</string>
     <string name="pure_alcohol">g čistého alkoholu</string>
     <string name="note">Poznámka (volitelně)</string>
     <string name="add_drink">Přidat nápoj</string>
@@ -197,6 +199,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alkohol_procento</string>
     <string name="csv_col_grams">Gramy_alkoholu</string>
     <string name="csv_col_note">Poznámka</string>
+    <string name="csv_col_logical_date">Logický_den</string>
     <string name="pdf_unit_g_per_day">g/den</string>
     <string name="drink_days_label">dny pití (posledních 7 dní)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

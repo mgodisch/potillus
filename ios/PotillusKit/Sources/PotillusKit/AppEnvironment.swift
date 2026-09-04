@@ -55,6 +55,11 @@ public struct AppEnvironment: Sendable {
     public let clock: any Clock
     public let importer: BackupImporter
 
+    /// Watches the day-change setting and rewrites the derived logical day after
+    /// it moves. Assembled here so the scene has one thing to start; see
+    /// `DayRealignment`.
+    public let realignment: DayRealignment
+
     public init(
         database: AppDatabase,
         drinks: any DrinkRepositoryProtocol,
@@ -68,6 +73,7 @@ public struct AppEnvironment: Sendable {
         self.preferences = preferences
         self.clock = clock
         self.importer = BackupImporter(database: database, preferences: preferences)
+        self.realignment = DayRealignment(entries: entries, preferences: preferences)
     }
 
     /// The real environment: an on-disk database and a Keychain-backed store.

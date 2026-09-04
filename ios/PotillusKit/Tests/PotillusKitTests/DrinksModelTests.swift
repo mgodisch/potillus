@@ -155,8 +155,11 @@ final class DrinksModelTests: XCTestCase {
         _ = try environment.entries.add(
             ConsumptionEntry(
                 drinkId: drink.id, drinkName: drink.name, volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: 19.3, timestampMillis: 1_000, logicalDate: "2026-01-01"
-            )
+                gramsAlcohol: 19.3, timestampMillis: 1_767_268_800_000,  // noon, 1 Jan 2026
+                logicalDate: "2026-01-01",
+                utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
 
         XCTAssertFalse(model.delete(drink))

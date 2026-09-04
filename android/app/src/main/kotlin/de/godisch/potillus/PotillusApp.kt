@@ -58,6 +58,7 @@ import de.godisch.potillus.data.repository.EntryRepository
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
+import de.godisch.potillus.data.repository.RoomTransactor
 import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.l10n.SupportedLocales
@@ -119,7 +120,13 @@ class PotillusApp : Application() {
     val drinkRepository: IDrinkRepository by lazy { DrinkRepository(database.drinkDao()) }
 
     /** Repository for consumption entries. */
-    val entryRepository: IEntryRepository by lazy { EntryRepository(database.entryDao()) }
+    val entryRepository: IEntryRepository by lazy {
+        EntryRepository(
+            dao = database.entryDao(),
+            keyDao = database.logicalDayKeyDao(),
+            transactor = RoomTransactor(database),
+        )
+    }
 
     /**
      * Transactional backup import repository.
@@ -129,7 +136,12 @@ class PotillusApp : Application() {
      * the ViewModel no longer needs a direct [AppDatabase] reference.
      */
     val backupRepository: IBackupRepository by lazy {
-        BackupRepository(database.entryDao(), database.drinkDao(), database)
+        BackupRepository(
+            database.entryDao(),
+            database.drinkDao(),
+            database.logicalDayKeyDao(),
+            database,
+        )
     }
 
     /**
@@ -148,6 +160,43 @@ class PotillusApp : Application() {
             // applySystemLanguage() needs the startup settings snapshot.
             val startupSettings = appPreferences.settingsFlow.first()
             applySystemLanguage(startupSettings)
+        }
+        applicationScope.launch(Dispatchers.IO) {
+            keepLogicalDaysAligned()
+        }
+    }
+
+    /**
+     * Keeps `entries.logicalDate` in step with the day-change setting, for as
+     * long as the process lives.
+     *
+     * WHY A COLLECTION AND NOT A SINGLE READ. The logical day is derived from the
+     * day-change time, so moving that setting changes what every screen should
+     * show — retroactively, which is the point of the whole design. Reading the
+     * setting once at startup would postpone the effect to the next launch and
+     * leave the app showing days that no longer follow from the setting the user
+     * is looking at.
+     *
+     * WHY IT IS CHEAP TO RUN ON EVERY EMISSION. `settingsFlow` emits for any
+     * preference the user touches, most of which have nothing to do with days.
+     * [IEntryRepository.realignDays] compares the setting against the key first
+     * and returns having read one row when they agree, which is almost always.
+     *
+     * WHY IT IS SAFE TO START BEFORE ANYTHING ELSE. The first emission usually
+     * finds the key unset — a fresh `MIGRATION_3_4` leaves it that way — and does
+     * the initial derivation, including the repair of pre-0.85.0 calendar
+     * entries. If the preference store cannot be read at all, the flow does not
+     * emit, nothing runs, and the app shows the days as stored: what the previous
+     * release showed permanently. Nothing is guessed and nothing is lost, because
+     * the old `logicalDate` stays until a run completes.
+     *
+     * THREAD: Dispatchers.IO. The collection reads DataStore and the realignment
+     * writes the database; neither belongs on the main thread, and the settings
+     * screen stays responsive while a large rewrite runs.
+     */
+    private suspend fun keepLogicalDaysAligned() {
+        appPreferences.settingsFlow.collect { settings ->
+            entryRepository.realignDays(settings)
         }
     }
 

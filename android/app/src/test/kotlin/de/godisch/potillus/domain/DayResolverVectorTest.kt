@@ -34,8 +34,11 @@ package de.godisch.potillus.domain
 // day every entry belongs to, so a divergence would silently corrupt daily
 // totals, the rolling 7-day window, violation counts and streaks alike.
 //
-// The vectors cover the two traps: DST transitions (the spring-forward gap and
-// the fall-back repetition) and cross-timezone instants.
+// The vectors cover what a recorded frame leaves of the two traps: each instant
+// around a daylight-saving switch is read once in the offset before it and once
+// in the offset after, and the same instant is read in two frames. A fixed
+// offset knows no switch, so the pairs are the statement `resolve` can still
+// make — and the one that lands on two days is the one that matters.
 //
 // This complements — it does not replace — DayResolverTest.kt, which remains the
 // authoritative, expressive unit suite the vectors were harvested from.
@@ -45,9 +48,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNull
 import org.junit.Test
-import java.time.ZoneId
 import java.util.Locale
 
 class DayResolverVectorTest {
@@ -72,9 +73,9 @@ class DayResolverVectorTest {
         VECTORS.getJSONArray("resolve").objects().forEach { case ->
             val actual = DayResolver.resolve(
                 timestampMillis = case.getLong("epochMillis"),
+                utcOffsetSeconds = case.getInt("utcOffsetSeconds"),
                 changeHour = case.getInt("changeHour"),
                 changeMinute = case.getInt("changeMinute"),
-                zoneId = ZoneId.of(case.getString("zoneId")),
             )
             assertEquals(
                 "resolve: ${case.getString("description")}",
@@ -84,92 +85,40 @@ class DayResolverVectorTest {
         }
     }
 
-    // ── calendarDate ─────────────────────────────────────────────────────────
+    // ── logicalDayDiffers ────────────────────────────────────────────────────
 
     @Test
-    fun `calendarDate matches the shared vectors`() {
-        VECTORS.getJSONArray("calendarDate").objects().forEach { case ->
-            assertEquals(
-                "calendarDate: ${case.getString("description")}",
-                case.getString("expected"),
-                DayResolver.calendarDate(case.getLong("timestampMillis"), ZoneId.of(case.getString("zoneId"))),
-            )
-        }
-    }
-
-    // ── instantOnLogicalDate ─────────────────────────────────────────────────
-
-    @Test
-    fun `instantOnLogicalDate matches the shared vectors`() {
-        VECTORS.getJSONArray("instantOnLogicalDate").objects().forEach { case ->
-            val actual = DayResolver.instantOnLogicalDate(
-                logicalDate = case.getString("logicalDate"),
-                hour = case.getInt("hour"),
-                minute = case.getInt("minute"),
+    fun `logicalDayDiffers matches the shared vectors`() {
+        VECTORS.getJSONArray("logicalDayDiffers").objects().forEach { case ->
+            val actual = DayResolver.logicalDayDiffers(
+                timestampMillis = case.getLong("epochMillis"),
+                utcOffsetSeconds = case.getInt("utcOffsetSeconds"),
                 changeHour = case.getInt("changeHour"),
                 changeMinute = case.getInt("changeMinute"),
-                zoneId = ZoneId.of(case.getString("zoneId")),
+                logicalDay = case.getString("logicalDay"),
             )
             assertEquals(
-                "instantOnLogicalDate: ${case.getString("description")}",
-                case.getLong("expected"),
+                "logicalDayDiffers: ${case.getString("description")}",
+                case.getBoolean("expected"),
                 actual,
             )
         }
     }
 
     /**
-     * [DayResolver.instantOnLogicalDate] and [DayResolver.resolve] are inverses:
-     * an instant built for a logical date must resolve back to it. This is the
-     * property the calendar relies on when it logs to a day other than today.
+     * The same instant is a different logical day in a different frame. This is
+     * not a quirk to smooth over — it is why the offset is an explicit parameter
+     * rather than an ambient global. 23:00 read at −04:00 is already 05:00 the
+     * next day at +02:00, so with a 04:00 boundary the two readings disagree by
+     * one day. The entry keeps the frame it was written in, so the day it counts
+     * toward does not move when the device zone does.
      */
     @Test
-    fun `instantOnLogicalDate round trips through resolve`() {
-        val berlin = ZoneId.of("Europe/Berlin")
-        listOf(20 to 0, 1 to 0, 4 to 0, 3 to 59, 23 to 30).forEach { (hour, minute) ->
-            val millis = DayResolver.instantOnLogicalDate(
-                logicalDate = "2026-08-30",
-                hour = hour,
-                minute = minute,
-                changeHour = 4,
-                changeMinute = 0,
-                zoneId = berlin,
-            )
-            assertEquals(
-                "round trip at $hour:$minute",
-                "2026-08-30",
-                DayResolver.resolve(millis!!, 4, 0, berlin),
-            )
-        }
-    }
-
-    /** A date the parser does not accept yields null rather than a guess. */
-    @Test
-    fun `instantOnLogicalDate rejects a non canonical date`() {
-        assertNull(
-            DayResolver.instantOnLogicalDate(
-                logicalDate = "2026-8-30",
-                hour = 20,
-                minute = 0,
-                changeHour = 4,
-                changeMinute = 0,
-                zoneId = ZoneId.of("Europe/Berlin"),
-            ),
-        )
-    }
-
-    /**
-     * The same instant is a different logical day in different zones. This is not
-     * a quirk to smooth over — it is why the zone is an explicit parameter rather
-     * than an ambient global. 23:00 in New York is already 05:00 the next day in
-     * Berlin, so with a 04:00 boundary the two zones disagree by one day.
-     */
-    @Test
-    fun `resolve is timezone dependent for the same instant`() {
+    fun `resolve follows the offset it is given for the same instant`() {
         val instant = 1_748_142_000_000L
-        val inNewYork = DayResolver.resolve(instant, 4, 0, ZoneId.of("America/New_York"))
-        val inBerlin = DayResolver.resolve(instant, 4, 0, ZoneId.of("Europe/Berlin"))
-        assertNotEquals("The same instant must resolve per zone", inNewYork, inBerlin)
+        val atMinusFour = DayResolver.resolve(instant, -4 * 3600, 4, 0)
+        val atPlusTwo = DayResolver.resolve(instant, 2 * 3600, 4, 0)
+        assertNotEquals("The same instant must resolve per frame", atMinusFour, atPlusTwo)
     }
 
     // ── effectivePeriodDays ──────────────────────────────────────────────────

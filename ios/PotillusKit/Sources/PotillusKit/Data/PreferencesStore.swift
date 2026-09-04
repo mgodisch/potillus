@@ -237,8 +237,8 @@ public actor PreferencesStore: PreferencesStoring {
         // A user installing at 02:00 with a 04:00 day-change boundary installed
         // today, whatever their drinking day says. Android reads the calendar
         // date of firstInstallTime the same way.
-        settings.statsFromDate = DayResolver.resolve(
-            timestampMillis: nowMillis,
+        settings.statsFromDate = DayResolver.today(
+            now: nowMillis,
             changeHour: 0,
             changeMinute: 0
         )

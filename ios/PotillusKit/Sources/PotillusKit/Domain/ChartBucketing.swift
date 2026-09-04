@@ -183,7 +183,7 @@ public enum ChartBucketing {
 
             // See the two consequences documented above.
             var bucketHoldsInProgressDay = false
-            // `inProgressDay` comes from `DayResolver.resolve`, so a parse failure
+            // `inProgressDay` comes from `DayResolver.today`, so a parse failure
             // is a bug (CONTRIBUTING §3); Android's `LocalDate.parse` throws here.
             assert(inProgressDay.map { DayResolver.parseDate($0) != nil } ?? true,
                    "bucketize: non-canonical inProgressDay")

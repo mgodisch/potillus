@@ -218,8 +218,8 @@ public final class DrinkCapacityModel {
     private func currentDay() async -> String {
         let settings = await preferences.load()
         let nowMillis = Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
-        return DayResolver.resolve(
-            timestampMillis: nowMillis,
+        return DayResolver.today(
+            now: nowMillis,
             changeHour: settings.dayChangeHour,
             changeMinute: settings.dayChangeMinute,
             timeZone: timeZone

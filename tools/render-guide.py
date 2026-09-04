@@ -199,6 +199,7 @@ TOKEN_TO_KEY = {
     # Logging an entry and correcting it.
     "drink": "Drink",
     "volume_ml": "Amount",
+    "date": "Date",
     "time": "Time",
     "note": "Note",
     "alcohol_content": "Alcohol Content",

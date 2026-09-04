@@ -35,15 +35,17 @@ import XCTest
 // every entry belongs to, a divergence here would silently corrupt daily totals,
 // the rolling seven-day window, violation counts, and streaks alike.
 //
-// The vectors deliberately include the two traps: DST transitions (the
-// spring-forward gap and the fall-back repetition) and cross-timezone instants.
+// The vectors cover what a recorded frame leaves of the two traps: each instant
+// around a daylight-saving switch is read once in the offset before it and once
+// in the offset after, and the same instant is read in two frames. A fixed
+// offset knows no switch, so the pairs are the statement `resolve` can still
+// make — and the one that lands on two days is the one that matters.
 // =============================================================================
 
 /// Root of `test-vectors/day-resolver.json`.
 struct DayResolverVectors: Decodable {
     let resolve: [ResolveCase]
-    let instantOnLogicalDate: [InstantCase]
-    let calendarDate: [CalendarDateCase]
+    let logicalDayDiffers: [LogicalDayDiffersCase]
     let effectivePeriodDays: [EffectiveDaysCase]
     let windowDays: [WindowDaysCase]
     let computeCurrentAbstinence: [CurrentAbstinenceCase]
@@ -54,30 +56,24 @@ struct DayResolverVectors: Decodable {
         let description: String
         /// Absolute instant. `Int64` because millisecond epochs overflow `Int32`.
         let epochMillis: Int64
-        /// IANA zone identifier, e.g. `Europe/Berlin`.
-        let zoneId: String
+        /// The frame the reading was taken in. No zone is consulted.
+        let utcOffsetSeconds: Int
         let changeHour: Int
         let changeMinute: Int
         let expected: String
     }
 
-    struct CalendarDateCase: Decodable {
+    struct LogicalDayDiffersCase: Decodable {
         let description: String
-        let timestampMillis: Int64
-        let zoneId: String
-        let expected: String
-    }
-
-    struct InstantCase: Decodable {
-        let description: String
-        let logicalDate: String
-        let hour: Int
-        let minute: Int
+        /// The composed instant of the date and time in the sheet.
+        let epochMillis: Int64
+        let utcOffsetSeconds: Int
         let changeHour: Int
         let changeMinute: Int
-        let zoneId: String
-        /// Absolute instant. `Int64` because millisecond epochs overflow `Int32`.
-        let expected: Int64
+        /// The logical day the sheet was opened on.
+        let logicalDay: String
+        /// True when the entry counts toward another day, so the note shows.
+        let expected: Bool
     }
 
     struct EffectiveDaysCase: Decodable {
@@ -139,101 +135,49 @@ final class DayResolverTests: XCTestCase {
 
     // ── resolve ──────────────────────────────────────────────────────────────
 
-    func testResolveAgainstSharedVectors() throws {
+    func testResolveAgainstSharedVectors() {
         for testCase in vectors.resolve {
-            let timeZone = try XCTUnwrap(
-                TimeZone(identifier: testCase.zoneId),
-                "Unknown time zone: \(testCase.zoneId)"
-            )
             let actual = DayResolver.resolve(
                 timestampMillis: testCase.epochMillis,
+                utcOffsetSeconds: testCase.utcOffsetSeconds,
                 changeHour: testCase.changeHour,
-                changeMinute: testCase.changeMinute,
-                timeZone: timeZone
+                changeMinute: testCase.changeMinute
             )
             XCTAssertEqual(actual, testCase.expected, "resolve: \(testCase.description)")
         }
     }
 
-    // ── instant ──────────────────────────────────────────────────────────────
+    // ── logicalDayDiffers ────────────────────────────────────────────────────
 
-    func testCalendarDateAgainstSharedVectors() throws {
-        for testCase in vectors.calendarDate {
-            let timeZone = try XCTUnwrap(TimeZone(identifier: testCase.zoneId), "Unknown time zone: \(testCase.zoneId)")
-            XCTAssertEqual(
-                DayResolver.calendarDate(timestampMillis: testCase.timestampMillis, timeZone: timeZone),
-                testCase.expected, "calendarDate: \(testCase.description)"
-            )
-        }
-    }
-
-    func testInstantAgainstSharedVectors() throws {
-        for testCase in vectors.instantOnLogicalDate {
-            let timeZone = try XCTUnwrap(
-                TimeZone(identifier: testCase.zoneId),
-                "Unknown time zone: \(testCase.zoneId)"
-            )
-            let actual = DayResolver.instant(
-                logicalDate: testCase.logicalDate,
-                hour: testCase.hour,
-                minute: testCase.minute,
+    func testLogicalDayDiffersAgainstSharedVectors() {
+        for testCase in vectors.logicalDayDiffers {
+            let actual = DayResolver.logicalDayDiffers(
+                timestampMillis: testCase.epochMillis,
+                utcOffsetSeconds: testCase.utcOffsetSeconds,
                 changeHour: testCase.changeHour,
                 changeMinute: testCase.changeMinute,
-                timeZone: timeZone
+                logicalDay: testCase.logicalDay
             )
-            XCTAssertEqual(actual, testCase.expected, "instant: \(testCase.description)")
+            XCTAssertEqual(actual, testCase.expected, "logicalDayDiffers: \(testCase.description)")
         }
     }
 
-    /// `instant` and `resolve` are inverses: an instant built for a logical date
-    /// must resolve back to it. This is the property the calendar relies on when
-    /// it logs to a day other than today.
-    func testInstantRoundTripsThroughResolve() throws {
-        let berlin = try XCTUnwrap(TimeZone(identifier: "Europe/Berlin"))
-        for (hour, minute) in [(20, 0), (1, 0), (4, 0), (3, 59), (23, 30)] {
-            let millis = try XCTUnwrap(
-                DayResolver.instant(
-                    logicalDate: "2026-08-30", hour: hour, minute: minute,
-                    changeHour: 4, changeMinute: 0, timeZone: berlin
-                )
-            )
-            XCTAssertEqual(
-                DayResolver.resolve(
-                    timestampMillis: millis, changeHour: 4, changeMinute: 0, timeZone: berlin
-                ),
-                "2026-08-30",
-                "round trip at \(hour):\(minute)"
-            )
-        }
-    }
-
-    /// A date the parser does not accept yields nil rather than a guess.
-    func testInstantRejectsANonCanonicalDate() throws {
-        let berlin = try XCTUnwrap(TimeZone(identifier: "Europe/Berlin"))
-        XCTAssertNil(
-            DayResolver.instant(
-                logicalDate: "2026-8-30", hour: 20, minute: 0,
-                changeHour: 4, changeMinute: 0, timeZone: berlin
-            )
-        )
-    }
-
-    /// The same instant is a different logical day in different zones. This is
-    /// not a quirk to be smoothed over — it is the reason the zone must be an
-    /// explicit parameter rather than an ambient global.
-    func testResolveIsTimeZoneDependentForTheSameInstant() throws {
-        // 2025-05-24 23:00 in New York is already 05:00 on the 25th in Berlin.
+    /// The same instant is a different logical day in a different frame. This is
+    /// not a quirk to be smoothed over — it is the reason the offset must be an
+    /// explicit parameter rather than an ambient global. The entry keeps the
+    /// frame it was written in, so the day it counts toward does not move when
+    /// the device zone does.
+    func testResolveFollowsTheOffsetItIsGivenForTheSameInstant() {
+        // 2025-05-24 23:00 read at -04:00 is already 05:00 on the 25th at +02:00.
         let instant: Int64 = 1_748_142_000_000
-        let newYork = try XCTUnwrap(TimeZone(identifier: "America/New_York"))
-        let berlin = try XCTUnwrap(TimeZone(identifier: "Europe/Berlin"))
 
-        let inNewYork = DayResolver.resolve(
-            timestampMillis: instant, changeHour: 4, changeMinute: 0, timeZone: newYork
+        let atMinusFour = DayResolver.resolve(
+            timestampMillis: instant, utcOffsetSeconds: -4 * 3600, changeHour: 4, changeMinute: 0
         )
-        let inBerlin = DayResolver.resolve(
-            timestampMillis: instant, changeHour: 4, changeMinute: 0, timeZone: berlin
+        let atPlusTwo = DayResolver.resolve(
+            timestampMillis: instant, utcOffsetSeconds: 2 * 3600, changeHour: 4, changeMinute: 0
         )
-        XCTAssertNotEqual(inNewYork, inBerlin, "The same instant must resolve per zone")
+        XCTAssertNotEqual(atMinusFour, atPlusTwo, "The same instant must resolve per frame")
     }
 
     // ── effectivePeriodDays ──────────────────────────────────────────────────
@@ -378,29 +322,20 @@ extension DayResolverTests {
     }
 
     func testDisplayTimeZoneUsesTheRecordedOffset() {
-        let zone = DayResolver.displayTimeZone(
-            utcOffsetSeconds: 3600, fallback: TimeZone(identifier: "America/New_York")!
-        )
-        XCTAssertEqual(zone.secondsFromGMT(), 3600)
-    }
-
-    /// Nil is not UTC: an entry that recorded no frame falls back to the device
-    /// zone, which is what the app did for every entry before the field existed.
-    func testDisplayTimeZoneFallsBackWhenNothingWasRecorded() {
-        let fallback = TimeZone(identifier: "Europe/Berlin")!
+        XCTAssertEqual(DayResolver.displayTimeZone(utcOffsetSeconds: 3600).secondsFromGMT(), 3600)
+        XCTAssertEqual(DayResolver.displayTimeZone(utcOffsetSeconds: 0).secondsFromGMT(), 0)
         XCTAssertEqual(
-            DayResolver.displayTimeZone(utcOffsetSeconds: nil, fallback: fallback), fallback
+            DayResolver.displayTimeZone(utcOffsetSeconds: -5 * 3600).secondsFromGMT(), -5 * 3600
         )
     }
 
     /// 22:30 in Berlin in January, read from a device that has since moved to New
-    /// York. The recorded frame still says 22:30.
+    /// York. The recorded frame still says 22:30 — and there is no zone to pass
+    /// in any more, which is what makes that unconditional.
     func testARecordedFrameSurvivesAChangeOfZone() {
         let instant = Date(timeIntervalSince1970: 1_768_512_600)  // 2026-01-15T21:30Z
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = DayResolver.displayTimeZone(
-            utcOffsetSeconds: 3600, fallback: TimeZone(identifier: "America/New_York")!
-        )
+        calendar.timeZone = DayResolver.displayTimeZone(utcOffsetSeconds: 3600)
         XCTAssertEqual(calendar.component(.hour, from: instant), 22)
         XCTAssertEqual(calendar.component(.minute, from: instant), 30)
         XCTAssertEqual(calendar.component(.day, from: instant), 15)

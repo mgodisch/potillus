@@ -103,14 +103,22 @@ data class DrinkDefinition(
  *                        re-deriving the value from volume × ABV on every read.
  * @param timestampMillis Unix epoch milliseconds (UTC) of the consumption event.
  * @param utcOffsetSeconds UTC offset in force where and when the drink was
- *                        logged, which is what the entry's clock time is read
- *                        in. `null` for entries written before the field
- *                        existed and for backups that predate it; see
- *                        [de.godisch.potillus.domain.DayResolver.localDateTime].
- * @param logicalDate     ISO-8601 "YYYY-MM-DD" resolved by
- *                        [de.godisch.potillus.domain.DayResolver], which attributes
- *                        late-night entries to the previous calendar day when
- *                        the timestamp is before the configured day-change time.
+ *                        logged. Together with [timestampMillis] it is the
+ *                        WALL-CLOCK READING the user made, and it is the frame
+ *                        both the displayed time and [logicalDate] are derived
+ *                        in. Every row carries one: schema 4 backfilled the
+ *                        entries written before the column existed and made it
+ *                        NOT NULL (see `MIGRATION_3_4`), and an import fills it
+ *                        from the device zone for a backup that predates the
+ *                        field.
+ * @param logicalDate     ISO-8601 "YYYY-MM-DD" DERIVED from [timestampMillis],
+ *                        [utcOffsetSeconds] and the day-change time by
+ *                        [de.godisch.potillus.domain.DayResolver.resolve], which
+ *                        attributes a reading before the boundary to the previous
+ *                        calendar day. Stored rather than recomputed on read, and
+ *                        rewritten from the timestamp whenever the day-change
+ *                        time moves — see the key table `logical_day_key` and
+ *                        [de.godisch.potillus.data.repository.IEntryRepository.realignDays].
  * @param note            Optional free-text annotation (empty string if absent).
  */
 data class ConsumptionEntry(
@@ -123,7 +131,11 @@ data class ConsumptionEntry(
     val timestampMillis: Long,
     val logicalDate: String,
     val note: String = "",
-    val utcOffsetSeconds: Int? = null,
+    // LAST, and without a default: the order matches `ConsumptionEntry` on the
+    // Swift side, whose call sites `check-swift-argument-order.py` holds to the
+    // declaration, and dropping the default is what makes the compiler point at
+    // every place that used to leave the frame unrecorded.
+    val utcOffsetSeconds: Int,
 )
 
 /**
@@ -268,6 +280,17 @@ data class DrinkCapacity(
  * @param dailyLimitGrams     Daily pure-alcohol limit in grams.
  * @param weeklyLimitGrams    Pure-alcohol limit in grams for a gliding 7-day window.
  * @param maxDrinkDaysPerWeek Maximum number of drink days within any 7-day window (1–7).
+ * @param statsFromDate       The statistics floor, `"yyyy-MM-dd"`, or empty for
+ *                            none. A LOGICAL day, like every other date the app
+ *                            compares it against — an entry is in or out of the
+ *                            evaluations by the day it counts toward, not by the
+ *                            calendar day its reading falls on.
+ *
+ *                            MOVING [dayChangeHour] THEREFORE MOVES ENTRIES
+ *                            ACROSS THIS FLOOR, and can lengthen or shorten a
+ *                            past abstinence streak. That is intended: the
+ *                            figures answer under the boundary the user has set,
+ *                            not under the one they had when they logged.
  */
 data class AppSettings(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,

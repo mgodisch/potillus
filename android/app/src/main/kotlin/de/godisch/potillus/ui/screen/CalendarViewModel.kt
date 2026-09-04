@@ -37,6 +37,13 @@ package de.godisch.potillus.ui.screen
 //   - Keeps the two DB queries independent so that tapping a day does not
 //     re-trigger the heavier period query.
 //
+// THE CALENDAR SHOWS LOGICAL DAYS, NOT CALENDAR DAYS
+//   The cell for day D lists the entries whose DERIVED day is D, and the daily
+//   total, the traffic light, the month rollup and the year heat-map follow that
+//   same attribution — so the Today screen and the calendar never disagree about
+//   how much a day held. Within a cell the entries are ordered by INSTANT, as on
+//   the Today screen: 20:00, 23:00, 01:00.
+//
 // See ViewModels.kt (package overview) for the shared Flow → StateFlow
 // pattern, @Immutable contract, manual-DI rationale, and Log-guard rule.
 // =============================================================================
@@ -426,43 +433,26 @@ class CalendarViewModel(
                 }
                 today
             }
-            // The dialog hands back TODAY at the chosen time, because its picker
-            // offers hours and minutes only. Storing that verbatim gave an entry
-            // logged for a past evening today's instant while its logicalDate said
-            // otherwise — the two facts contradicted each other, and everything
-            // reading the instant (the blood-alcohol estimate, the most recent
-            // entry) believed the wrong one. The time is kept, the day is the one
-            // the user selected.
-            val onSelectedDay = DayResolver.instantOnLogicalDate(
-                logicalDate = logicalDate,
-                timestampMillis = timestampMillis,
-                changeHour = settings.dayChangeHour,
-                changeMinute = settings.dayChangeMinute,
-            ) ?: timestampMillis
-            entryRepo.addFromDrinkWithDate(drink, volumeMl, onSelectedDay, note, logicalDate)
+            // THE INSTANT IS PASSED THROUGH, NOT PLACED. The sheet composes it
+            // from its own date and time fields — and its date follows the tapped
+            // day, so an entry booked onto the 12th still lands on the 12th. This
+            // method used to do that placing, because the sheet offered hours and
+            // minutes alone and handed back TODAY at the chosen time.
+            entryRepo.addFromDrink(drink, volumeMl, timestampMillis, note, settings)
         }
     }
 
     /**
-     * Updates a calendar entry, preserving its [ConsumptionEntry.logicalDate].
+     * Updates a calendar entry, as the sheet composed it.
      *
-     * The edited time is placed on the calendar day that keeps the entry on its
-     * logical day, as [addEntry] does: an entry on the logical 10th edited to
-     * "02:00" is stored at 02:00 on the calendar 11th. Until v0.86.0 the
-     * timestamp was stored as typed, so such an edit left an entry whose own
-     * timestamp resolved to another day than the one it was filed under. The
-     * Today screen applies the same rule since v0.86.0 (`TodayViewModel.updateEntry`).
+     * Nothing is placed here any more; the sheet carries a date beside its time.
+     * An entry moved to another day leaves the cell it was opened from, which the
+     * sheet said it would. The Today screen applies the same rule
+     * (`TodayViewModel.updateEntry`).
      */
     fun updateEntry(entry: ConsumptionEntry) {
         viewModelScope.launch {
-            val settings = prefs.settingsFlow.first()
-            val onItsDay = DayResolver.instantOnLogicalDate(
-                logicalDate = entry.logicalDate,
-                timestampMillis = entry.timestampMillis,
-                changeHour = settings.dayChangeHour,
-                changeMinute = settings.dayChangeMinute,
-            ) ?: entry.timestampMillis
-            entryRepo.update(entry.copy(timestampMillis = onItsDay)) // preserves logicalDate
+            entryRepo.update(entry, prefs.settingsFlow.first())
         }
     }
 

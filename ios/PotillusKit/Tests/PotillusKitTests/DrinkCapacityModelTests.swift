@@ -114,8 +114,10 @@ final class DrinkCapacityModelTests: XCTestCase {
                 alcoholPercent: drink.alcoholPercent,
                 gramsAlcohol: grams,
                 timestampMillis: Int64(noon.timeIntervalSince1970 * 1000),
-                logicalDate: date
-            )
+                logicalDate: date,
+                utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
     }
 

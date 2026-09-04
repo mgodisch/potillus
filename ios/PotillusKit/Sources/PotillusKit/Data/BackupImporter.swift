@@ -147,7 +147,7 @@ public struct BackupImporter: Sendable {
     public func restore(
         _ backup: BackupFile, mode: ImportMode, deviceCanAuthenticate: Bool = true
     ) async throws -> ImportStats {
-        let stats = try importData(backup, mode: mode)
+        let stats = try importData(backup, mode: mode, dayChange: await fileDayChange(backup))
         guard mode == .replace else { return stats }
         let lockNotRestored = try await applySettings(
             backup, deviceCanAuthenticate: deviceCanAuthenticate
@@ -159,8 +159,53 @@ public struct BackupImporter: Sendable {
 
     // ── Data ─────────────────────────────────────────────────────────────────
 
-    private func importData(_ backup: BackupFile, mode: ImportMode) throws -> ImportStats {
-        try database.write { db in
+    /// The day-change boundary the file's `logicalDate` values were derived under.
+    ///
+    /// The file's own when it carries a settings block: those dates were written
+    /// under that boundary, and it may differ from this device's. Otherwise —
+    /// formats 1 and 2 — this device's, which is the best available and the one
+    /// the app assumed before it recorded the setting in backups at all.
+    ///
+    /// Only the repair of pre-0.85.0 calendar entries uses it. The days
+    /// themselves are NOT taken from the file: the import invalidates the key,
+    /// and the realignment derives every day afresh under the setting in force
+    /// here. A backup written under another boundary therefore lands on the days
+    /// that hold on this device.
+    private func fileDayChange(_ backup: BackupFile) async -> (hour: Int, minute: Int) {
+        if let settings = backup.settings {
+            return (settings.dayChangeHour, settings.dayChangeMinute)
+        }
+        let local = await preferences?.load() ?? AppSettings()
+        return (local.dayChangeHour, local.dayChangeMinute)
+    }
+
+    private func importData(
+        _ backup: BackupFile, mode: ImportMode, dayChange: (hour: Int, minute: Int)
+    ) throws -> ImportStats {
+        // Outside the transaction: pure arithmetic over values already in memory,
+        // and holding a write open across it would lock the database for nothing.
+        //
+        // The MERGE duplicate check runs on the REPAIRED timestamps, which is
+        // what lets a re-import recognise a row it repaired the first time — as
+        // long as both runs compute the same repair, i.e. same file boundary and
+        // same device zone. Under a changed zone the instants differ and the row
+        // comes in twice; matching on the unrepaired timestamp instead would fail
+        // against local rows that the realignment repaired.
+        let incoming = backup.entries.map { entry -> ConsumptionEntry in
+            guard let fixed = LegacyDayRepair.repair(
+                timestampMillis: entry.timestampMillis,
+                utcOffsetSeconds: entry.utcOffsetSeconds,
+                logicalDate: entry.logicalDate,
+                changeHour: dayChange.hour,
+                changeMinute: dayChange.minute
+            ) else { return entry }
+            var repaired = entry
+            repaired.timestampMillis = fixed.timestampMillis
+            repaired.utcOffsetSeconds = fixed.utcOffsetSeconds
+            return repaired
+        }
+
+        return try database.write { db in
             if mode == .replace {
                 _ = try Entry.deleteAll(db)
                 // Wipe EVERY drink, presets included. The log was just cleared,
@@ -181,7 +226,7 @@ public struct BackupImporter: Sendable {
             var imported = 0
             var skipped = 0
 
-            for entry in backup.entries {
+            for entry in incoming {
                 guard let localDrinkId = idMap[entry.drinkId] else {
                     // Thrown inside the transaction, so nothing is committed.
                     throw ImportError.unmappedDrink(backupDrinkId: entry.drinkId)
@@ -198,6 +243,15 @@ public struct BackupImporter: Sendable {
                 try record.insert(db)
                 imported += 1
             }
+
+            // ROWS WENT IN WITHOUT A DERIVED DAY, so the key goes back to "not
+            // computed yet". That is the rule, not a special case for imports:
+            // any path that inserts rows or moves their reading without deriving
+            // the day invalidates the key, and the next realignment — one
+            // settings emission away — rebuilds the column under this device's
+            // boundary. Inside the transaction, so a rolled-back import cannot
+            // leave the key claiming something about rows that never landed.
+            try LogicalDayKey().save(db)
 
             return ImportStats(imported: imported, skipped: skipped)
         }

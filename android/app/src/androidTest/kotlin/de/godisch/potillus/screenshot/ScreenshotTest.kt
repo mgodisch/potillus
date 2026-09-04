@@ -162,7 +162,9 @@ import androidx.test.uiautomator.Until
 import de.godisch.potillus.MainActivity
 import de.godisch.potillus.PotillusApp
 import de.godisch.potillus.R
+import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.domain.LocaleDetector
+import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.domain.model.ThemeMode
 import de.godisch.potillus.l10n.SupportedLocales
 import de.godisch.potillus.l10n.fmt1
@@ -296,7 +298,15 @@ class ScreenshotTest {
 
             // 1b) Seed the demo data through the REAL repository path so the running app
             //     (which reads the same Room database) shows it.
-            app.backupRepository.importReplace(parsed.drinks, parsed.entries)
+            // The boundary the fixture's `logicalDate` values were written under.
+            // Only the repair of pre-0.85.0 calendar entries reads it; the days
+            // themselves are re-derived after the import. The fixture carries a
+            // settings block, so the fall-back arm is a guard, not a path.
+            val fixtureDayChange = BackupDayChange(
+                hour = parsed.settings?.dayChangeHour ?: AppSettings().dayChangeHour,
+                minute = parsed.settings?.dayChangeMinute ?: AppSettings().dayChangeMinute,
+            )
+            app.backupRepository.importReplace(parsed.drinks, parsed.entries, fixtureDayChange)
 
             // Apply the fixture's settings. Until 0.84.0 the fixture carried none
             // and this step did not exist, so the report and the screens showed
@@ -469,9 +479,7 @@ class ScreenshotTest {
      * @param selector  equivalent UiAutomator selector for stage (b).
      */
     private fun captureWhen(name: String, semantics: SemanticsMatcher, selector: BySelector) {
-        composeRule.waitUntil(readyTimeoutMs) {
-            composeRule.onAllNodes(semantics).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeRule.waitUntil(readyTimeoutMs) { hasNodes(semantics) }
         composeRule.waitForIdle()
         check(device.wait(Until.hasObject(selector), uiTimeoutMs)) {
             "Screen for '$name' never became visible on the device (marker: $selector)"
@@ -540,10 +548,37 @@ class ScreenshotTest {
     private fun waitUntilReady() {
         applyCaptureLanguage()
         val todayLabel = label(R.string.today)
-        composeRule.waitUntil(readyTimeoutMs) {
-            composeRule.onAllNodes(hasText(todayLabel)).fetchSemanticsNodes().isNotEmpty()
-        }
+        composeRule.waitUntil(readyTimeoutMs) { hasNodes(hasText(todayLabel)) }
         composeRule.waitForIdle()
+    }
+
+    /**
+     * Whether any node matches, with "no Compose hierarchy at all" counted as NO.
+     *
+     * WHY THIS IS NOT JUST `fetchSemanticsNodes().isNotEmpty()`. When no Compose
+     * root is registered, `fetchSemanticsNodes` does not return an empty list —
+     * it THROWS `IllegalStateException("No compose hierarchies found in the
+     * app")`. A condition that throws does not make `waitUntil` wait; it
+     * propagates out of it. So a wait that exists precisely to bridge the gap
+     * until a hierarchy appears would abort the moment it looked too early.
+     *
+     * AND IT LOOKS TOO EARLY BY CONSTRUCTION. [waitUntilReady] calls
+     * [applyCaptureLanguage] one line before waiting, which sets the per-app
+     * locale; the framework applies that ASYNCHRONOUSLY and recreates the visible
+     * Activity. Between the old hierarchy going away and the new one registering
+     * there is a window with none, and the first evaluation lands in it often
+     * enough to matter — the same run failed here on one attempt and several
+     * screens later on the next.
+     *
+     * WHAT IS NOT SWALLOWED: the timeout. An Activity that never launches, or one
+     * that launches without content, still fails — after [readyTimeoutMs], with
+     * the message naming what was waited for, instead of immediately with a
+     * message about hierarchies that says nothing about the screen.
+     */
+    private fun hasNodes(matcher: SemanticsMatcher): Boolean = try {
+        composeRule.onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty()
+    } catch (_: IllegalStateException) {
+        false
     }
 
     /**

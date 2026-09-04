@@ -182,7 +182,23 @@ biometric           = "1.1.0"
 # androidx.test.ext:junit provides AndroidJUnit4 + ext assertions. The Compose
 # UI-test artifacts (ui-test-junit4 / ui-test-manifest) are version-managed by
 # the Compose BOM, so they need no version here.
-androidx-test-ext-junit = "1.2.1"
+#
+# THREE androidx.test ARTEFACTS MOVE TOGETHER, and the reason is a platform
+# change rather than a wish for newer numbers. Espresso reaches
+# `android.hardware.input.InputManager.getInstance` by reflection from
+# `Espresso.onIdle`; that method is gone from recent system images, so every
+# Compose UI test on one of them died with a NoSuchMethodException before it
+# could assert anything — including tests that touch nothing but a heading.
+# `espresso-core`, `androidx.test:runner` and `androidx.test.ext:junit` share a
+# release train and a set of transitive `androidx.test` artefacts, so they are
+# raised as a set even where only Espresso is implicated.
+#
+# `uiautomator` STAYS WHERE IT IS. Espresso's reflection is what the platform
+# broke; nothing here asked for 2.4.0, and a version raised on the chance that it
+# might help is a change nobody can attribute later. `screengrab` pulls
+# `androidx.test` in as well and is likewise left alone: it is a fastlane
+# release, not part of that train, and Gradle resolves the higher version.
+androidx-test-ext-junit = "1.3.0"
 
 # ── Previously inline-pinned versions, consolidated here (single source of truth) ──
 # These were hard-coded as string literals in app/build.gradle.kts; the rationale
@@ -194,8 +210,8 @@ junit                   = "4.13.2"    # JUnit 4 (JVM unit tests)
 coroutines-test         = "1.11.0"    # kotlinx-coroutines-test
 turbine                 = "1.2.0"     # Flow/StateFlow test assertions
 org-json                = "20240303"  # real org.json impl for JVM unit tests
-androidx-test-runner    = "1.6.2"     # androidTest runner
-espresso-core           = "3.6.1"     # androidTest Espresso core
+androidx-test-runner    = "1.7.0"     # androidTest runner
+espresso-core           = "3.7.0"     # androidTest Espresso core
 uiautomator             = "2.3.0"     # full-screen capture incl. demo-mode status bar
 screengrab              = "2.1.1"     # fastlane screengrab AAR (Screengrab + LocaleTestRule)
 

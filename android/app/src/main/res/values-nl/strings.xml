@@ -51,6 +51,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Selecteer een drank …</string>
     <string name="volume_ml">Hoeveelheid</string>
     <string name="time">Tijdstip</string>
+    <string name="date">Datum</string>
+    <string name="entry_counts_toward">Telt mee voor %1$s</string>
     <string name="pure_alcohol">g pure alcohol</string>
     <string name="note">Notitie (optioneel)</string>
     <string name="add_drink">Drank toevoegen</string>
@@ -193,6 +195,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Alcohol_percentage</string>
     <string name="csv_col_grams">Gram_alcohol</string>
     <string name="csv_col_note">Notitie</string>
+    <string name="csv_col_logical_date">Logische_dag</string>
     <string name="pdf_unit_g_per_day">g/dag</string>
     <string name="drink_days_label">drinkdagen (laatste 7 dagen)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

@@ -36,98 +36,115 @@ class DayResolverTest {
 
     private val zone = ZoneId.of("Europe/Berlin")
 
-    // Hilfsmethode: LocalDateTime → Unix-Millisekunden in einer fixen Zeitzone
+    // Helper: LocalDateTime → Unix milliseconds in a fixed time zone
     private fun toMillis(ldt: LocalDateTime): Long = ldt.atZone(zone).toInstant().toEpochMilli()
 
-    // ── Basisfall: nach Tageswechsel ──────────────────────────────────────────
+    // The offset the zone was at that instant — the reading an entry would
+    // record with it. `resolve` looks nothing up on its own any more.
+    private fun offsetAt(millis: Long): Int = DayResolver.utcOffsetSeconds(millis, zone)
+
+    // ── Base case: after the day change ─────────────────────────────────────
 
     @Test fun `resolve 04h01 stays same day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 4, 1))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-24", day)
     }
 
     @Test fun `resolve 12h00 stays same day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 12, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-24", day)
     }
 
     @Test fun `resolve 23h59 stays same day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 23, 59))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-24", day)
     }
 
-    // ── Vor Tageswechsel → Vortag ─────────────────────────────────────────────
+    // ── Before the day change → previous day ────────────────────────────────
 
     @Test fun `resolve 03h59 maps to previous day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 3, 59))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve 02h30 maps to previous day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 2, 30))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve 00h00 (midnight) maps to previous day`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 0, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-23", day)
     }
 
-    // ── Exakt auf Tageswechsel-Zeitpunkt ─────────────────────────────────────
+    // ── Exactly on the day-change boundary ──────────────────────────────────
 
     @Test fun `resolve exactly at change time stays same day`() {
         // 04:00 ist NICHT vor 04:00, also gleicher Tag
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 4, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-05-24", day)
     }
 
-    // ── Benutzerdefinierter Tageswechsel ──────────────────────────────────────
+    // ── A day change the user set ───────────────────────────────────────────
 
     @Test fun `resolve custom change time 06h00`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 5, 59))
-        val day = DayResolver.resolve(ts, 6, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 6, 0)
         assertEquals("2025-05-23", day)
     }
 
     @Test fun `resolve custom change time 06h00 after`() {
         val ts = toMillis(LocalDateTime.of(2025, 5, 24, 6, 0))
-        val day = DayResolver.resolve(ts, 6, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 6, 0)
         assertEquals("2025-05-24", day)
     }
 
     @Test fun `resolve change time with minutes`() {
-        // Tageswechsel um 04:30 → 04:29 ist Vortag, 04:30 ist heute
+        // Day change at 04:30 → 04:29 is the previous day, 04:30 is today
         val tsBefore = toMillis(LocalDateTime.of(2025, 5, 24, 4, 29))
         val tsAt = toMillis(LocalDateTime.of(2025, 5, 24, 4, 30))
-        assertEquals("2025-05-23", DayResolver.resolve(tsBefore, 4, 30, zone))
-        assertEquals("2025-05-24", DayResolver.resolve(tsAt, 4, 30, zone))
+        assertEquals("2025-05-23", DayResolver.resolve(tsBefore, offsetAt(tsBefore), 4, 30))
+        assertEquals("2025-05-24", DayResolver.resolve(tsAt, offsetAt(tsAt), 4, 30))
     }
 
-    // ── Monatsgrenzen ──────────────────────────────────────────────────────────
+    // ── Month boundaries ────────────────────────────────────────────────────
 
     @Test fun `resolve maps midnight Jan 1 to Dec 31`() {
         val ts = toMillis(LocalDateTime.of(2025, 1, 1, 0, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2024-12-31", day)
     }
 
     @Test fun `resolve maps midnight March 1 to Feb 28 in non-leap year`() {
         val ts = toMillis(LocalDateTime.of(2025, 3, 1, 0, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2025-02-28", day)
     }
 
     @Test fun `resolve maps midnight March 1 to Feb 29 in leap year`() {
         val ts = toMillis(LocalDateTime.of(2024, 3, 1, 0, 0))
-        val day = DayResolver.resolve(ts, 4, 0, zone)
+        val day = DayResolver.resolve(ts, offsetAt(ts), 4, 0)
         assertEquals("2024-02-29", day)
+    }
+
+    // ── The note about a differing day ───────────────────────────────────────
+
+    /**
+     * The same reading answers differently depending on the day the sheet was
+     * opened on: 03:00 on the 11th counts toward the 10th, so a sheet opened on
+     * the 11th has something to say and one opened on the 10th does not.
+     */
+    @Test fun `logicalDayDiffers compares the reading against the sheet's day`() {
+        val ts = toMillis(LocalDateTime.of(2026, 3, 11, 3, 0))
+        assertTrue(DayResolver.logicalDayDiffers(ts, offsetAt(ts), 4, 0, "2026-03-11"))
+        assertFalse(DayResolver.logicalDayDiffers(ts, offsetAt(ts), 4, 0, "2026-03-10"))
     }
 
     // ── parseDate & formatDate ──────────────────────────────────────────────
@@ -151,7 +168,7 @@ class DayResolverTest {
     }
 
     @Test fun `computeCurrentAbstinence last date is today returns 0`() {
-        // Heute getrunken → aktuelle Abstinenz = 0
+        // Drank today → the current abstinence is 0
         assertEquals(0, DayResolver.computeCurrentAbstinence(listOf("2025-05-22", "2025-05-24"), "2025-05-24"))
     }
 
@@ -197,7 +214,7 @@ class DayResolverTest {
         assertEquals(4, DayResolver.computeLongestAbstinence(listOf("2025-05-01", "2025-05-06")))
     }
 
-    // ── computeCurrentAbstinence mit statsFrom ────────────────────────────────
+    // ── computeCurrentAbstinence with statsFrom ─────────────────────────────
 
     @Test fun `computeCurrentAbstinence empty list with statsFrom returns days since statsFrom`() {
         // No entries, statsFrom = Jan 1, today = Jan 10 → 9 days
@@ -237,7 +254,7 @@ class DayResolverTest {
         )
     }
 
-    // ── computeLongestAbstinence mit today und statsFrom ─────────────────────
+    // ── computeLongestAbstinence with today and statsFrom ───────────────────
 
     @Test fun `computeLongestAbstinence empty list with statsFrom and today`() {
         // No entries: longest = days from statsFrom to today = 9
@@ -310,21 +327,23 @@ class DayResolverTest {
 
     @Test fun `localDateTime reads the entry in its recorded frame`() {
         // 22:30 in Berlin in January, read from a device that has since moved to
-        // New York. The recorded frame still says 22:30.
+        // New York. The recorded frame still says 22:30 — and there is no zone to
+        // pass in any more, which is what makes that unconditional.
         val instant = Instant.parse("2026-01-15T21:30:00Z").toEpochMilli()
-        val local = DayResolver.localDateTime(instant, 3600, ZoneId.of("America/New_York"))
+        val local = DayResolver.localDateTime(instant, 3600)
         assertEquals(22, local.hour)
         assertEquals(30, local.minute)
         assertEquals(15, local.dayOfMonth)
     }
 
-    @Test fun `localDateTime without a recorded frame falls back to the zone rules`() {
-        // No offset on record: the device zone's rules for THAT instant, which is
-        // what the app did for every entry before the column existed. January is
-        // +01:00 in Berlin even when the reading is made in July.
+    @Test fun `localDateTime reads a frame of UTC as UTC`() {
+        // Zero is an offset like any other, not "nothing recorded". The nullable
+        // column that made the distinction is gone: schema 4 gave every row a
+        // frame, and with it went the fallback that read an unset one in the
+        // device zone.
         val instant = Instant.parse("2026-01-15T21:30:00Z").toEpochMilli()
-        val local = DayResolver.localDateTime(instant, null, ZoneId.of("Europe/Berlin"))
-        assertEquals(22, local.hour)
+        val local = DayResolver.localDateTime(instant, 0)
+        assertEquals(21, local.hour)
         assertEquals(30, local.minute)
     }
 
@@ -333,7 +352,7 @@ class DayResolverTest {
         // read after it. The recorded +02:00 keeps the reading at 02:30; deriving
         // the offset from the zone at READ time would have moved it to 01:30.
         val instant = Instant.parse("2026-10-24T00:30:00Z").toEpochMilli()
-        val recorded = DayResolver.localDateTime(instant, 7200, ZoneId.of("Europe/Berlin"))
+        val recorded = DayResolver.localDateTime(instant, 7200)
         assertEquals(2, recorded.hour)
         assertEquals(30, recorded.minute)
     }

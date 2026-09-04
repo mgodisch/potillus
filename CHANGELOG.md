@@ -52,6 +52,8 @@ Two apps, one set of rules
 - A shared vector for the statistics screen's hour and category aggregations.
 - A shared vector for the Today screen's two progress bars.
 - A shared vector for the licence header a backup carries.
+- A shared vector for the note the entry sheet shows when a reading counts
+  toward another day.
 
 ### Changed
 
@@ -101,6 +103,31 @@ Two apps, one set of rules
   day before.
 - Editing an entry on iOS lets you change its drink, as on Android.
 - The bundled fastlane was updated to 2.238.0.
+- The logical day of an entry follows the offset recorded with it, not the
+  device zone.
+- iOS derives the running logical day through `DayResolver.today`, as Android
+  does.
+- The abstinence streaks sit in an extension of the iOS `DayResolver`.
+- The logical day of an entry follows from its timestamp and offset, and the
+  day-change time is stored beside it.
+- Changing the day-change time moves every entry to the day it falls on.
+- The entry sheet carries a date beside the time, and names the day an entry
+  counts toward when the two part company.
+- Editing the time of an entry moves it to the day that time falls on.
+- The CSV export opens with the calendar date of the reading and closes with
+  the day the entry counts toward.
+- The user's guide describes the entry sheet's date field in English and
+  German.
+- A build with assertions on checks that a stored logical day follows from the
+  entry's own reading.
+- The rules behind the derived logical day sit in the code they govern.
+- The instrumented tests build against androidx.test 1.7.0, Espresso 3.7.0 and
+  ext:junit 1.3.0.
+- The screenshot run waits out an Activity that is being recreated.
+
+### Fixed
+
+- Calendar entries from before v0.85.0 sit on the day they were booked for.
 
 ## v0.85.0
 

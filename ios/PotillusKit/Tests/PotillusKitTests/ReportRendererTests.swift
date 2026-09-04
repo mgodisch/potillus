@@ -74,7 +74,8 @@ final class ReportRendererTests: XCTestCase {
             ConsumptionEntry(
                 id: Int64(index + 1), drinkId: Int64(index % 2 + 1), drinkName: "d",
                 volumeMl: 500, alcoholPercent: 5, gramsAlcohol: pair.1,
-                timestampMillis: 1_772_411_400_000, logicalDate: pair.0
+                timestampMillis: 1_772_411_400_000, logicalDate: pair.0,
+                utcOffsetSeconds: 0
             )
         }
     }
@@ -92,8 +93,7 @@ final class ReportRendererTests: XCTestCase {
         try XCTUnwrap(
             ReportData.make(
                 entries: entries(), drinks: drinks(), settings: settings(),
-                periodEnd: "2026-05-30", today: "2026-06-10",
-                timeZone: TimeZone(identifier: "UTC")!, locale: locale
+                periodEnd: "2026-05-30", today: "2026-06-10", locale: locale
             )
         )
     }

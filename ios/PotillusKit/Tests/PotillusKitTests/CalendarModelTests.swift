@@ -61,53 +61,48 @@ final class CalendarModelTests: XCTestCase {
 
     // ── Logging onto the selected day ────────────────────────────────────────
     //
-    // The point of these: a calendar entry's TIMESTAMP and its LOGICAL DATE are
-    // different facts. The user is typing now; the day they are recording is the
-    // one they tapped. `EntryLogger` derived the date from the instant
+    // The point of these: a calendar entry belongs to the day the user tapped,
+    // and the sheet's date field is what puts it there. The model stores the
+    // reading it is handed. `EntryLogger` derived the date from the instant
     // unconditionally until 0.83.0, so an entry booked onto the 12th would have
     // landed on today -- silently, and only noticed once the month was reopened.
 
-    func testAnEntryIsBookedOntoTheSelectedDayNotToday() async throws {
+    func testTheStoredReadingIsTheOneTheSheetComposed() async throws {
         let model = makeModel(at: midJanuary)
         await model.load()
         await model.select("2026-01-12")
 
+        // What the sheet composes for the tapped day: its date field follows the
+        // selection, so 12:00 on 12 January, not 12:00 today. The model used to
+        // do that placing itself, because the sheet handed back today at a
+        // chosen time and the two facts had to be reconciled somewhere.
+        let noonOnTheTwelfth: Int64 = 1_768_219_200_000
         let drink = try XCTUnwrap(environment.drinks.allOnce().first)
-        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: midJanuary)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: noonOnTheTwelfth)
 
         let stored = try environment.entries.all()
         XCTAssertEqual(stored.count, 1)
-        XCTAssertEqual(stored[0].logicalDate, "2026-01-12", "the day the user picked")
-        // The TIME the user typed, on the DAY they picked. The sheet's picker
-        // offers hours and minutes, so the instant it hands over carries the date
-        // of the day it was opened on; keeping that verbatim filed a January-12
-        // entry under a January-15 instant, and everything reading the instant
-        // believed the latter.
-        XCTAssertEqual(
-            stored[0].timestampMillis, 1_768_219_200_000,
-            "12:00 on the selected day, not 12:00 today"
-        )
+        XCTAssertEqual(stored[0].timestampMillis, noonOnTheTwelfth, "stored untouched")
+        XCTAssertEqual(stored[0].logicalDate, "2026-01-12", "and the day follows from it")
     }
 
-    /// The selected day is honoured whatever the day-change boundary says: a
-    /// calendar square is not subject to a 4 a.m. rollover.
-    func testTheDayChangeBoundaryDoesNotMoveACalendarEntry() async throws {
+    /// A night-hour reading on the FOLLOWING calendar day still counts toward the
+    /// tapped one — which is what the sheet's date field arranges when the user
+    /// turns the time wheel back past the boundary.
+    func testANightHourReadingCountsTowardTheTappedDay() async throws {
         try await environment.preferences.update { $0.dayChangeHour = 4 }
         let model = makeModel(at: midJanuary)
         await model.load()
         await model.select("2026-01-12")
 
-        // 02:00 on the 15th: before the boundary, so the derivation this replaces
-        // would have said "the 14th" -- neither today nor the day chosen.
-        let earlyHours = midJanuary - 10 * 3_600_000
+        // 02:00 on the calendar 13th, which is the small hours of the logical 12th.
+        let earlyHoursOnTheThirteenth: Int64 = 1_768_269_600_000
         let drink = try XCTUnwrap(environment.drinks.allOnce().first)
-        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: earlyHours)
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: earlyHoursOnTheThirteenth)
 
         let stored = try environment.entries.all()
+        XCTAssertEqual(stored[0].timestampMillis, earlyHoursOnTheThirteenth)
         XCTAssertEqual(stored[0].logicalDate, "2026-01-12")
-        // 02:00 is before the boundary, so it is the small hours of the logical
-        // 12th and therefore lands on the calendar 13th.
-        XCTAssertEqual(stored[0].timestampMillis, 1_768_269_600_000)
     }
 
     func testAddingWithNoSelectionDoesNothing() async throws {
@@ -127,7 +122,8 @@ final class CalendarModelTests: XCTestCase {
         await model.select("2026-01-12")
 
         let drink = try XCTUnwrap(environment.drinks.allOnce().first)
-        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: midJanuary)
+        // Noon on the tapped day, as the sheet composes it.
+        await model.addEntry(drink: drink, volumeMl: 500, timestampMillis: 1_768_219_200_000)
 
         XCTAssertEqual(model.state.selectedEntries.count, 1)
         XCTAssertGreaterThan(model.state.totalGramsSelected, 0)
@@ -210,7 +206,7 @@ final class CalendarModelTests: XCTestCase {
     /// A day with no entries is absent from the map, not present with zero. The
     /// view can then distinguish "nothing logged" from "logged nothing".
     func testOnlyDaysWithEntriesHaveSummaries() async throws {
-        try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 19.3, at: 0)
 
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -222,9 +218,9 @@ final class CalendarModelTests: XCTestCase {
 
     /// Summaries stop at the month's edge, or January would colour December's days.
     func testSummariesAreConfinedToTheVisibleMonth() async throws {
-        try addEntry(on: "2025-12-31", grams: 40.0, at: midJanuary)
-        try addEntry(on: "2026-01-01", grams: 10.0, at: midJanuary)
-        try addEntry(on: "2026-02-01", grams: 50.0, at: midJanuary)
+        try addEntry(on: "2025-12-31", grams: 40.0, at: 0)
+        try addEntry(on: "2026-01-01", grams: 10.0, at: 0)
+        try addEntry(on: "2026-02-01", grams: 50.0, at: 0)
 
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -257,7 +253,7 @@ final class CalendarModelTests: XCTestCase {
 
     /// A selection belongs to the month it was made in.
     func testNavigatingAwayClearsTheSelection() async throws {
-        try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 19.3, at: 0)
         let model = makeModel(at: midJanuary)
         await model.load()
 
@@ -272,9 +268,9 @@ final class CalendarModelTests: XCTestCase {
     // ── Selection ────────────────────────────────────────────────────────────
 
     func testSelectingADayLoadsItsEntriesAndTotal() async throws {
-        try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
-        try addEntry(on: "2026-01-10", grams: 20.5, at: midJanuary + 1)
-        try addEntry(on: "2026-01-11", grams: 99.0, at: midJanuary + 2)
+        try addEntry(on: "2026-01-10", grams: 19.3, at: 0)
+        try addEntry(on: "2026-01-10", grams: 20.5, at: 1)
+        try addEntry(on: "2026-01-11", grams: 99.0, at: 2)
 
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -285,7 +281,7 @@ final class CalendarModelTests: XCTestCase {
     }
 
     func testSelectingTheSameDayTwiceKeepsItSelected() async throws {
-        try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 19.3, at: 0)
         let model = makeModel(at: midJanuary)
         await model.load()
 
@@ -303,8 +299,8 @@ final class CalendarModelTests: XCTestCase {
 
     func testADayOverTheDailyLimitIsMarked() async throws {
         try await environment.preferences.update { $0.dailyLimitGrams = 20.0 }
-        try addEntry(on: "2026-01-10", grams: 25.0, at: midJanuary)
-        try addEntry(on: "2026-01-11", grams: 10.0, at: midJanuary + 1)
+        try addEntry(on: "2026-01-10", grams: 25.0, at: 0)
+        try addEntry(on: "2026-01-11", grams: 10.0, at: 1)
 
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -319,8 +315,8 @@ final class CalendarModelTests: XCTestCase {
     /// grid, no colour in the heat map, and nothing for a screen reader to read
     /// that the display does not show.
     func testADayOfAlcoholFreeEntriesIsNotADrinkDay() async throws {
-        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
-        try addEntry(on: "2026-01-11", grams: 0.0, at: midJanuary + 1)
+        try addEntry(on: "2026-01-10", grams: 12.0, at: 0)
+        try addEntry(on: "2026-01-11", grams: 0.0, at: 1)
 
         let model = makeModel(at: midJanuary)
         await model.load()
@@ -335,7 +331,7 @@ final class CalendarModelTests: XCTestCase {
     /// Deleting the last entry of a day must remove its summary, not leave a
     /// coloured cell behind.
     func testDeletingTheLastEntryOfADayRemovesItsSummary() async throws {
-        try addEntry(on: "2026-01-10", grams: 19.3, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 19.3, at: 0)
         let model = makeModel(at: midJanuary)
         await model.load()
         await model.select("2026-01-10")
@@ -355,7 +351,7 @@ final class CalendarModelTests: XCTestCase {
 
     /// `start()` loads the visible month without a separate `load()`.
     func testStartLoadsTheMonth() async throws {
-        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 12.0, at: 0)
 
         let model = makeModel(at: midJanuary)
         await model.start()
@@ -372,7 +368,7 @@ final class CalendarModelTests: XCTestCase {
 
         try await waitUntil { model.state.summaries.isEmpty }
 
-        try addEntry(on: "2026-01-20", grams: 8.0, at: midJanuary)
+        try addEntry(on: "2026-01-20", grams: 8.0, at: 0)
         try await waitUntil { model.state.summaries["2026-01-20"] != nil }
     }
 
@@ -380,7 +376,7 @@ final class CalendarModelTests: XCTestCase {
     /// one leaves `SELECT DISTINCT logicalDate` unchanged, and the dot must still
     /// update. GRDB fires on the write regardless.
     func testASecondEntryOnAnExistingDayUpdatesTheDot() async throws {
-        try addEntry(on: "2026-01-10", grams: 12.0, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 12.0, at: 0)
 
         let model = makeModel(at: midJanuary)
         await model.start()
@@ -390,7 +386,7 @@ final class CalendarModelTests: XCTestCase {
             (model.state.summaries["2026-01-10"]?.totalGrams ?? 0) == 12.0
         }
 
-        try addEntry(on: "2026-01-10", grams: 8.0, at: midJanuary)
+        try addEntry(on: "2026-01-10", grams: 8.0, at: 0)
         try await waitUntil {
             (model.state.summaries["2026-01-10"]?.totalGrams ?? 0) == 20.0
         }
@@ -407,7 +403,7 @@ final class CalendarModelTests: XCTestCase {
         await model.nextMonth()
         try await waitUntil { model.state.month == 2 }
 
-        try addEntry(on: "2026-02-14", grams: 30.0, at: midJanuary)
+        try addEntry(on: "2026-02-14", grams: 30.0, at: 0)
         try await waitUntil { model.state.summaries["2026-02-14"] != nil }
     }
 
@@ -418,7 +414,7 @@ final class CalendarModelTests: XCTestCase {
         try await waitUntil { model.state.summaries.isEmpty }
         model.stop()
 
-        try addEntry(on: "2026-01-15", grams: 42.0, at: midJanuary)
+        try addEntry(on: "2026-01-15", grams: 42.0, at: 0)
         try await Task.sleep(nanoseconds: 100_000_000)
 
         XCTAssertNil(model.state.summaries["2026-01-15"], "a stopped observation still fired")
@@ -442,12 +438,25 @@ extension CalendarModelTests {
     }
 
     @discardableResult
+    /// Seeds one entry ON a logical day.
+    ///
+    /// `at` IS A NUDGE WITHIN THE DAY, NOT AN INSTANT. The timestamp is noon on
+    /// `date`, read at +00:00, plus that many milliseconds; the cases pass 0, 1
+    /// or 2 and use it only to order rows. Noon is on the far side of every
+    /// plausible day-change boundary, so the day the repository DERIVES is the
+    /// day the case asked for. The parameter took a full instant while the seeded
+    /// `logicalDate` was stored as handed in; it is a derivation now, and an
+    /// instant in mid-January no longer states a day in mid-January.
     private func addEntry(on date: String, grams: Double, at millis: Int64) throws -> Int64 {
-        try environment.entries.add(
+        let noon = try XCTUnwrap(DayResolver.parseDate(date))
+        return try environment.entries.add(
             ConsumptionEntry(
                 drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
-            )
+                gramsAlcohol: grams,
+                timestampMillis: Int64(noon.timeIntervalSince1970 * 1000) + millis,
+                logicalDate: date, utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
     }
 

@@ -120,6 +120,7 @@ object CsvExporter {
             context.getString(R.string.csv_col_alcohol_pct),
             context.getString(R.string.csv_col_grams),
             context.getString(R.string.csv_col_note),
+            context.getString(R.string.csv_col_logical_date),
         )
 
         val csv = buildCsv(headerCells, entries, drinks)
@@ -201,10 +202,10 @@ object CsvExporter {
         // Build a map from drink ID → definition for O(1) category lookups.
         val drinkMap = drinks.associateBy { it.id }
         // No zone on the formatter: the entry carries its own frame, and
-        // DayResolver.localDateTime resolves it (or falls back for a row written
-        // before the offset existed). Formatting a LocalDateTime that already
-        // stands in the right frame is what keeps the exported time equal to the
-        // time the drink was logged at, in the row whose date says the same.
+        // DayResolver.localDateTime resolves it. Formatting a LocalDateTime that
+        // already stands in the right frame is what keeps the exported time equal
+        // to the time the drink was logged at, in the row whose date says the
+        // same.
         val timeFmt = DateTimeFormatter.ofPattern("HH:mm")
 
         // Headers are escaped too (see step 2 in the KDoc above).
@@ -216,7 +217,14 @@ object CsvExporter {
             // or if a future backup format includes an unknown category.
             val category = drinkMap[e.drinkId]?.category?.name ?: "OTHER"
             listOf(
-                e.logicalDate,
+                // THE CALENDAR DAY OF THE READING, not the logical one. Columns 1
+                // and 2 describe the same moment: an entry read at 01:00 exports
+                // its own date beside its own time, and a reader who puts the two
+                // together gets the instant the drink was had. The logical day it
+                // counts toward has a column of its own at the end. Before v0.87.0
+                // column 1 held the logical day, so a night entry's date and time
+                // contradicted each other and nothing in the file said why.
+                DayResolver.formatDate(local.toLocalDate()),
                 timeFmt.format(local),
                 escapeField(e.drinkName),
                 category,
@@ -227,6 +235,11 @@ object CsvExporter {
                 // Locale.ROOT forces a '.' decimal separator (see step 1 above).
                 String.format(Locale.ROOT, "%.2f", e.gramsAlcohol),
                 escapeField(e.note),
+                // LAST, AND THE ONLY PLACE THE USER TAKES THE RULE WITH THEM. The
+                // day-change time is not in the file, and rebuilding it in a
+                // spreadsheet is not something to ask of someone whose whole app
+                // is built on this attribution.
+                e.logicalDate,
             ).joinToString(",")
         }
 

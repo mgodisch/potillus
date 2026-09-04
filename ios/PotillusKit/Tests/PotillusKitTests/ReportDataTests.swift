@@ -71,7 +71,8 @@ final class ReportDataTests: XCTestCase {
     ) -> ConsumptionEntry {
         ConsumptionEntry(
             id: id, drinkId: drink, drinkName: "x", volumeMl: 500, alcoholPercent: 5,
-            gramsAlcohol: grams, timestampMillis: millis, logicalDate: date, note: ""
+            gramsAlcohol: grams, timestampMillis: millis, logicalDate: date, note: "",
+            utcOffsetSeconds: 0
         )
     }
 
@@ -103,8 +104,7 @@ final class ReportDataTests: XCTestCase {
                     ),
                     periodStart: testCase.periodStart,
                     periodEnd: testCase.periodEnd,
-                    today: testCase.today ?? "2026-12-31",
-                    timeZone: TimeZone(identifier: "UTC")!
+                    today: testCase.today ?? "2026-12-31"
                 )
             )
 
@@ -178,29 +178,30 @@ final class ReportDataTests: XCTestCase {
         )
     }
 
-    /// The hour comes from the WALL CLOCK, not from the logical day.
-    func testTheHourlyProfileFollowsTheGivenZone() {
-        // 2026-03-02T00:30:00Z — half past midnight in UTC, half past one in Berlin.
+    /// The hour comes from the WALL CLOCK, not from the logical day, and the wall
+    /// clock is the one the entry recorded.
+    func testTheHourlyProfileFollowsEachEntrysFrame() {
+        // 2026-03-02T00:30:00Z — 00:30 read at +00:00, 01:30 read at +01:00.
         let millis: Int64 = 1_772_411_400_000
-        let entries = [entry(1, drink: 1, date: "2026-03-01", grams: 10, millis: millis)]
+        var atUtc = entry(1, drink: 1, date: "2026-03-01", grams: 10, millis: millis)
+        atUtc.utcOffsetSeconds = 0
+        var atPlusOne = atUtc
+        atPlusOne.utcOffsetSeconds = 3600
 
-        let utc = ReportData.hourlyGrams(entries: entries, timeZone: TimeZone(identifier: "UTC")!)
-        let berlin = ReportData.hourlyGrams(
-            entries: entries, timeZone: TimeZone(identifier: "Europe/Berlin")!
-        )
+        let utc = ReportData.hourlyGrams(entries: [atUtc])
+        let plusOne = ReportData.hourlyGrams(entries: [atPlusOne])
 
-        XCTAssertEqual(utc[0], 10, accuracy: Self.epsilon, "00:30 UTC lands in hour 0")
-        XCTAssertEqual(berlin[1], 10, accuracy: Self.epsilon, "01:30 in Berlin lands in hour 1")
+        XCTAssertEqual(utc[0], 10, accuracy: Self.epsilon, "00:30 at +00:00 lands in hour 0")
+        XCTAssertEqual(plusOne[1], 10, accuracy: Self.epsilon, "01:30 at +01:00 lands in hour 1")
         XCTAssertEqual(utc.count, 24)
-        XCTAssertEqual(utc.reduce(0, +), berlin.reduce(0, +), accuracy: Self.epsilon)
+        XCTAssertEqual(utc.reduce(0, +), plusOne.reduce(0, +), accuracy: Self.epsilon)
     }
 
     /// A day the app books to yesterday still bucketed by the clock it was drunk at.
     func testAnEntryAfterMidnightBucketsByItsRealHour() {
         let millis: Int64 = 1_772_411_400_000  // 00:30 UTC
         let hours = ReportData.hourlyGrams(
-            entries: [entry(1, drink: 1, date: "2026-03-01", grams: 5, millis: millis)],
-            timeZone: TimeZone(identifier: "UTC")!
+            entries: [entry(1, drink: 1, date: "2026-03-01", grams: 5, millis: millis)]
         )
         XCTAssertEqual(hours[0], 5, accuracy: Self.epsilon)
         XCTAssertEqual(hours[20], 0, accuracy: Self.epsilon)
@@ -239,8 +240,7 @@ final class ReportDataTests: XCTestCase {
             ReportData.make(
                 entries: entries, drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                periodEnd: "2026-03-31", today: "2026-09-01",
-                timeZone: TimeZone(identifier: "UTC")!
+                periodEnd: "2026-03-31", today: "2026-09-01"
             )
         )
         XCTAssertLessThanOrEqual(
@@ -267,8 +267,7 @@ final class ReportDataTests: XCTestCase {
             ReportData.make(
                 entries: entries, drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                periodEnd: "2026-03-11", today: "2026-03-12",
-                timeZone: TimeZone(identifier: "UTC")!
+                periodEnd: "2026-03-11", today: "2026-03-12"
             )
         )
         XCTAssertEqual(report.drinkDays, 2, "the 0.0 g day is not a drink day")
@@ -286,7 +285,7 @@ final class ReportDataTests: XCTestCase {
             ReportData.make(
                 entries: entries, drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                today: "2026-03-02", timeZone: TimeZone(identifier: "UTC")!,
+                today: "2026-03-02",
                 locale: Locale(identifier: "de_DE")
             )
         )
@@ -294,7 +293,7 @@ final class ReportDataTests: XCTestCase {
             ReportData.make(
                 entries: entries, drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                today: "2026-03-02", timeZone: TimeZone(identifier: "UTC")!,
+                today: "2026-03-02",
                 locale: Locale(identifier: "en_US")
             )
         )
@@ -317,7 +316,7 @@ final class ReportDataTests: XCTestCase {
                 entries: [entry(1, drink: 1, date: "2026-03-02", grams: 10)],
                 drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                today: "2026-03-02", timeZone: TimeZone(identifier: "UTC")!,
+                today: "2026-03-02",
                 locale: Locale(identifier: "de_DE")
             )
         )
@@ -370,8 +369,7 @@ extension ReportDataTests {
             ReportData.make(
                 entries: entries, drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                periodStart: from, periodEnd: to, today: today,
-                timeZone: TimeZone(identifier: "UTC")!
+                periodStart: from, periodEnd: to, today: today
             )
         )
     }
@@ -440,8 +438,7 @@ extension ReportDataTests {
                 ],
                 drinks: [drink(1, .beer)],
                 settings: settings(daily: 24, weekly: 168, drinkDays: 5),
-                periodEnd: "2026-02-28", today: "2026-06-30",
-                timeZone: TimeZone(identifier: "UTC")!
+                periodEnd: "2026-02-28", today: "2026-06-30"
             )
         )
         XCTAssertEqual(report.firstDate, "2026-01-10")
@@ -484,17 +481,15 @@ extension ReportDataTests {
 
 extension ReportDataTests {
 
-    /// A recorded frame beats the reader's frame: the `timeZone` argument is the
-    /// fallback for entries that have none, not an override.
+    /// The recorded frame is the only frame: the reader's zone is not an argument
+    /// any more, so it cannot override anything.
     func testTheHourlyProfileFollowsTheRecordedFrame() {
         // 2026-03-02T00:30:00Z, logged where the offset was +01:00 — 01:30 there.
         let millis: Int64 = 1_772_411_400_000
         var logged = entry(1, drink: 1, date: "2026-03-01", grams: 10, millis: millis)
         logged.utcOffsetSeconds = 3600
 
-        let hours = ReportData.hourlyGrams(
-            entries: [logged], timeZone: TimeZone(identifier: "UTC")!
-        )
+        let hours = ReportData.hourlyGrams(entries: [logged])
         XCTAssertEqual(hours[1], 10, accuracy: Self.epsilon, "01:30 in the recorded frame")
         XCTAssertEqual(hours[0], 0, accuracy: Self.epsilon, "not the reader's hour")
     }

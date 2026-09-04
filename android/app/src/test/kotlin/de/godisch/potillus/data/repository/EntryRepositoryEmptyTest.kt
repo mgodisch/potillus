@@ -28,6 +28,8 @@ package de.godisch.potillus.data.repository
 import de.godisch.potillus.data.db.dao.DailySummaryRaw
 import de.godisch.potillus.data.db.dao.EntryDao
 import de.godisch.potillus.data.db.entity.EntryEntity
+import de.godisch.potillus.fake.DirectTransactor
+import de.godisch.potillus.fake.FakeLogicalDayKeyDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -42,7 +44,7 @@ import org.junit.Test
  */
 class EntryRepositoryEmptyTest {
 
-    private val repo = EntryRepository(EmptyEntryDao())
+    private val repo = EntryRepository(EmptyEntryDao(), FakeLogicalDayKeyDao(), DirectTransactor())
 
     @Test fun `mostRecentEntry maps a null row to null`() = runTest {
         assertNull(repo.mostRecentEntry().first())
@@ -65,6 +67,7 @@ private class EmptyEntryDao : EntryDao {
     override suspend fun insert(entry: EntryEntity): Long = 0L
     override suspend fun insertOrReplace(entry: EntryEntity): Long = 0L
     override suspend fun update(entry: EntryEntity) {}
+    override suspend fun updateAll(entries: List<EntryEntity>) {}
     override suspend fun delete(entry: EntryEntity) {}
     override suspend fun getAll(): List<EntryEntity> = emptyList()
     override fun getMostRecent(): Flow<EntryEntity?> = flowOf(null)

@@ -49,6 +49,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.EntryDayOrigin
 import de.godisch.potillus.domain.Trend
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
@@ -485,9 +486,10 @@ fun TodayScreen(
             capacity = capacity,
             useStatusSymbols = state.settings.alternativeStatusSymbols,
             logicalDay = DayResolver.today(state.settings.dayChangeHour, state.settings.dayChangeMinute),
+            origin = EntryDayOrigin.NOW,
             dayChangeHour = state.settings.dayChangeHour,
             dayChangeMinute = state.settings.dayChangeMinute,
-            onSave = { drink, vol, ts, note ->
+            onSave = { drink, vol, ts, _, note ->
                 vm.addEntry(drink, vol, ts, note)
                 showAdd = false
                 preSelectedDrink = null
@@ -504,9 +506,10 @@ fun TodayScreen(
             drinks = drinks,
             capacity = capacity,
             logicalDay = entry.logicalDate,
+            origin = EntryDayOrigin.EDIT,
             dayChangeHour = state.settings.dayChangeHour,
             dayChangeMinute = state.settings.dayChangeMinute,
-            onSave = { drink, vol, ts, note ->
+            onSave = { drink, vol, ts, offset, note ->
                 vm.updateEntry(
                     entry.copy(
                         drinkId = drink.id,
@@ -515,6 +518,10 @@ fun TodayScreen(
                         alcoholPercent = drink.alcoholPercent,
                         gramsAlcohol = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
                         timestampMillis = ts,
+                        // The frame comes from the dialog, which knows whether the
+                        // user moved the date: a corrected time keeps the frame the
+                        // reading was taken in, a new date is read in this one.
+                        utcOffsetSeconds = offset,
                         note = note,
                     ),
                 )

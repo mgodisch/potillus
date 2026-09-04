@@ -80,10 +80,23 @@ final class BackupImporterTests: XCTestCase {
         )
     }
 
+    /// Noon on 2026-01-01, read at +00:00 — the instant every seeded entry sits on.
+    private static let noonJan1: Int64 = 1_767_268_800_000
+
+    /// One entry on the logical 1 January.
+    ///
+    /// `at` is a nudge WITHIN the day, not an instant: the timestamp is noon plus
+    /// that many milliseconds. The instant and `logicalDate` HAVE TO AGREE here,
+    /// and not only because the repository derives the day — the import repairs a
+    /// reading that sits two or more days from the day it is filed under, and a
+    /// bare `500` is fifty-six years away. It would be repaired, its timestamp
+    /// would move, and the MERGE duplicate check, which matches on the timestamp,
+    /// would stop recognising it.
     private func entry(drinkId: Int64, at millis: Int64, name: String = "x") -> ConsumptionEntry {
         ConsumptionEntry(
             drinkId: drinkId, drinkName: name, volumeMl: 500, alcoholPercent: 4.9,
-            gramsAlcohol: 19.3, timestampMillis: millis, logicalDate: "2026-01-01"
+            gramsAlcohol: 19.3, timestampMillis: Self.noonJan1 + millis,
+            logicalDate: "2026-01-01", utcOffsetSeconds: 0
         )
     }
 
@@ -170,7 +183,7 @@ final class BackupImporterTests: XCTestCase {
         _ = try drinks.add(DrinkDefinition(name: "Preset", volumeMl: 500, alcoholPercent: 5, isPreset: true))
         _ = try drinks.add(DrinkDefinition(name: "House Lager", volumeMl: 500, alcoholPercent: 4.8, isPreset: true))
         let mine = try drinks.add(DrinkDefinition(name: "Mine", volumeMl: 500, alcoholPercent: 5))
-        _ = try entries.add(entry(drinkId: mine, at: 500))
+        _ = try entries.add(entry(drinkId: mine, at: 500), settings: AppSettings())
 
         let file = backup(
             drinks: [

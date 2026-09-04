@@ -318,13 +318,14 @@ class CalendarViewModelTest {
      * the repository and the new entry appears in selectedEntries.
      *
      * TEACHING NOTE:
-     *   This test verifies the critical calendar-specific contract: the logicalDate
-     *   of the new entry must be the *selected calendar day*, NOT derived from the
-     *   timestamp via DayResolver. A drink added to a past calendar day must stay
-     *   on that day even if the user enters a timestamp that crosses the day-change
-     *   boundary.
+     *   The calendar-specific contract used to live here: the view model
+     *   overrode the logical date with the selected day, because the sheet
+     *   handed back today at a chosen time. It lives in the SHEET now — its date
+     *   field follows the tapped day — and the view model stores the reading it
+     *   is given. What this test states is therefore the outcome, not the
+     *   mechanism: a drink booked onto 10 January sits on 10 January.
      */
-    @Test fun `addEntry with selected date stores entry on correct logical date`() = runTest {
+    @Test fun `addEntry stores the entry on the day the sheet composed`() = runTest {
         val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
         drinkRepo = FakeDrinkRepository(listOf(drink))
         val vm = makeVm()
@@ -333,8 +334,10 @@ class CalendarViewModelTest {
         vm.uiState.test {
             awaitItem() // initial state with selected date
 
-            val ts = System.currentTimeMillis()
-            vm.addEntry(drink, 500, ts, note = "")
+            // What the sheet composes for the tapped day at its default hour.
+            val evening = java.time.LocalDate.parse("2026-01-10").atTime(20, 0)
+                .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+            vm.addEntry(drink, 500, evening, note = "")
 
             val state = awaitItem()
             assertEquals(1, state.selectedEntries.size)
@@ -344,27 +347,49 @@ class CalendarViewModelTest {
     }
 
     /**
-     * Editing a calendar entry keeps it on the day it was filed under, and a
-     * time before the day-change boundary is placed on the next calendar day so
-     * the entry's own timestamp still resolves to that day — the rule addEntry
-     * has always applied, and since v0.86.0 the Today screen too.
+     * A night-hour reading on the FOLLOWING calendar day still counts toward the
+     * tapped one — which is what the sheet's date field arranges when the user
+     * turns the time wheel back past the boundary.
      */
-    @Test fun `updateEntry keeps the entry on its logical day`() = runTest {
+    @Test fun `addEntry keeps a night-hour reading on the tapped day`() = runTest {
         val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
         drinkRepo = FakeDrinkRepository(listOf(drink))
         val vm = makeVm()
         vm.selectDate("2026-01-10")
-        vm.addEntry(drink, 500, System.currentTimeMillis(), note = "")
+
+        val oneAmNextDay = java.time.LocalDate.parse("2026-01-11").atTime(1, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.addEntry(drink, 500, oneAmNextDay, note = "")
+
         val stored = entryRepo.allEntries.single()
+        assertEquals(oneAmNextDay, stored.timestampMillis)
+        assertEquals("2026-01-10", stored.logicalDate)
+    }
+
+    /**
+     * An edit that crosses the boundary MOVES the entry out of the cell it was
+     * opened from, and the sheet named the day it was going to. Until the sheet
+     * had a date, this method placed the new time on whatever calendar day kept
+     * the entry where it was.
+     */
+    @Test fun `updateEntry lets an edited time move the entry`() = runTest {
+        val drink = DrinkDefinition(id = 1, name = "Pils", volumeMl = 500, alcoholPercent = 5.0)
+        drinkRepo = FakeDrinkRepository(listOf(drink))
+        val vm = makeVm()
+        vm.selectDate("2026-01-10")
+        val evening = java.time.LocalDate.parse("2026-01-10").atTime(20, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.addEntry(drink, 500, evening, note = "")
+        val stored = entryRepo.allEntries.single()
+        assertEquals("2026-01-10", stored.logicalDate)
 
         val twoAm = java.time.LocalDate.parse("2026-01-10").atTime(2, 0)
             .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
         vm.updateEntry(stored.copy(timestampMillis = twoAm))
 
         val edited = entryRepo.allEntries.single()
-        assertEquals("2026-01-10", edited.logicalDate)
-        assertEquals("2026-01-10", DayResolver.resolve(edited.timestampMillis, 4, 0))
-        assertEquals("2026-01-11", DayResolver.calendarDate(edited.timestampMillis))
+        assertEquals(twoAm, edited.timestampMillis)
+        assertEquals("the reading is before the boundary, so it counts toward the 9th", "2026-01-09", edited.logicalDate)
     }
 
     /**
@@ -392,8 +417,12 @@ class CalendarViewModelTest {
         val vm = makeVm()
 
         vm.selectDate("2026-01-10")
-        val ts = System.currentTimeMillis()
-        vm.addEntry(drink, 500, ts, note = "")
+        // The instant the sheet composes for the tapped day. `now` would land on
+        // today: the view model stores the reading it is handed and no longer
+        // overrides the day with the selection.
+        val evening = java.time.LocalDate.parse("2026-01-10").atTime(20, 0)
+            .atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli()
+        vm.addEntry(drink, 500, evening, note = "")
 
         vm.uiState.test {
             val stateWithEntry = awaitItem()

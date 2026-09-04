@@ -88,7 +88,7 @@ public struct YearGrid: Sendable, Equatable {
     ///   - year: Four-digit year.
     ///   - firstDayOfWeekIso: 1 = Monday … 7 = Sunday, from
     ///     `DayResolver.firstDayOfWeekIso()`.
-    ///   - today: The logical today (`DayResolver.resolve`), not the wall-clock
+    ///   - today: The logical today (`DayResolver.today`), not the wall-clock
     ///     date: the day-change time decides which day the user is in.
     ///   - statsFrom: The statistics start date, or empty for none. The empty
     ///     string is the app-wide sentinel for "no floor set"

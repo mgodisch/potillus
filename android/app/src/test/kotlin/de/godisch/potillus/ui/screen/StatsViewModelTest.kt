@@ -102,8 +102,17 @@ class StatsViewModelTest {
      * Converts an ISO-8601 date string to a Unix timestamp at midnight local time.
      * Used to create ConsumptionEntry values with a deterministic timestampMillis.
      */
+    /**
+     * NOON on [date], not midnight.
+     *
+     * The seeded `logicalDate` is no longer stored as handed in: the repository
+     * derives it from the timestamp and the recorded frame. Midnight is BEFORE
+     * the 04:00 boundary and would file every seeded entry on the day before the
+     * one the case names. Noon is on the far side of every plausible boundary.
+     */
     private fun dateToMillis(date: String): Long = LocalDate.parse(date)
-        .atStartOfDay(ZoneId.systemDefault())
+        .atTime(12, 0)
+        .atZone(ZoneId.systemDefault())
         .toInstant()
         .toEpochMilli()
 
@@ -123,6 +132,9 @@ class StatsViewModelTest {
         gramsAlcohol = grams,
         timestampMillis = dateToMillis(date),
         logicalDate = date,
+        // The frame the timestamp was built in, so the derived day is [date] on
+        // whatever machine runs the suite.
+        utcOffsetSeconds = DayResolver.utcOffsetSeconds(dateToMillis(date)),
     )
 
     /**
@@ -192,7 +204,7 @@ class StatsViewModelTest {
      */
     @Test fun `periodFrom carries the floored window start for the export dialog`() = runTest {
         val today = DayResolver.today(4, 0)
-        entryRepo.add(entry(id = 1, date = today, grams = 5.0))
+        entryRepo.add(entry(id = 1, date = today, grams = 5.0), AppSettings())
 
         val vm = makeVm()
         vm.uiState.test {
@@ -280,7 +292,7 @@ class StatsViewModelTest {
         // `current` would be empty and totalGrams 0. The args must match setUp()'s
         // AppSettings(dayChangeHour = 4, dayChangeMinute = 0).
         val today = DayResolver.today(4, 0)
-        entryRepo.add(entry(id = 1, date = today, grams = 25.0))
+        entryRepo.add(entry(id = 1, date = today, grams = 25.0), AppSettings())
 
         val vm = makeVm()
         vm.uiState.test {
@@ -308,7 +320,7 @@ class StatsViewModelTest {
     @Test fun `drink today extends the effective period for avgPerDay`() = runTest {
         // Logical today, not LocalDate.now() (see the over-limit-day test for why).
         val today = DayResolver.today(4, 0)
-        entryRepo.add(entry(id = 1, date = today, grams = 24.0))
+        entryRepo.add(entry(id = 1, date = today, grams = 24.0), AppSettings())
 
         val vm = makeVm()
         vm.uiState.test {
@@ -340,8 +352,8 @@ class StatsViewModelTest {
 
         // Logical today, not LocalDate.now() (see the over-limit-day test for why).
         val today = DayResolver.today(4, 0)
-        entryRepo.add(entry(id = 1, date = today, grams = 19.73, drinkId = 1, category = DrinkCategory.BEER))
-        entryRepo.add(entry(id = 2, date = today, grams = 15.41, drinkId = 2, category = DrinkCategory.WINE))
+        entryRepo.add(entry(id = 1, date = today, grams = 19.73, drinkId = 1, category = DrinkCategory.BEER), AppSettings())
+        entryRepo.add(entry(id = 2, date = today, grams = 15.41, drinkId = 2, category = DrinkCategory.WINE), AppSettings())
 
         val vm = makeVm()
         vm.uiState.test {
@@ -395,9 +407,9 @@ class StatsViewModelTest {
         )
         // Inside the previous WEEK window (today-13 … today-7) and before the floor.
         val preFloorDay = LocalDate.parse(today).minusDays(10).toString()
-        entryRepo.add(entry(id = 1, date = preFloorDay, grams = 50.0))
+        entryRepo.add(entry(id = 1, date = preFloorDay, grams = 50.0), AppSettings())
         // Inside the current (floored) window, so the state differs from the seed.
-        entryRepo.add(entry(id = 2, date = today, grams = 10.0))
+        entryRepo.add(entry(id = 2, date = today, grams = 10.0), AppSettings())
 
         val vm = makeVm()
         vm.setPeriod(StatsPeriod.WEEK)
@@ -431,8 +443,8 @@ class StatsViewModelTest {
         val today = DayResolver.today(4, 0)
         val todayDate = LocalDate.parse(today)
         // Alcohol five days ago, an alcohol-free drink two days ago, dry since.
-        entryRepo.add(entry(id = 1, date = todayDate.minusDays(5).toString(), grams = 30.0))
-        entryRepo.add(entry(id = 2, date = todayDate.minusDays(2).toString(), grams = 0.0))
+        entryRepo.add(entry(id = 1, date = todayDate.minusDays(5).toString(), grams = 30.0), AppSettings())
+        entryRepo.add(entry(id = 2, date = todayDate.minusDays(2).toString(), grams = 0.0), AppSettings())
 
         val vm = makeVm()
         vm.setPeriod(StatsPeriod.WEEK)

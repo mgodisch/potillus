@@ -50,7 +50,11 @@ struct EntrySheet: View {
     let preselected: DrinkDefinition?
 
     /// Returns whether the entry was stored, so the sheet stays open on failure.
-    let onSave: (DrinkDefinition, Int, Int64, String) async -> Bool
+    ///
+    /// Takes the whole reading — the composed instant AND the frame it is read in
+    /// — because the sheet is what composes it. The models used to place a bare
+    /// time on a day of their own choosing.
+    let onSave: (DrinkDefinition, Int, Int64, Int, String) async -> Bool
 
     /// Today's budget snapshot, for the capacity dot next to the grams preview.
     /// `nil` hides the dot (the caller had no snapshot to give).
@@ -65,14 +69,19 @@ struct EntrySheet: View {
     /// action adds or updates — so this stays one sheet, as Android keeps one
     /// `AddEditEntryDialog`.
     let editing: ConsumptionEntry?
-    /// The logical day the entry belongs to — today, or the calendar day the
-    /// sheet was opened under — with the day-change time that defines it. When
-    /// given, the sheet shows the CALENDAR date the typed time will be stored
-    /// on whenever it differs: "02:00" on the logical 10th lands on the calendar
-    /// 11th (`DayResolver.instant(logicalDate:matchingTimeOf:…)`), and the user
-    /// sees "11 Mar" under the time before saving. The models do the placing;
-    /// this only says what they will do. `nil` shows nothing.
-    let logicalDay: String?
+    /// The logical day the sheet was opened ON — today's on the Today screen and
+    /// in the drinks list, the tapped cell's in the calendar, the entry's own when
+    /// editing. The sheet does NOT file the entry under it: the day follows from
+    /// the reading its two fields compose. What this is for is the note — when the
+    /// composed reading falls on another logical day, the sheet says which,
+    /// because the entry then disappears from the list it was made on and the
+    /// user should not have to discover that afterwards.
+    let logicalDay: String
+
+    /// Where the sheet was opened, which decides how the date follows a changed
+    /// time while the user has not touched it. See `EntrySheetDate`.
+    let origin: EntryDayOrigin
+
     let dayChangeHour: Int
     let dayChangeMinute: Int
 
@@ -84,6 +93,14 @@ struct EntrySheet: View {
     @State private var note: String = ""
     @State private var timestamp: Date
     @State private var isSaving = false
+
+    /// Set the moment the user picks a date. See `dateBinding`.
+    @State private var dateTouched = false
+
+    /// The instant the sheet was opened at, which the `.now` follow-up measures
+    /// a typed time against. Held rather than read afresh so the rule cannot
+    /// change its answer while the sheet is open.
+    private let now: Date
 
     /// What `timestamp` was seeded with — `now`, or the edited entry's time —
     /// kept so `isDirty` can tell a touched date wheel from an untouched one
@@ -98,10 +115,11 @@ struct EntrySheet: View {
         capacity: DrinkCapacity? = nil,
         useSymbols: Bool = false,
         editing: ConsumptionEntry? = nil,
-        logicalDay: String? = nil,
+        logicalDay: String,
+        origin: EntryDayOrigin,
         dayChangeHour: Int = 4,
         dayChangeMinute: Int = 0,
-        onSave: @escaping (DrinkDefinition, Int, Int64, String) async -> Bool
+        onSave: @escaping (DrinkDefinition, Int, Int64, Int, String) async -> Bool
     ) {
         self.drinks = drinks
         self.preselected = preselected
@@ -109,6 +127,8 @@ struct EntrySheet: View {
         self.useSymbols = useSymbols
         self.editing = editing
         self.logicalDay = logicalDay
+        self.origin = origin
+        self.now = now
         self.dayChangeHour = dayChangeHour
         self.dayChangeMinute = dayChangeMinute
         self.onSave = onSave
@@ -133,9 +153,27 @@ struct EntrySheet: View {
             )
         } else {
             _volumeText = State(initialValue: initial.map { String($0.volumeMl) } ?? "")
-            initialTimestamp = now
+            // The sheet's own opening rule, not simply `now`: from the calendar it
+            // offers the tapped evening. See `EntrySheetDate`.
+            let opening = EntrySheetDate.initial(
+                origin: origin, logicalDay: logicalDay,
+                changeHour: dayChangeHour, changeMinute: dayChangeMinute, now: now
+            )
+            initialTimestamp = Self.compose(day: opening.date, hour: opening.hour, minute: opening.minute)
         }
         _timestamp = State(initialValue: initialTimestamp)
+    }
+
+    /// The instant of `hour:minute` on the calendar day `day` falls on, in the
+    /// device zone. The sheet keeps one `Date` and edits its two halves through
+    /// the bindings below; this is where they are put back together.
+    private static func compose(day: Date, hour: Int, minute: Int) -> Date {
+        let calendar = Calendar(identifier: .gregorian)
+        var parts = calendar.dateComponents([.year, .month, .day], from: day)
+        parts.hour = hour
+        parts.minute = minute
+        parts.second = 0
+        return calendar.date(from: parts) ?? day
     }
 
     /// Whether any field differs from what `init` seeded — the guard for the
@@ -206,16 +244,29 @@ struct EntrySheet: View {
                             .multilineTextAlignment(.trailing)
                     }
 
-                    // Hours and minutes only. The picker offered a date as well,
-                    // which the field's own name contradicts and which the screen
-                    // behind it already fixes — the Today screen is today, and from
-                    // the calendar the view model overrides the logical date anyway,
-                    // so the date part of this timestamp is never the one that
-                    // counts. A reader heard it read out digit by digit before
-                    // reaching the time.
+                    // TWO PICKERS, NOT ONE COMBINED. A picker showing both halves
+                    // cannot say WHICH the user turned, and the follow-up rule
+                    // hangs on that difference. Each binding below edits its own
+                    // half of `timestamp`.
+                    //
+                    // SELECTABLE UP TO TODAY, DISPLAYED WITHOUT LIMIT. A drink
+                    // cannot be had in the future, so the picker does not offer
+                    // one; the bound is raised to the current value when that
+                    // already lies ahead, because an entry the previous release
+                    // wrote into the future must not be moved merely by opening
+                    // it, and the calendar follow-up legitimately puts a time
+                    // before the boundary on tomorrow's date.
+                    DatePicker(
+                        Loc.string("Date", locale: locale),
+                        selection: dateBinding,
+                        in: ...max(Date(), timestamp),
+                        displayedComponents: .date
+                    )
+                    .accessibilityElement(children: .combine)
+
                     DatePicker(
                         Loc.string("Time", locale: locale),
-                        selection: $timestamp,
+                        selection: timeBinding,
                         displayedComponents: .hourAndMinute
                     )
                     // Caption and value as one stop. `.combine` rather than
@@ -223,13 +274,17 @@ struct EntrySheet: View {
                     // actions in place, and the picker has to stay operable.
                     .accessibilityElement(children: .combine)
 
-                    // The calendar date the model will store this time on, when it
-                    // is not the day the sheet was opened under (see `logicalDay`).
-                    if let placedDate {
-                        Text(placedDate)
+                    // The note: one condition, no special cases. The entry is not
+                    // wrong when the reading falls on another logical day, it just
+                    // belongs elsewhere — so no warning colour, no symbol, nothing
+                    // blocking the save. It is its OWN element rather than folded
+                    // into either picker, because both of them can bring it up.
+                    if let countsToward {
+                        Text(Loc.string("Counts toward %@", countsToward, locale: locale))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .accessibilityElement(children: .combine)
                     }
 
                     TextField(Loc.string("Note", locale: locale), text: $note, axis: .vertical)
@@ -310,33 +365,105 @@ struct EntrySheet: View {
         .interactiveDismissDisabled(isDirty)
     }
 
-    /// The formatted calendar date the typed time lands on, or `nil` while it
-    /// is the sheet's own day (or no day was given).
-    private var placedDate: String? {
-        guard let logicalDay else { return nil }
-        let typed = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
-        guard let placed = DayResolver.instant(
-            logicalDate: logicalDay, matchingTimeOf: typed,
-            changeHour: dayChangeHour, changeMinute: dayChangeMinute
+    private func save() {
+        guard let drink = selection, let volume else { return }
+        isSaving = true
+        Task {
+            let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
+            let stored = await onSave(drink, volume, millis, utcOffsetSeconds, note)
+            isSaving = false
+            if stored { dismiss() }
+        }
+    }
+}
+
+// =============================================================================
+// The two halves of one instant
+// =============================================================================
+//
+// IN AN EXTENSION, NOT IN THE TYPE BODY: `check-swift-length` holds the body to
+// what SwiftLint's `type_body_length` allows, and an extension is not counted.
+// =============================================================================
+
+extension EntrySheet {
+
+    // ── The two halves of one instant ────────────────────────────────────────
+
+    /// The DATE half. Setting it marks the date as the user's, after which the
+    /// follow-up below falls silent — otherwise the next turn of the time wheel
+    /// would take back the date they had just chosen.
+    private var dateBinding: Binding<Date> {
+        Binding(
+            get: { timestamp },
+            set: { picked in
+                let parts = Calendar(identifier: .gregorian)
+                    .dateComponents([.hour, .minute], from: timestamp)
+                timestamp = Self.compose(
+                    day: picked, hour: parts.hour ?? 0, minute: parts.minute ?? 0
+                )
+                dateTouched = true
+            }
+        )
+    }
+
+    /// The TIME half. Setting it lets the date follow, per `EntrySheetDate`.
+    private var timeBinding: Binding<Date> {
+        Binding(
+            get: { timestamp },
+            set: { picked in
+                let calendar = Calendar(identifier: .gregorian)
+                let parts = calendar.dateComponents([.hour, .minute], from: picked)
+                let hour = parts.hour ?? 0
+                let minute = parts.minute ?? 0
+                var day = timestamp
+                if !dateTouched, let followed = EntrySheetDate.followUp(
+                    origin: origin, logicalDay: logicalDay,
+                    changeHour: dayChangeHour, changeMinute: dayChangeMinute,
+                    hour: hour, minute: minute, now: now
+                ) {
+                    day = followed
+                }
+                timestamp = Self.compose(day: day, hour: hour, minute: minute)
+            }
+        )
+    }
+
+    /// The frame the composed reading is read in.
+    ///
+    /// The one the user is in NOW, except while an edit leaves the date alone:
+    /// correcting a time inside a recorded reading must not reframe it, or the
+    /// row would come back at an hour nobody typed.
+    private var utcOffsetSeconds: Int {
+        let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
+        if let editing, !dateTouched, sameDay(timestamp, initialTimestamp) {
+            return editing.utcOffsetSeconds
+        }
+        return DayResolver.utcOffsetSeconds(timestampMillis: millis)
+    }
+
+    private func sameDay(_ lhs: Date, _ rhs: Date) -> Bool {
+        Calendar(identifier: .gregorian).isDate(lhs, inSameDayAs: rhs)
+    }
+
+    /// The logical day the composed reading counts toward, formatted, or `nil`
+    /// while it is the day the sheet was opened on.
+    private var countsToward: String? {
+        let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
+        let offset = utcOffsetSeconds
+        guard DayResolver.logicalDayDiffers(
+            timestampMillis: millis, utcOffsetSeconds: offset,
+            changeHour: dayChangeHour, changeMinute: dayChangeMinute, logicalDay: logicalDay
         ) else { return nil }
-        let calendarDay = DayResolver.calendarDate(timestampMillis: placed)
-        guard calendarDay != logicalDay, let date = DayResolver.parseDate(calendarDay) else { return nil }
+        let day = DayResolver.resolve(
+            timestampMillis: millis, utcOffsetSeconds: offset,
+            changeHour: dayChangeHour, changeMinute: dayChangeMinute
+        )
+        guard let date = DayResolver.parseDate(day) else { return nil }
         let formatter = DateFormatter()
         formatter.locale = locale
         formatter.timeZone = TimeZone(identifier: "UTC")  // `parseDate` anchors at noon UTC
         formatter.dateStyle = .medium
         formatter.timeStyle = .none
         return formatter.string(from: date)
-    }
-
-    private func save() {
-        guard let drink = selection, let volume else { return }
-        isSaving = true
-        Task {
-            let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
-            let stored = await onSave(drink, volume, millis, note)
-            isSaving = false
-            if stored { dismiss() }
-        }
     }
 }

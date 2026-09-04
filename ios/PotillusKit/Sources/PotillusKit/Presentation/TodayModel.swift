@@ -290,8 +290,18 @@ public final class TodayModel {
             let settings = await preferences.load()
             let nowMillis = Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
 
-            let today = DayResolver.resolve(
-                timestampMillis: nowMillis,
+            // TWO CLOCKS MEET HERE, and the seam is deliberate. The screen's
+            // "today" comes from the device zone as it is right now; which day an
+            // entry counts toward comes from the frame that entry recorded. Both
+            // are right, and after a flight they disagree: eastwards, entries drop
+            // off the list; westwards, entries appear that are not yet drunk by
+            // the local clock. The alternative — reading the entries in the
+            // current zone — would move every historical time by the length of
+            // the flight and is what the recorded offset exists to prevent. The
+            // case needs a plane, so it is accepted rather than papered over;
+            // this note is here so the next reader does not take it for a defect.
+            let today = DayResolver.today(
+                now: nowMillis,
                 changeHour: settings.dayChangeHour,
                 changeMinute: settings.dayChangeMinute,
                 timeZone: timeZone
@@ -459,69 +469,48 @@ public final class TodayModel {
     /// is about to store when it differs. Android's `TodayViewModel.addEntry`
     /// applies the same rule.
     public func addEntry(
-        drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64? = nil, note: String = ""
+        drink: DrinkDefinition,
+        volumeMl: Int,
+        timestampMillis: Int64? = nil,
+        utcOffsetSeconds: Int? = nil,
+        note: String = ""
     ) async {
-        let typed = timestampMillis ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
-        // Empty until the first load: resolve from the clock in that window rather
-        // than filing the entry under an empty day.
-        let day = state.logicalDate.isEmpty
-            ? DayResolver.resolve(
-                timestampMillis: typed, changeHour: state.settings.dayChangeHour,
-                changeMinute: state.settings.dayChangeMinute, timeZone: timeZone
-            )
-            : state.logicalDate
-        let onToday = DayResolver.instant(
-            logicalDate: day, matchingTimeOf: typed,
-            changeHour: state.settings.dayChangeHour, changeMinute: state.settings.dayChangeMinute,
-            timeZone: timeZone
-        ) ?? typed
+        let instant = timestampMillis ?? Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
+        let offset = utcOffsetSeconds ?? DayResolver.utcOffsetSeconds(
+            timestampMillis: instant, timeZone: timeZone
+        )
         // The derivation lives in `EntryLogger`, so the Drinks screen and this one
         // cannot produce differently-shaped entries.
         let entry = EntryLogger.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: onToday,
+            timestampMillis: instant,
+            utcOffsetSeconds: offset,
             note: note,
-            settings: state.settings,
-            timeZone: timeZone,
-            logicalDate: day
+            settings: state.settings
         )
 
         // The new row id is discarded explicitly rather than silenced with
         // `@discardableResult` on the protocol: it is real information, and a
         // caller that does not want it should have to say so.
-        await perform { _ = try self.entries.add(entry) }
+        await perform { _ = try self.entries.add(entry, settings: self.state.settings) }
     }
 
     public func deleteEntry(_ entry: ConsumptionEntry) async {
         await perform { try self.entries.delete(entry) }
     }
 
-    /// Persists edits to `entry`, keeping it on its logical day.
+    /// Persists edits to `entry`, as the sheet composed them.
     ///
-    /// The edited time is placed on the calendar day that keeps the entry on
-    /// `entry.logicalDate` — the same rule as `addEntry` and as the calendar's
-    /// edit, so an edit never moves an entry off the screen it was edited on.
-    /// (Android re-resolved the day from the new time until v0.86.0, and 05:00
-    /// corrected to 02:00 sent the entry to yesterday.) Moving an entry to
-    /// another day is the calendar's job: pick the day there.
+    /// NOTHING IS PLACED HERE ANY MORE. The sheet carries a date beside its time,
+    /// so a correction that crosses the day-change boundary moves the entry to
+    /// another day — in the user's sight, with the sheet naming the day it is
+    /// going to. Until the sheet had a date, this method moved the timestamp onto
+    /// whatever calendar day kept the entry where it was, and re-read the frame
+    /// with it; both are the sheet's business now, because only the sheet knows
+    /// whether the user touched the date.
     public func updateEntry(_ entry: ConsumptionEntry) async {
-        var stamped = entry
-        stamped.timestampMillis = DayResolver.instant(
-            logicalDate: entry.logicalDate, matchingTimeOf: entry.timestampMillis,
-            changeHour: state.settings.dayChangeHour, changeMinute: state.settings.dayChangeMinute,
-            timeZone: timeZone
-        ) ?? entry.timestampMillis
-        // The frame is re-read with the timestamp, unlike the logical date. The
-        // two answer different questions: the date is where the user filed the
-        // drink, the offset is the frame the time they just typed was typed in.
-        // Keeping a stale offset would show the edited entry at an hour the user
-        // did not enter. Done here rather than in the view, so no caller can
-        // forget it — the shape Android gives its repository.
-        stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
-            timestampMillis: stamped.timestampMillis, timeZone: timeZone
-        )
-        await perform { try self.entries.update(stamped) }
+        await perform { try self.entries.update(entry, settings: self.state.settings) }
     }
 
     /// Clears the surfaced failure — the OK button of the screen's error alert.

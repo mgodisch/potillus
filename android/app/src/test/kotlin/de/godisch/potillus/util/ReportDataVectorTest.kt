@@ -91,6 +91,7 @@ class ReportDataVectorTest {
                 gramsAlcohol = entry.getDouble("gramsAlcohol"),
                 timestampMillis = 0L,
                 logicalDate = entry.getString("logicalDate"),
+                utcOffsetSeconds = 0,
             )
         }.toList()
 

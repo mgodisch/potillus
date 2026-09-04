@@ -54,9 +54,10 @@ class CsvExporterCategoryTest {
             gramsAlcohol = 20.0,
             timestampMillis = 1_700_000_000_000L,
             logicalDate = "2026-01-01",
+            utcOffsetSeconds = 0,
         )
         val csv = CsvExporter.buildCsv(
-            listOf("d", "t", "drink", "cat", "v", "a", "g", "n"),
+            listOf("d", "t", "drink", "cat", "v", "a", "g", "n", "ld"),
             listOf(entry),
             listOf(drink),
         )

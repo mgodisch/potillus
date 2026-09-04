@@ -128,16 +128,35 @@ public protocol EntryRepositoryProtocol: Sendable {
     /// only alcohol-free entries are absent.
     func drinkDates() throws -> [String]
 
-    /// Inserts `entry` and returns its new database id.
-    func add(_ entry: ConsumptionEntry) throws -> Int64
+    /// Inserts `entry` with a freshly derived logical day and returns its new id.
+    ///
+    /// `entry.logicalDate` as handed in is IGNORED. Every insert path ends here,
+    /// so this is the one place a row can be given a day, and a caller that could
+    /// supply its own would eventually supply a wrong one. What the caller owns
+    /// is the reading — the timestamp and the offset — and the day follows.
+    func add(_ entry: ConsumptionEntry, settings: AppSettings) throws -> Int64
 
-    func update(_ entry: ConsumptionEntry) throws
+    /// Updates `entry`, deriving its logical day from the edited reading.
+    ///
+    /// The stored day does not survive an edit, and that is the point: an entry
+    /// corrected from 23:00 to 02:00 moves to the previous logical day, because
+    /// 02:00 is before the boundary and that is what the reading says.
+    func update(_ entry: ConsumptionEntry, settings: AppSettings) throws
+
     func delete(_ entry: ConsumptionEntry) throws
     func deleteAll() throws
 
     /// Whether an entry with exactly this timestamp and drink already exists.
     /// The de-duplication guard for MERGE imports.
     func exists(timestampMillis: Int64, drinkId: Int64) throws -> Bool
+
+    /// Rewrites `logicalDate` across the table when the day-change time in
+    /// `settings` differs from the one the column was last derived under, and
+    /// records the new one. A no-op when the two already agree.
+    ///
+    /// Called on every settings emission, from one place in the app. Safe beside
+    /// ordinary writes: it runs in a single transaction.
+    func realignDays(settings: AppSettings) throws
 }
 
 // =============================================================================
@@ -245,11 +264,13 @@ public struct EntryRepository: EntryRepositoryProtocol {
     /// `SELECT * FROM entries WHERE logicalDate = ? ORDER BY timestampMillis ASC`
     public func observeEntries(forDate date: String) -> AsyncThrowingStream<[ConsumptionEntry], Error> {
         observing(reader: database.reader) { db in
-            try Entry
-                .filter(Column("logicalDate") == date)
-                .order(Column("timestampMillis").asc)
-                .fetchAll(db)
-                .map(\.domain)
+            try Self.checked(
+                Entry
+                    .filter(Column("logicalDate") == date)
+                    .order(Column("timestampMillis").asc)
+                    .fetchAll(db),
+                db
+            ).map(\.domain)
         }
     }
 
@@ -332,27 +353,31 @@ public struct EntryRepository: EntryRepositoryProtocol {
 
     public func observeEntries(from: String, to: String) -> AsyncThrowingStream<[ConsumptionEntry], Error> {
         observing(reader: database.reader) { db in
-            try Entry
-                .filter(Column("logicalDate") >= from && Column("logicalDate") <= to)
-                .order(Column("timestampMillis").asc)
-                .fetchAll(db)
-                .map(\.domain)
+            try Self.checked(
+                Entry
+                    .filter(Column("logicalDate") >= from && Column("logicalDate") <= to)
+                    .order(Column("timestampMillis").asc)
+                    .fetchAll(db),
+                db
+            ).map(\.domain)
         }
     }
 
     public func all() throws -> [ConsumptionEntry] {
         try database.read { db in
-            try Entry.order(Column("timestampMillis").asc).fetchAll(db).map(\.domain)
+            try Self.checked(Entry.order(Column("timestampMillis").asc).fetchAll(db), db).map(\.domain)
         }
     }
 
     public func inRange(from: String, to: String) throws -> [ConsumptionEntry] {
         try database.read { db in
-            try Entry
-                .filter(Column("logicalDate") >= from && Column("logicalDate") <= to)
-                .order(Column("timestampMillis").asc)
-                .fetchAll(db)
-                .map(\.domain)
+            try Self.checked(
+                Entry
+                    .filter(Column("logicalDate") >= from && Column("logicalDate") <= to)
+                    .order(Column("timestampMillis").asc)
+                    .fetchAll(db),
+                db
+            ).map(\.domain)
         }
     }
 
@@ -362,7 +387,8 @@ public struct EntryRepository: EntryRepositoryProtocol {
 
     public func lastEntry() throws -> ConsumptionEntry? {
         try database.read { db in
-            try Entry.order(Column("id").desc).fetchOne(db)?.domain
+            let row = try Entry.order(Column("id").desc).fetchOne(db)
+            return Self.checked(row.map { [$0] } ?? [], db).first?.domain
         }
     }
 
@@ -374,9 +400,10 @@ public struct EntryRepository: EntryRepositoryProtocol {
         try database.read { db in try Self.fetchDrinkDates(db) }
     }
 
-    public func add(_ entry: ConsumptionEntry) throws -> Int64 {
+    public func add(_ entry: ConsumptionEntry, settings: AppSettings) throws -> Int64 {
         try database.write { db in
             var record = Entry(entry)
+            record.logicalDate = try Self.derivedDay(db, of: record, settings: settings)
             try record.insert(db)
             guard let id = record.id else {
                 throw DatabaseError(message: "insert did not yield a row id")
@@ -385,8 +412,173 @@ public struct EntryRepository: EntryRepositoryProtocol {
         }
     }
 
-    public func update(_ entry: ConsumptionEntry) throws {
-        try database.write { db in try Entry(entry).update(db) }
+    public func update(_ entry: ConsumptionEntry, settings: AppSettings) throws {
+        try database.write { db in
+            var record = Entry(entry)
+            record.logicalDate = try Self.derivedDay(db, of: record, settings: settings)
+            try record.update(db)
+        }
+    }
+
+    // ── The derived logical day ──────────────────────────────────────────────
+
+    /// The rows, after checking the invariant `entries.logicalDate` is bound by.
+    ///
+    /// WHAT IT CATCHES, AND WHY IT IS WORTH A CHECK ON THE READ PATH. Making the
+    /// column a derivation buys the app the ability to move every entry when the
+    /// day-change time moves; what it risks is a row whose stored day and whose
+    /// reading have come apart — a write that went round `add` and `update`, a
+    /// realignment that half ran, a key written without the rows it describes.
+    /// None of those is visible in the data itself: a wrong day looks exactly
+    /// like a right one. So the equation is checked where every row passes, and
+    /// the failure names the row instead of surfacing weeks later as a total
+    /// nobody can account for.
+    ///
+    /// A NIL KEY IS NOT A VIOLATION. It means the column has not been derived yet
+    /// — the state a fresh migration and a finished import both leave — and the
+    /// rows legitimately hold whatever they were imported or migrated with until
+    /// the next realignment.
+    ///
+    /// COSTS NOTHING IN A SHIPPED BUILD: `assert` takes its condition as an
+    /// autoclosure and does not evaluate it when assertions are compiled out, so
+    /// neither the key read nor the loop happens there. The rows are returned
+    /// either way, which is what lets this sit inside the fetch expression.
+    private static func checked(_ rows: [Entry], _ db: Database) -> [Entry] {
+        assert(invariantHolds(rows, db))
+        return rows
+    }
+
+    /// The condition `checked` asserts, spelled out so the assertion reads as one
+    /// line and this can name what failed while debugging.
+    private static func invariantHolds(_ rows: [Entry], _ db: Database) -> Bool {
+        guard let key = try? LogicalDayKey.fetchOne(db),
+              let hour = key.changeHour, let minute = key.changeMinute
+        else { return true }
+        return rows.allSatisfy { row in
+            DayResolver.resolve(
+                timestampMillis: row.timestampMillis,
+                utcOffsetSeconds: row.utcOffsetSeconds,
+                changeHour: hour,
+                changeMinute: minute
+            ) == row.logicalDate
+        }
+    }
+
+    /// The logical day `record`'s own reading falls on.
+    ///
+    /// THE BOUNDARY COMES FROM THE KEY WHEN THERE IS ONE, and only from
+    /// `settings` when there is not. That looks backwards — the settings are
+    /// newer — and it is deliberate: the invariant on `entries` is stated against
+    /// the KEY, so a row written under a boundary the key does not name would
+    /// break it for as long as the realignment has not run. Deriving under the
+    /// key keeps every row consistent with every other, and the realignment
+    /// already on its way moves the new row along with the rest a moment later.
+    private static func derivedDay(
+        _ db: Database, of record: Entry, settings: AppSettings
+    ) throws -> String {
+        let key = try LogicalDayKey.fetchOne(db)
+        // Both or neither: the two columns are written together and read
+        // together, so a half-set key counts as no key rather than being mixed
+        // with the settings into a boundary that was never in force anywhere.
+        let hour: Int
+        let minute: Int
+        if let keyHour = key?.changeHour, let keyMinute = key?.changeMinute {
+            hour = keyHour
+            minute = keyMinute
+        } else {
+            hour = settings.dayChangeHour
+            minute = settings.dayChangeMinute
+        }
+        return DayResolver.resolve(
+            timestampMillis: record.timestampMillis,
+            utcOffsetSeconds: record.utcOffsetSeconds,
+            changeHour: hour,
+            changeMinute: minute
+        )
+    }
+
+    /// Brings `entries.logicalDate` in line with the day-change time in `settings`.
+    ///
+    /// WHAT IT COMPARES. The single row of `logical_day_key` says which boundary
+    /// the column currently holds. Equal to the setting: nothing to do, and the
+    /// common case — this runs on every settings emission, which includes every
+    /// unrelated change the user makes. Different, or not set at all: one
+    /// transaction that rewrites the column and records the new boundary.
+    ///
+    /// WHAT RUNS FIRST WHEN THE KEY IS UNSET. A nil key means the column has
+    /// never been derived — the state a fresh v4 migration and a finished backup
+    /// import both leave. That is also the only moment at which the stored
+    /// `logicalDate` still carries the user's ORIGINAL intent for the entries
+    /// damaged by the pre-0.85.0 calendar path, so `LegacyDayRepair` gets its
+    /// turn before the recomputation overwrites them. The order is not a
+    /// preference; it is the difference between repairing those rows and losing
+    /// what they meant.
+    ///
+    /// WHY IT IS SAFE TO INTERRUPT. Everything happens inside one transaction. An
+    /// abort rolls back the rewrite AND the key, so the next emission finds the
+    /// old key, disagrees with the setting again, and starts over. There is no
+    /// half-converted state to detect, because there is no state between the two.
+    ///
+    /// WHAT THE SCREENS DO. Nothing, until the transaction commits; then GRDB
+    /// reports `entries` as changed and every observation re-emits by itself. In
+    /// the window between the setting being written and the commit, the screens
+    /// show the old days — what the app showed permanently before this existed.
+    public func realignDays(settings: AppSettings) throws {
+        try database.write { db in
+            let key = try LogicalDayKey.fetchOne(db)
+            let isUnset = key?.changeHour == nil || key?.changeMinute == nil
+            if !isUnset,
+               key?.changeHour == settings.dayChangeHour,
+               key?.changeMinute == settings.dayChangeMinute {
+                return
+            }
+
+            for row in try Entry.fetchAll(db) {
+                let repaired = isUnset ? Self.repairedOrSame(row, settings: settings) : row
+                var rewritten = repaired
+                rewritten.logicalDate = DayResolver.resolve(
+                    timestampMillis: repaired.timestampMillis,
+                    utcOffsetSeconds: repaired.utcOffsetSeconds,
+                    changeHour: settings.dayChangeHour,
+                    changeMinute: settings.dayChangeMinute
+                )
+                // Only the rows that actually moved. A no-op update is still a
+                // write, and on the first run after an upgrade nearly every row
+                // is one: the previous release placed timestamps so that they
+                // resolve to the day it stored beside them.
+                if rewritten != row {
+                    try rewritten.update(db)
+                }
+            }
+
+            // `save`, not `update`: the migration puts the row in, but `update`
+            // would throw if it were ever absent, and failing a realignment over
+            // a missing bookkeeping row would be the wrong trade — `save` writes
+            // it either way.
+            try LogicalDayKey(
+                changeHour: settings.dayChangeHour,
+                changeMinute: settings.dayChangeMinute
+            ).save(db)
+        }
+    }
+
+    /// `row` with its pre-0.85.0 calendar damage undone, or `row` unchanged.
+    ///
+    /// Split out so `realignDays` reads as the decisions it makes rather than as
+    /// the mechanics of one of them. See `LegacyDayRepair` for how a damaged row
+    /// is recognised and why the rule lives there and not in `DayResolver`.
+    private static func repairedOrSame(_ row: Entry, settings: AppSettings) -> Entry {
+        guard let fixed = LegacyDayRepair.repair(
+            timestampMillis: row.timestampMillis,
+            utcOffsetSeconds: row.utcOffsetSeconds,
+            logicalDate: row.logicalDate,
+            changeHour: settings.dayChangeHour,
+            changeMinute: settings.dayChangeMinute
+        ) else { return row }
+        var repaired = row
+        repaired.timestampMillis = fixed.timestampMillis
+        repaired.utcOffsetSeconds = fixed.utcOffsetSeconds
+        return repaired
     }
 
     public func delete(_ entry: ConsumptionEntry) throws {

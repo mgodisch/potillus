@@ -49,10 +49,8 @@ import de.godisch.potillus.domain.model.DrinkCategory
 import de.godisch.potillus.domain.model.DrinkDefinition
 import org.json.JSONArray
 import org.json.JSONObject
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.util.TimeZone
 
 class CsvExportVectorTest {
 
@@ -63,13 +61,6 @@ class CsvExportVectorTest {
             (0 until length()).asSequence().map { getJSONObject(it) }
 
         fun JSONArray.strings(): List<String> = (0 until length()).map { getString(it) }
-    }
-
-    private val originalZone: TimeZone = TimeZone.getDefault()
-
-    @After
-    fun restoreDefaultTimeZone() {
-        TimeZone.setDefault(originalZone)
     }
 
     // ── escapeField ──────────────────────────────────────────────────────────
@@ -90,8 +81,10 @@ class CsvExportVectorTest {
     @Test
     fun `buildCsv matches the shared vectors`() {
         VECTORS.getJSONArray("buildCsv").objects().forEach { case ->
-            TimeZone.setDefault(TimeZone.getTimeZone(case.getString("zoneId")))
-
+            // NO ZONE IS SET HERE ANY MORE. The cases named one while an entry
+            // could record no offset, and it stood in as the fallback; every
+            // vector entry now carries its own frame, and the export reads each
+            // row in that frame rather than in the machine's.
             val actual = CsvExporter.buildCsv(
                 headerCells = case.getJSONArray("headers").strings(),
                 entries = case.entries(),
@@ -116,6 +109,7 @@ class CsvExportVectorTest {
                 timestampMillis = obj.getLong("timestampMillis"),
                 logicalDate = obj.getString("logicalDate"),
                 note = obj.getString("note"),
+                utcOffsetSeconds = obj.getInt("utcOffsetSeconds"),
             )
         }.toList()
 

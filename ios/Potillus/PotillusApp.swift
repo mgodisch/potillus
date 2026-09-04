@@ -155,6 +155,19 @@ struct PotillusApp: App {
                     }
                 }
             }
+            // A SECOND observation of the same store, deliberately not folded into
+            // the one above. That one belongs to the scene: it drives two pieces
+            // of chrome that sit outside the root view. This one belongs to the
+            // kit and touches the database; sharing a loop would tie a long
+            // rewrite of the entries table to the cover that hides the diary in
+            // the app switcher. Keyed on readiness for the same reason as its
+            // neighbour — a plain `.task` fires while `startup` is still
+            // `.loading` and never sees an environment.
+            .task(id: startup.isReady) {
+                if case .ready(let environment) = startup {
+                    await environment.realignment.run()
+                }
+            }
             .onChange(of: scenePhase) { _, phase in
                 // .inactive is the transient state during the switcher animation;
                 // only .background is a real departure, and only .active a real

@@ -91,7 +91,7 @@ class BackupRepositoryInstrumentedTest {
         db = Room.inMemoryDatabaseBuilder(ctx, AppDatabase::class.java).build()
         drinkDao = db.drinkDao()
         entryDao = db.entryDao()
-        repo = BackupRepository(entryDao, drinkDao, db)
+        repo = BackupRepository(entryDao, drinkDao, db.logicalDayKeyDao(), db)
     }
 
     @After
@@ -128,6 +128,7 @@ class BackupRepositoryInstrumentedTest {
                 timestampMillis = 500L,
                 logicalDate = "2024-12-31",
                 note = "",
+                utcOffsetSeconds = 0,
             ),
         )
 
@@ -147,11 +148,12 @@ class BackupRepositoryInstrumentedTest {
             ConsumptionEntry(
                 id = 0, drinkId = 99, drinkName = "Mojito", volumeMl = 200, alcoholPercent = 10.0,
                 gramsAlcohol = 15.78, timestampMillis = 1_000L, logicalDate = "2025-01-01", note = "",
+                utcOffsetSeconds = 0,
             ),
         )
 
         // ── Act: this must NOT throw an FK constraint exception. ───────────────
-        val stats = repo.importReplace(backupDrinks, backupEntries)
+        val stats = repo.importReplace(backupDrinks, backupEntries, BackupDayChange(hour = 4, minute = 0))
 
         // ── Assert: the entry was imported and points at a real drink row. ─────
         assertEquals("one backup entry should be imported", 1, stats.imported)
@@ -208,7 +210,7 @@ class BackupRepositoryInstrumentedTest {
             ),
         )
 
-        repo.importReplace(backupDrinks, backupEntries = emptyList())
+        repo.importReplace(backupDrinks, backupEntries = emptyList(), dayChange = BackupDayChange(hour = 4, minute = 0))
 
         // ── Assert: exactly the backup's drinks remain; "Lager" is gone. ───────
         val remaining = drinkDao.getAllOnce()

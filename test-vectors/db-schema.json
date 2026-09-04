@@ -11,9 +11,10 @@
     "The JSON backup is. What is shared is the table shape, so the domain logic and",
     "the queries mean the same thing on both sides.",
     "Column order follows the Room export and is significant only for readability.",
-    "entries.utcOffsetSeconds is nullable on purpose: NULL means the entry predates the column and its clock time is read through the device zone's historical rules. It is appended last so a freshly created table and one reached by ALTER TABLE carry the same column order."
+    "entries.utcOffsetSeconds is NOT NULL from schema 4 on: MIGRATION_3_4 backfilled every row that predated the column with the offset the device zone had at that row's instant, then rebuilt the table with the constraint, because SQLite cannot add one to an existing column. The rebuild also removed the reason the column sits last, which was that ALTER TABLE appends; the order is kept because moving it would churn this contract for nothing.",
+    "logical_day_key holds one row and records which day-change time entries.logicalDate was last derived under. Both columns are nullable and mean, together, \"not derived yet\"; that is the state a finished migration and a finished backup import leave behind. While the key is set, every row satisfies logicalDate == DayResolver.resolve(timestampMillis, utcOffsetSeconds, changeHour, changeMinute)."
   ],
-  "schemaVersion": 3,
+  "schemaVersion": 4,
   "tables": [
     {
       "name": "drinks",
@@ -112,7 +113,7 @@
         {
           "name": "utcOffsetSeconds",
           "type": "INTEGER",
-          "notNull": false
+          "notNull": true
         }
       ],
       "primaryKey": [
@@ -144,6 +145,32 @@
           "onUpdate": "NO ACTION"
         }
       ]
+    },
+    {
+      "name": "logical_day_key",
+      "columns": [
+        {
+          "name": "id",
+          "type": "INTEGER",
+          "notNull": true
+        },
+        {
+          "name": "changeHour",
+          "type": "INTEGER",
+          "notNull": false
+        },
+        {
+          "name": "changeMinute",
+          "type": "INTEGER",
+          "notNull": false
+        }
+      ],
+      "primaryKey": [
+        "id"
+      ],
+      "autoIncrement": false,
+      "indices": [],
+      "foreignKeys": []
     }
   ]
 }

@@ -190,19 +190,23 @@ struct CalendarScreen: View {
                     // The instant the sheet offers, and Android's dialog too: now.
                     // What makes the entry land on the CHOSEN day is not this
                     // timestamp but the logicalDate the model attaches; the two are
-                    // deliberately separate facts. The sheet shows the calendar day
-                    // a typed night-hour time will be stored on (`logicalDay`).
+                    // The instant the sheet opens on. It is only a starting point:
+                    // the sheet offers the tapped day at 20:00 and keeps the entry
+                    // there while the user turns the time wheel, and the day it
+                    // ends up on follows from the reading it composes.
                     now: Date(),
                     // capacity: omitted, so the sheet hides the capacity dot. Its
                     // figures — today's grams, this week's total, this week's
                     // drinking days — are all about TODAY, and this entry is not.
                     // A dot answering the wrong day's question is worse than none.
-                    logicalDay: model.state.selectedDate,
+                    logicalDay: model.state.selectedDate ?? model.state.today,
+                    origin: .calendar,
                     dayChangeHour: model.state.dayChangeHour,
                     dayChangeMinute: model.state.dayChangeMinute
-                ) { drink, volume, millis, note in
+                ) { drink, volume, millis, offset, note in
                     await model.addEntry(
-                        drink: drink, volumeMl: volume, timestampMillis: millis, note: note
+                        drink: drink, volumeMl: volume,
+                        timestampMillis: millis, utcOffsetSeconds: offset, note: note
                     )
                     return model.failure == nil
                 }
@@ -219,15 +223,18 @@ struct CalendarScreen: View {
                     now: Date(),
                     editing: entry,
                     logicalDay: entry.logicalDate,
+                    origin: .edit,
                     dayChangeHour: model.state.dayChangeHour,
                     dayChangeMinute: model.state.dayChangeMinute
-                ) { drink, volume, millis, note in
+                ) { drink, volume, millis, offset, note in
                     var updated = entry
                     updated.drinkId = drink.id
                     updated.drinkName = drink.name
                     updated.alcoholPercent = drink.alcoholPercent
                     updated.volumeMl = volume
                     updated.timestampMillis = millis
+                    // See the twin in TodayScreenSheets: the sheet owns the frame.
+                    updated.utcOffsetSeconds = offset
                     updated.note = note
                     updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
                         volumeMl: volume, alcoholPercent: drink.alcoholPercent

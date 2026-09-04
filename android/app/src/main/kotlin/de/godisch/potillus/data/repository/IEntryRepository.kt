@@ -84,8 +84,12 @@ interface IEntryRepository {
 
     // ── Write operations ──────────────────────────────────────────────────────
 
-    /** Inserts [entry] and returns its new row id. */
-    suspend fun add(entry: ConsumptionEntry): Long
+    /**
+     * Inserts [entry] and returns its new row id. The logical day is derived
+     * from the entry's timestamp and offset; whatever `logicalDate` the caller
+     * put on the object is discarded.
+     */
+    suspend fun add(entry: ConsumptionEntry, settings: AppSettings): Long
 
     /**
      * Creates and inserts an entry from a [drink] selection, deriving grams and
@@ -100,23 +104,27 @@ interface IEntryRepository {
     ): Long
 
     /**
-     * Like [addFromDrink] but assigns an explicit [logicalDate] (used by the
-     * calendar, where the target day is chosen by the user, not derived).
+     * Updates [entry] as the caller composed it — timestamp and frame both — and
+     * derives its logical day from that reading. An edited time can move the
+     * entry to another day; the sheet says so before it happens.
      */
-    suspend fun addFromDrinkWithDate(
-        drink: DrinkDefinition,
-        volumeMl: Int,
-        timestampMillis: Long,
-        note: String,
-        logicalDate: String,
-    ): Long
-
-    /** Updates [entry] as-is, preserving its existing logicalDate (calendar edits). */
-    suspend fun update(entry: ConsumptionEntry)
+    suspend fun update(entry: ConsumptionEntry, settings: AppSettings)
 
     /** Deletes [entry]. */
     suspend fun delete(entry: ConsumptionEntry)
 
     /** Deletes every entry (used by backup REPLACE import). */
     suspend fun deleteAll()
+
+    // ── Derived-column maintenance ────────────────────────────────────────────
+
+    /**
+     * Rewrites `logicalDate` across the table when the day-change time in
+     * [settings] differs from the one the column was last derived under, and
+     * records the new one. A no-op when the two already agree.
+     *
+     * Called on every settings emission, from one place per platform. Safe to
+     * call concurrently with ordinary writes: it runs in a transaction.
+     */
+    suspend fun realignDays(settings: AppSettings)
 }

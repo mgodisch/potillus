@@ -236,7 +236,8 @@ final class SchemaParityTests: XCTestCase {
         try database.write { db in
             var entry = Entry(
                 drinkId: drinkId, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: 19.3, timestampMillis: 1_748_142_000_000, logicalDate: "2025-05-24"
+                gramsAlcohol: 19.3, timestampMillis: 1_748_142_000_000, logicalDate: "2025-05-24",
+                utcOffsetSeconds: 0
             )
             try entry.insert(db)
         }

@@ -31,14 +31,18 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import de.godisch.potillus.data.db.dao.DrinkDao
 import de.godisch.potillus.data.db.dao.EntryDao
+import de.godisch.potillus.data.db.dao.LogicalDayKeyDao
 import de.godisch.potillus.data.db.entity.DrinkEntity
 import de.godisch.potillus.data.db.entity.EntryEntity
+import de.godisch.potillus.data.db.entity.LogicalDayKeyEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.security.GeneralSecurityException
 import java.security.KeyStore
+import java.time.Instant
+import java.time.ZoneId
 
 // =============================================================================
 // AppDatabase.kt – Room database definition and singleton
@@ -87,8 +91,8 @@ import java.security.KeyStore
 // forward-only and never destructive. See CONTRIBUTING.md §8 (compatibility
 // guarantee) for the promise this upholds.
 @Database(
-    entities = [DrinkEntity::class, EntryEntity::class],
-    version = 3,
+    entities = [DrinkEntity::class, EntryEntity::class, LogicalDayKeyEntity::class],
+    version = 4,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -98,6 +102,15 @@ abstract class AppDatabase : RoomDatabase() {
 
     /** Returns the DAO for consumption-entry operations. */
     abstract fun entryDao(): EntryDao
+
+    /**
+     * Returns the DAO for the single row of `logical_day_key`.
+     *
+     * Separate from [entryDao] although it describes the `entries` table: the
+     * two are written together but read by different callers, and a DAO per
+     * table keeps Room's generated code and the fakes in the tests small.
+     */
+    abstract fun logicalDayKeyDao(): LogicalDayKeyDao
 
     companion object {
 
@@ -200,7 +213,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME,
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
                     .addCallback(PrepopulateCallback(applicationScope))
                     .build()
                     .also { instance = it }
@@ -304,11 +317,164 @@ val MIGRATION_1_2 = object : Migration(1, 2) {
  *
  * `ALTER TABLE … ADD COLUMN` is safe on a table with data: SQLite rewrites no
  * row, and a nullable column needs no DEFAULT.
+ *
+ * SUPERSEDED BY [MIGRATION_3_4], which does backfill and drops the nullability.
+ * The reasoning above still describes what was known in v0.83.0 and is left
+ * standing as history; the weighing that overturned it — the second code path
+ * costs more than the frozen estimate does — is written out there.
  */
 val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("ALTER TABLE entries ADD COLUMN utcOffsetSeconds INTEGER")
     }
+}
+
+/**
+ * v3 → v4: backfill `entries.utcOffsetSeconds`, make it `NOT NULL`, and add the
+ * one-row `logical_day_key` table.
+ *
+ * TWO STEPS, IN THIS ORDER:
+ *
+ *  1. BACKFILL, in Kotlin. Every row still holding NULL gets the offset the
+ *     device zone had AT THAT ROW'S INSTANT, through the zone's historical
+ *     rules. This is exactly the value the readers computed on every read while
+ *     the column was nullable, so the migration freezes what the app already
+ *     showed rather than inventing a number. The step is Kotlin and not SQL
+ *     because SQLite has no timezone database: `strftime('%s', …, 'localtime')`
+ *     answers for the CURRENT rules, not for the rules in force in 2024.
+ *
+ *  2. REBUILD, in SQL. SQLite cannot add `NOT NULL` to an existing column, so
+ *     the table is recreated with the constraint and the rows are copied. Column
+ *     order matches [EntryEntity]'s declaration, and the foreign key is spelled
+ *     as Room's own export spells it, so the schema validation at the end of the
+ *     migration passes.
+ *
+ * WHY THE ZONE RULE IS PRIVATE TO THIS FILE AND NOT `DayResolver`'s
+ *   A migration runs once per device and can never run again. If it borrowed
+ *   [de.godisch.potillus.domain.DayResolver.utcOffsetSeconds], a later change
+ *   there would silently redefine what an ALREADY MIGRATED database means
+ *   against one still waiting to migrate. Reading the zone here, in six lines
+ *   that nothing else calls, keeps the two apart.
+ *
+ * WHAT THIS MIGRATION DOES NOT DO
+ *   It does not read the day-change time, and it does not touch `logicalDate`.
+ *   `logical_day_key` is created holding NULLs, which every reader takes as "the
+ *   column has not been derived yet". The first realignment in the repository
+ *   then repairs the pre-0.85.0 calendar entries and recomputes the whole column
+ *   under the setting it reads from the preferences. Keeping settings out of the
+ *   migration is what lets the database open before the preferences are
+ *   readable: a locked store delays the realignment, it no longer blocks the
+ *   start.
+ *
+ * WHAT A USER SEES IF THIS IS INTERRUPTED
+ *   Nothing, twice over: Room runs the whole migration in a transaction, and the
+ *   key it leaves behind is NULL either way.
+ */
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        backfillUtcOffsets(db)
+        rebuildEntriesWithNotNullOffset(db)
+        createLogicalDayKey(db)
+    }
+}
+
+/**
+ * Step 1 of [MIGRATION_3_4]: writes an offset into every row that has none.
+ *
+ * Rows are read first and written afterwards rather than updated while the
+ * cursor is open: SQLite allows the interleaving, but a cursor that walks a
+ * table being written under it is a well-known way to read a row twice or not at
+ * all. The row count here is the user's drink history, so holding the ids in
+ * memory costs nothing worth optimising.
+ */
+private fun backfillUtcOffsets(db: SupportSQLiteDatabase) {
+    val zone = ZoneId.systemDefault()
+    val pending = mutableListOf<Pair<Long, Long>>() // id → timestampMillis
+    db.query("SELECT id, timestampMillis FROM entries WHERE utcOffsetSeconds IS NULL").use { c ->
+        while (c.moveToNext()) {
+            pending += c.getLong(0) to c.getLong(1)
+        }
+    }
+    pending.forEach { (id, timestampMillis) ->
+        val offset = zone.rules.getOffset(Instant.ofEpochMilli(timestampMillis)).totalSeconds
+        db.execSQL(
+            "UPDATE entries SET utcOffsetSeconds = ? WHERE id = ?",
+            arrayOf<Any>(offset, id),
+        )
+    }
+}
+
+/**
+ * Step 2 of [MIGRATION_3_4]: the twelve-step table rebuild, minus the steps that
+ * do not apply here.
+ *
+ * The order is the one SQLite's own documentation prescribes for altering a
+ * table: create the replacement, copy, drop, rename, recreate the indices. The
+ * foreign key survives the drop because it is declared ON the entries table, and
+ * it is re-declared verbatim below.
+ *
+ * `PRAGMA foreign_keys` is deliberately not touched. Room turns foreign keys off
+ * around a migration and runs `PRAGMA foreign_key_check` afterwards, so dropping
+ * a table that is the CHILD of a key is safe here; toggling the pragma inside a
+ * transaction is a no-op in SQLite anyway.
+ */
+private fun rebuildEntriesWithNotNullOffset(db: SupportSQLiteDatabase) {
+    db.execSQL(
+        """
+        CREATE TABLE IF NOT EXISTS `entries_new` (
+            `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `drinkId` INTEGER NOT NULL,
+            `drinkName` TEXT NOT NULL,
+            `volumeMl` INTEGER NOT NULL,
+            `alcoholPercent` REAL NOT NULL,
+            `gramsAlcohol` REAL NOT NULL,
+            `timestampMillis` INTEGER NOT NULL,
+            `logicalDate` TEXT NOT NULL,
+            `note` TEXT NOT NULL,
+            `utcOffsetSeconds` INTEGER NOT NULL,
+            FOREIGN KEY(`drinkId`) REFERENCES `drinks`(`id`)
+                ON UPDATE NO ACTION ON DELETE RESTRICT
+        )
+        """.trimIndent(),
+    )
+    db.execSQL(
+        """
+        INSERT INTO `entries_new`
+            (id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol,
+             timestampMillis, logicalDate, note, utcOffsetSeconds)
+        SELECT id, drinkId, drinkName, volumeMl, alcoholPercent, gramsAlcohol,
+               timestampMillis, logicalDate, note, utcOffsetSeconds
+        FROM `entries`
+        """.trimIndent(),
+    )
+    db.execSQL("DROP TABLE `entries`")
+    db.execSQL("ALTER TABLE `entries_new` RENAME TO `entries`")
+    db.execSQL("CREATE INDEX IF NOT EXISTS `index_entries_drinkId` ON `entries` (`drinkId`)")
+    db.execSQL("CREATE INDEX IF NOT EXISTS `index_entries_logicalDate` ON `entries` (`logicalDate`)")
+}
+
+/**
+ * Step 3 of [MIGRATION_3_4]: creates `logical_day_key` and puts its one row in.
+ *
+ * The row is inserted with NULL columns, which is the state
+ * [LogicalDayKeyEntity] documents as "not computed yet". Inserting it here
+ * rather than lazily means every reader can rely on the row existing.
+ */
+private fun createLogicalDayKey(db: SupportSQLiteDatabase) {
+    db.execSQL(
+        """
+        CREATE TABLE IF NOT EXISTS `logical_day_key` (
+            `id` INTEGER NOT NULL,
+            `changeHour` INTEGER,
+            `changeMinute` INTEGER,
+            PRIMARY KEY(`id`)
+        )
+        """.trimIndent(),
+    )
+    db.execSQL(
+        "INSERT OR REPLACE INTO `logical_day_key` (id, changeHour, changeMinute) VALUES (?, NULL, NULL)",
+        arrayOf<Any>(LogicalDayKeyEntity.SINGLETON_ID),
+    )
 }
 
 // =============================================================================

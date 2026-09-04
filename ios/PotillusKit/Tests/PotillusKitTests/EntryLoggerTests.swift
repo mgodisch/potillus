@@ -71,8 +71,8 @@ final class EntryLoggerTests: XCTestCase {
     /// Grams follow from volume and strength. A caller may not supply them.
     func testGramsAreDerivedFromVolumeAndStrength() {
         let entry = EntryLogger.makeEntry(
-            drink: pils(), volumeMl: 500, timestampMillis: evening, note: "",
-            settings: AppSettings(), timeZone: utc
+            drink: pils(), volumeMl: 500, timestampMillis: evening,
+            utcOffsetSeconds: 0, note: "", settings: AppSettings()
         )
         XCTAssertEqual(
             entry.gramsAlcohol,
@@ -85,8 +85,8 @@ final class EntryLoggerTests: XCTestCase {
     /// changes at 04:00 — not at midnight.
     func testTheLogicalDateFollowsTheDayChangeHourNotTheCalendar() {
         let entry = EntryLogger.makeEntry(
-            drink: pils(), volumeMl: 500, timestampMillis: afterMidnight, note: "",
-            settings: AppSettings(), timeZone: utc
+            drink: pils(), volumeMl: 500, timestampMillis: afterMidnight,
+            utcOffsetSeconds: 0, note: "", settings: AppSettings()
         )
         XCTAssertEqual(entry.logicalDate, "2026-01-02")
     }
@@ -97,8 +97,8 @@ final class EntryLoggerTests: XCTestCase {
         settings.dayChangeHour = 1
 
         let entry = EntryLogger.makeEntry(
-            drink: pils(), volumeMl: 500, timestampMillis: afterMidnight, note: "",
-            settings: settings, timeZone: utc
+            drink: pils(), volumeMl: 500, timestampMillis: afterMidnight,
+            utcOffsetSeconds: 0, note: "", settings: settings
         )
         XCTAssertEqual(entry.logicalDate, "2026-01-03", "02:00 is past a 01:00 change")
     }
@@ -107,8 +107,8 @@ final class EntryLoggerTests: XCTestCase {
     /// or correction does not rewrite history.
     func testTheEntryCarriesTheDrinksNameAndStrengthAtTheTimeOfLogging() {
         let entry = EntryLogger.makeEntry(
-            drink: pils(), volumeMl: 330, timestampMillis: evening, note: "on the terrace",
-            settings: AppSettings(), timeZone: utc
+            drink: pils(), volumeMl: 330, timestampMillis: evening,
+            utcOffsetSeconds: 0, note: "on the terrace", settings: AppSettings()
         )
         XCTAssertEqual(entry.drinkId, 1)
         XCTAssertEqual(entry.drinkName, "Pils")
@@ -133,22 +133,28 @@ final class EntryLoggerTests: XCTestCase {
         XCTAssertEqual(stored.logicalDate, "2026-01-02")
     }
 
-    /// The day is the screen's, the time is the user's: a night-hour time typed
-    /// while logging for today is placed on the calendar day that keeps the
-    /// entry on today (v0.86.0). Here "02:00" typed at 20:14 on the 2nd.
-    func testANightHourTimeStaysOnTodayWhenLoggedFromTheDrinksScreen() async throws {
+    /// THE READING IS PASSED THROUGH, NOT PLACED. The sheet composes an instant
+    /// from its own date and time fields and the logger stores it as given; the
+    /// day follows from it. Until the sheet had a date, this path moved a
+    /// night-hour time onto the calendar day that kept the entry on today,
+    /// because a bare time had to be filed somewhere.
+    func testTheStoredReadingIsTheOneTheSheetComposed() async throws {
         let drinkId = try environment.drinks.add(
             DrinkDefinition(name: "Pils", volumeMl: 500, alcoholPercent: 4.9)
         )
         let drink = try XCTUnwrap(try environment.drinks.allOnce().first { $0.id == drinkId })
 
         let logger = makeLogger(at: evening)
-        // 1_767_319_200_000 is 2026-01-02, 02:00 UTC.
-        _ = try await logger.log(drink: drink, volumeMl: 500, timestampMillis: 1_767_319_200_000)
+        // 2026-01-02, 02:00 UTC — before the 04:00 boundary, so it counts toward
+        // the 1st. That is what the sheet would have said before the user saved.
+        let earlyHoursOnTheSecond: Int64 = 1_767_319_200_000
+        _ = try await logger.log(
+            drink: drink, volumeMl: 500, timestampMillis: earlyHoursOnTheSecond
+        )
 
         let stored = try XCTUnwrap(try environment.entries.all().first)
-        XCTAssertEqual(stored.logicalDate, "2026-01-02")
-        XCTAssertEqual(stored.timestampMillis, afterMidnight, "placed on the calendar 3rd, 02:00")
+        XCTAssertEqual(stored.timestampMillis, earlyHoursOnTheSecond, "stored untouched")
+        XCTAssertEqual(stored.logicalDate, "2026-01-01", "and the day follows from it")
     }
 
     /// The Drinks screen logs the same entry the Today screen would.

@@ -51,6 +51,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">Επιλέξτε ποτό …</string>
     <string name="volume_ml">Ποσότητα</string>
     <string name="time">Ώρα</string>
+    <string name="date">Ημερομηνία</string>
+    <string name="entry_counts_toward">Προσμετράται στις %1$s</string>
     <string name="pure_alcohol">γρ. καθαρής αλκοόλης</string>
     <string name="note">Σημείωση (προαιρετικό)</string>
     <string name="add_drink">Προσθήκη ποτού</string>
@@ -193,6 +195,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">Αλκοόλη_ποσοστό</string>
     <string name="csv_col_grams">Γρ_αλκοόλης</string>
     <string name="csv_col_note">Σημείωση</string>
+    <string name="csv_col_logical_date">Λογική_ημέρα</string>
     <string name="pdf_unit_g_per_day">g/ημέρα</string>
     <string name="drink_days_label">μέρες κατανάλωσης (τελευταίες 7 ημέρες)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

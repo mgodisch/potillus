@@ -77,16 +77,37 @@ final class RepositoryTests: XCTestCase {
         )
     }
 
+    /// Seeds one entry ON a logical day.
+    ///
+    /// `at` IS A NUDGE WITHIN THE DAY, NOT AN INSTANT. The timestamp is noon on
+    /// `on`, read at +00:00, plus that many milliseconds; the values the cases
+    /// pass are a few seconds apart and exist only to order rows. Noon is on the
+    /// far side of every plausible day-change boundary, so the day the repository
+    /// DERIVES is the day the case asked for. Before the column became a
+    /// derivation the seeded `logicalDate` said so directly and the timestamp
+    /// could be anything; a bare `1_000` now resolves to 1969.
     @discardableResult
     private func addEntry(
         drinkId: Int64, at millis: Int64, on date: String, grams: Double = 10.0
     ) throws -> Int64 {
-        try entries.add(
+        let noon = try XCTUnwrap(DayResolver.parseDate(date))
+        return try entries.add(
             ConsumptionEntry(
                 drinkId: drinkId, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
-                gramsAlcohol: grams, timestampMillis: millis, logicalDate: date
-            )
+                gramsAlcohol: grams,
+                timestampMillis: Int64(noon.timeIntervalSince1970 * 1000) + millis,
+                logicalDate: date, utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
+    }
+
+    /// Noon on `date`, in milliseconds and read at +00:00 — the anchor `addEntry`
+    /// places its nudges on. A case that names a timestamp states it as this plus
+    /// the nudge it seeded, so the two cannot drift apart.
+    private static func noon(_ date: String) -> Int64 {
+        guard let day = DayResolver.parseDate(date) else { return 0 }
+        return Int64(day.timeIntervalSince1970 * 1000)
     }
 
     /// Takes the first value an observation publishes. Observations emit their
@@ -153,8 +174,10 @@ final class RepositoryTests: XCTestCase {
             try entries.add(
                 ConsumptionEntry(
                     drinkId: 999_999, drinkName: "ghost", volumeMl: 500, alcoholPercent: 4.9,
-                    gramsAlcohol: 19.3, timestampMillis: 1_000, logicalDate: "2026-01-01"
-                )
+                    gramsAlcohol: 19.3, timestampMillis: 1_000, logicalDate: "2026-01-01",
+                    utcOffsetSeconds: 0
+                ),
+                settings: AppSettings()
             ),
             "an entry may not reference a drink that does not exist"
         )
@@ -193,7 +216,9 @@ final class RepositoryTests: XCTestCase {
         try addEntry(drinkId: id, at: 2_000, on: "2026-01-02")
 
         let observed = try await firstValue(entries.observeEntries(forDate: "2026-01-01"))
-        XCTAssertEqual(observed.map(\.timestampMillis), [1_000, 3_000])
+        // The nudges, read back off the seeded day rather than as bare numbers:
+        // the helper anchors them at noon so the derived day is the one asked for.
+        XCTAssertEqual(observed.map { $0.timestampMillis - Self.noon("2026-01-01") }, [1_000, 3_000])
     }
 
     /// The GROUP BY summary query, the backbone of every statistic.
@@ -259,7 +284,7 @@ final class RepositoryTests: XCTestCase {
         try addEntry(drinkId: id, at: 5_000, on: "2026-01-05")
         try addEntry(drinkId: id, at: 1_000, on: "2026-01-01")  // back-dated, inserted last
 
-        XCTAssertEqual(try entries.lastEntry()?.timestampMillis, 1_000)
+        XCTAssertEqual(try entries.lastEntry()?.timestampMillis, Self.noon("2026-01-01") + 1_000)
     }
 
     func testLastEntryIsNilOnAnEmptyLog() throws {
@@ -272,9 +297,10 @@ final class RepositoryTests: XCTestCase {
         let wine = try addDrink("Wine")
         try addEntry(drinkId: pils, at: 1_000, on: "2026-01-01")
 
-        XCTAssertTrue(try entries.exists(timestampMillis: 1_000, drinkId: pils))
-        XCTAssertFalse(try entries.exists(timestampMillis: 1_000, drinkId: wine))
-        XCTAssertFalse(try entries.exists(timestampMillis: 2_000, drinkId: pils))
+        let seeded = Self.noon("2026-01-01") + 1_000
+        XCTAssertTrue(try entries.exists(timestampMillis: seeded, drinkId: pils))
+        XCTAssertFalse(try entries.exists(timestampMillis: seeded, drinkId: wine))
+        XCTAssertFalse(try entries.exists(timestampMillis: seeded + 1_000, drinkId: pils))
     }
 
     func testDeleteAllEmptiesTheLogButKeepsDrinks() async throws {
@@ -293,9 +319,10 @@ final class RepositoryTests: XCTestCase {
         let entry = ConsumptionEntry(
             drinkId: id, drinkName: "Pils", volumeMl: 500, alcoholPercent: 4.9,
             gramsAlcohol: 19.3, timestampMillis: 1_748_142_000_000,
-            logicalDate: "2025-05-24", note: "at the pub"
+            logicalDate: "2025-05-24", note: "at the pub",
+            utcOffsetSeconds: 0
         )
-        let newId = try entries.add(entry)
+        let newId = try entries.add(entry, settings: AppSettings())
 
         let stored = try XCTUnwrap(try entries.all().first)
         XCTAssertEqual(stored.id, newId)
@@ -319,5 +346,116 @@ final class RepositoryTests: XCTestCase {
 
         let updated = try await iterator.next()
         XCTAssertEqual(updated?.count, 2, "a committed write must produce a new value")
+    }
+}
+
+// =============================================================================
+// Realignment of the derived logical day
+// =============================================================================
+//
+// IN AN EXTENSION, NOT IN THE TYPE BODY: `check-swift-length` holds the body to
+// what SwiftLint's `type_body_length` allows, and an extension is not counted.
+// The helpers these cases need go with them.
+// =============================================================================
+
+extension RepositoryTests {
+
+    // ── Realignment and the key ──────────────────────────────────────────────
+
+    /// 2026-03-10T23:00Z, i.e. 23:00 read at +00:00.
+    private static let march10at2300: Int64 = 1_773_183_600_000
+
+    /// A row written straight to the table, past `add`, so the seeded
+    /// `logicalDate` survives to be realigned. This is the shape a v4 migration
+    /// leaves behind, and the reason the key starts unset.
+    private func seedRaw(drinkId: Int64, at millis: Int64, on date: String) throws {
+        try database.write { db in
+            var record = Entry(
+                drinkId: drinkId, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
+                gramsAlcohol: 10.0, timestampMillis: millis, logicalDate: date,
+                utcOffsetSeconds: 0
+            )
+            try record.insert(db)
+        }
+    }
+
+    private func storedKey() throws -> LogicalDayKey? {
+        try database.read { db in try LogicalDayKey.fetchOne(db) }
+    }
+
+    /// The rows as the table holds them, read PAST the repository.
+    ///
+    /// `EntryRepository`'s reads assert the invariant that binds `logicalDate` to
+    /// the reading while the key is set — which is exactly what the case below
+    /// has to break in order to show that a matching key leaves the table alone.
+    /// Reading through the repository there would trip an assertion on a state
+    /// the case creates on purpose, so it reads the rows directly.
+    private func rawRows() throws -> [Entry] {
+        try database.read { db in try Entry.fetchAll(db) }
+    }
+
+    func testRealignRewritesEveryDayAndRecordsTheBoundary() throws {
+        let drink = try addDrink("Pils")
+        try seedRaw(drinkId: drink, at: Self.march10at2300, on: "2026-03-10")
+
+        try entries.realignDays(settings: AppSettings(dayChangeHour: 4, dayChangeMinute: 0))
+        XCTAssertEqual(try storedKey()?.changeHour, 4)
+        XCTAssertEqual(try entries.all().first?.logicalDate, "2026-03-10")
+
+        // 23:00 is before a 23:30 boundary, so the same reading now counts for
+        // the previous day. The row itself does not move.
+        try entries.realignDays(settings: AppSettings(dayChangeHour: 23, dayChangeMinute: 30))
+        XCTAssertEqual(try storedKey()?.changeHour, 23)
+        XCTAssertEqual(try storedKey()?.changeMinute, 30)
+        let row = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(row.logicalDate, "2026-03-09")
+        XCTAssertEqual(row.timestampMillis, Self.march10at2300)
+    }
+
+    func testRealignDoesNothingWhenTheKeyAlreadyMatches() throws {
+        let drink = try addDrink("Pils")
+        let settings = AppSettings(dayChangeHour: 4, dayChangeMinute: 0)
+        try entries.realignDays(settings: settings)
+
+        // Seeded AFTER the key was set, with a day nothing would derive.
+        try seedRaw(drinkId: drink, at: Self.march10at2300, on: "not-a-derived-day")
+        try entries.realignDays(settings: settings)
+
+        XCTAssertEqual(
+            try rawRows().first?.logicalDate, "not-a-derived-day",
+            "an untouched key means an untouched table"
+        )
+    }
+
+    /// Filed under 5 March, but the reading says 10 March: the signature of the
+    /// pre-0.85.0 calendar path, which stored the instant of the day the entry
+    /// was booked ON. The first realignment — the one that finds no key — repairs
+    /// it before it recomputes anything.
+    func testTheFirstRealignmentRepairsAPreV085CalendarEntry() throws {
+        let drink = try addDrink("Pils")
+        try seedRaw(drinkId: drink, at: Self.march10at2300, on: "2026-03-05")
+
+        try entries.realignDays(settings: AppSettings())
+
+        let row = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(row.logicalDate, "2026-03-05", "the day the user chose is restored")
+        XCTAssertLessThan(
+            row.timestampMillis, Self.march10at2300,
+            "and the instant moves back to it"
+        )
+    }
+
+    /// One calendar day apart is what a day-change boundary produces every night,
+    /// so it is not damage and nothing is moved.
+    func testAOneDayGapIsLeftAlone() throws {
+        let drink = try addDrink("Pils")
+        let afterMidnight: Int64 = 1_773_190_800_000  // 2026-03-11T01:00Z
+        try seedRaw(drinkId: drink, at: afterMidnight, on: "2026-03-10")
+
+        try entries.realignDays(settings: AppSettings())
+
+        let row = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(row.timestampMillis, afterMidnight)
+        XCTAssertEqual(row.logicalDate, "2026-03-10")
     }
 }

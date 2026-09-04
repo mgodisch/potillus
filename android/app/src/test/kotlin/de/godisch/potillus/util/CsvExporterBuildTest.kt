@@ -58,6 +58,7 @@ class CsvExporterBuildTest {
         "abv",
         "grams",
         "note",
+        "logicalDay",
     )
 
     private lateinit var originalLocale: Locale
@@ -88,6 +89,7 @@ class CsvExporterBuildTest {
         id = 1L, drinkId = drinkId, drinkName = "Pilsner", volumeMl = 500,
         alcoholPercent = 4.9, gramsAlcohol = 19.6,
         timestampMillis = 1_700_000_000_000L, logicalDate = "2026-05-29", note = "",
+        utcOffsetSeconds = 0,
     )
 
     /** Non-empty lines (the CRLF terminator leaves a trailing empty element). */
@@ -100,11 +102,11 @@ class CsvExporterBuildTest {
         assertEquals("19.60", cols[6])
     }
 
-    @Test fun `a data row has exactly eight columns under a comma-decimal locale`() {
+    @Test fun `a data row has exactly nine columns under a comma-decimal locale`() {
         val csv = CsvExporter.buildCsv(header, listOf(sampleEntry(10L)), listOf(sampleDrink(10L)))
         val cols = lines(csv)[1].split(",")
-        // Would be 9 if the grams field were rendered as "19,60".
-        assertEquals(8, cols.size)
+        // Would be 10 if the grams field were rendered as "19,60".
+        assertEquals(9, cols.size)
     }
 
     @Test fun `header cell containing a comma is RFC4180-quoted`() {

@@ -30,6 +30,13 @@ import Observation
 // CalendarModel.swift – a month of logical days
 // =============================================================================
 //
+// THE CALENDAR SHOWS LOGICAL DAYS, NOT CALENDAR DAYS
+//   The cell for day D lists the entries whose DERIVED day is D, and the daily
+//   total, the traffic light, the month rollup and the year heat-map follow that
+//   same attribution — so the Today screen and the calendar never disagree about
+//   how much a day held. Within a cell the entries are ordered by INSTANT, as on
+//   the Today screen: 20:00, 23:00, 01:00.
+//
 // The counterpart of Android's `CalendarViewModel`, month and year. The year view
 // is a second layout over the same summaries: `YearGrid` lays out twelve months,
 // the cells read from the same `summaries` dictionary, and only the query range
@@ -168,8 +175,8 @@ public final class CalendarModel {
     public func load() async {
         let settings = await preferences.load()
         let nowMillis = Int64((clock.now().timeIntervalSince1970 * 1000).rounded())
-        let today = DayResolver.resolve(
-            timestampMillis: nowMillis,
+        let today = DayResolver.today(
+            now: nowMillis,
             changeHour: settings.dayChangeHour,
             changeMinute: settings.dayChangeMinute,
             timeZone: timeZone
@@ -351,8 +358,8 @@ public final class CalendarModel {
                     do { try await Task.sleep(for: self.tickInterval) } catch { break }
                     let settings = await self.preferences.load()
                     let nowMillis = Int64((self.clock.now().timeIntervalSince1970 * 1000).rounded())
-                    let today = DayResolver.resolve(
-                        timestampMillis: nowMillis,
+                    let today = DayResolver.today(
+                        now: nowMillis,
                         changeHour: settings.dayChangeHour,
                         changeMinute: settings.dayChangeMinute,
                         timeZone: self.timeZone
@@ -486,36 +493,35 @@ public final class CalendarModel {
     ///     on and is replaced by the selected day, see below.
     ///   - note:            Optional free text.
     public func addEntry(
-        drink: DrinkDefinition, volumeMl: Int, timestampMillis: Int64, note: String = ""
+        drink: DrinkDefinition,
+        volumeMl: Int,
+        timestampMillis: Int64,
+        utcOffsetSeconds: Int? = nil,
+        note: String = ""
     ) async {
-        guard let date = state.selectedDate else { return }
+        guard state.selectedDate != nil else { return }
         // Loaded, not read off `state`: CalendarState carries no settings, unlike
-        // TodayState. The day-change fields are read here, not just passed on: the
-        // instant below is built from them.
+        // TodayState.
         let settings = await preferences.load()
+        let offset = utcOffsetSeconds ?? DayResolver.utcOffsetSeconds(
+            timestampMillis: timestampMillis, timeZone: timeZone
+        )
 
-        // The sheet hands back TODAY at the chosen time, because its picker offers
-        // hours and minutes only. Storing that verbatim gave an entry logged for a
-        // past evening today's instant while its logicalDate said otherwise — the
-        // two facts contradicted each other, and everything reading the instant
-        // (the blood-alcohol estimate, the "most recent entry") believed the wrong
-        // one. The time is kept, the day is the one the user selected.
-        let onSelectedDay = DayResolver.instant(
-            logicalDate: date, matchingTimeOf: timestampMillis,
-            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
-            timeZone: timeZone) ?? timestampMillis
-
+        // THE INSTANT IS PASSED THROUGH, NOT PLACED. The sheet composes it from
+        // its own date and time fields, and its date follows the tapped day, so an
+        // entry booked onto the 12th still lands on the 12th. This method used to
+        // do that placing, because the sheet handed back TODAY at the chosen time
+        // and the two facts had to be reconciled somewhere.
         let entry = EntryLogger.makeEntry(
             drink: drink,
             volumeMl: volumeMl,
-            timestampMillis: onSelectedDay,
+            timestampMillis: timestampMillis,
+            utcOffsetSeconds: offset,
             note: note,
-            settings: settings,
-            timeZone: timeZone,
-            logicalDate: date
+            settings: settings
         )
         do {
-            _ = try entries.add(entry)
+            _ = try entries.add(entry, settings: settings)
         } catch {
             failure = String(describing: error)
             return
@@ -621,32 +627,15 @@ extension CalendarModel {
 // only the body against `type_body_length`, and the model had reached it.
 extension CalendarModel {
 
-    /// Persists edits to `entry`, keeping it on its logical day.
+    /// Persists edits to `entry`, as the sheet composed them.
     ///
-    /// The edited time is placed on the calendar day that keeps the entry on
-    /// `entry.logicalDate`, as `addEntry` does: an entry on the logical 10th
-    /// edited to "02:00" is stored at 02:00 on the calendar 11th. Until v0.86.0 the
-    /// timestamp was stored as typed, so such an edit left an entry whose own
-    /// timestamp resolved to another day than the one it was filed under.
+    /// Nothing is placed here any more; the sheet carries a date beside its time.
+    /// An entry moved to another day leaves the cell it was opened from, which the
+    /// sheet said it would. The Today screen applies the same rule.
     public func updateEntry(_ entry: ConsumptionEntry) async {
         let settings = await preferences.load()
-        var stamped = entry
-        stamped.timestampMillis = DayResolver.instant(
-            logicalDate: entry.logicalDate, matchingTimeOf: entry.timestampMillis,
-            changeHour: settings.dayChangeHour, changeMinute: settings.dayChangeMinute,
-            timeZone: timeZone
-        ) ?? entry.timestampMillis
-        // The frame is re-read with the timestamp, unlike the logical date. The
-        // two answer different questions: the date is where the user filed the
-        // drink, the offset is the frame the time they just typed was typed in.
-        // Keeping a stale offset would show the edited entry at an hour the user
-        // did not enter. Done here rather than in the view, so no caller can
-        // forget it — the shape Android gives its repository.
-        stamped.utcOffsetSeconds = DayResolver.utcOffsetSeconds(
-            timestampMillis: stamped.timestampMillis, timeZone: timeZone
-        )
         do {
-            try entries.update(stamped)
+            try entries.update(entry, settings: settings)
         } catch {
             failure = String(describing: error)
             return

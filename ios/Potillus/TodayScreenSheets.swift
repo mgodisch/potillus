@@ -62,11 +62,13 @@ extension TodayScreen {
             ),
             useSymbols: model.state.settings.alternativeStatusSymbols,
             logicalDay: model.state.logicalDate,
+            origin: .now,
             dayChangeHour: model.state.settings.dayChangeHour,
             dayChangeMinute: model.state.settings.dayChangeMinute
-        ) { drink, volume, millis, note in
+        ) { drink, volume, millis, offset, note in
             await model.addEntry(
-                drink: drink, volumeMl: volume, timestampMillis: millis, note: note
+                drink: drink, volumeMl: volume,
+                timestampMillis: millis, utcOffsetSeconds: offset, note: note
             )
             return model.failure == nil
         }
@@ -87,15 +89,20 @@ extension TodayScreen {
             now: Date(),
             editing: entry,
             logicalDay: entry.logicalDate,
+            origin: .edit,
             dayChangeHour: model.state.settings.dayChangeHour,
             dayChangeMinute: model.state.settings.dayChangeMinute
-        ) { drink, volume, millis, note in
+        ) { drink, volume, millis, offset, note in
             var updated = entry
             updated.drinkId = drink.id
             updated.drinkName = drink.name
             updated.alcoholPercent = drink.alcoholPercent
             updated.volumeMl = volume
             updated.timestampMillis = millis
+            // The frame comes from the sheet, which knows whether the user moved
+            // the date: a corrected time keeps the frame the reading was taken in,
+            // a new date is read in this one.
+            updated.utcOffsetSeconds = offset
             updated.note = note
             updated.gramsAlcohol = AlcoholCalculator.calculateGrams(
                 volumeMl: volume, alcoholPercent: drink.alcoholPercent

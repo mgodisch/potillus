@@ -51,6 +51,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.runtime.*
@@ -58,11 +59,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.hideFromAccessibility
+import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
@@ -70,6 +72,9 @@ import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
 import de.godisch.potillus.domain.DrinkValidator
+import de.godisch.potillus.domain.EntryDayOrigin
+import de.godisch.potillus.domain.EntryReading
+import de.godisch.potillus.domain.EntrySheetDate
 import de.godisch.potillus.domain.model.ConsumptionEntry
 import de.godisch.potillus.domain.model.DrinkCapacity
 import de.godisch.potillus.domain.model.DrinkCategory
@@ -100,7 +105,9 @@ import java.time.format.FormatStyle
  * @param useStatusSymbols When true, the traffic-light dot draws its accessible
  *                         glyph variant (cross / "1" / up-arrow) in addition to
  *                         the colour; forwarded to [TrafficLightDot.useSymbols].
- * @param onSave           Called with (drink, volumeMl, timestampMs, note) on confirm.
+ * @param onSave           Called with (drink, volumeMl, timestampMs, utcOffsetSeconds,
+ *                         note) on confirm. The dialog composes the instant from
+ *                         BOTH its fields, so the caller stores what the user saw.
  * @param onDismiss        Called when the user cancels or taps outside.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,18 +119,24 @@ fun AddEditEntryDialog(
     capacity: DrinkCapacity? = null,
     useStatusSymbols: Boolean = false,
     /**
-     * The logical day the entry belongs to — today, or the calendar day the
-     * dialog was opened under — with the day-change time that defines it. When
-     * given, the dialog shows the CALENDAR date the typed time will be stored
-     * on whenever it differs: "02:00" on the logical 10th lands on the calendar
-     * 11th (`DayResolver.instantOnLogicalDate`), and the user sees "11 Mar" next
-     * to the time before saving. The view models do the placing; this only
-     * says what they will do. `null` shows nothing.
+     * The logical day the dialog was opened ON — today's on the Today screen and
+     * in the drinks list, the tapped cell's in the calendar, the entry's own when
+     * editing. The dialog does NOT file the entry under it: the day follows from
+     * the reading the two fields compose. What this is for is the note — when the
+     * composed reading falls on another logical day, the dialog says which
+     * ([R.string.entry_counts_toward]), because the entry then disappears from
+     * the list it was made on and the user should not have to discover that
+     * afterwards.
      */
-    logicalDay: String? = null,
+    logicalDay: String,
+    /**
+     * Where the dialog was opened, which decides how the date follows a changed
+     * time while the user has not touched it. See [EntrySheetDate].
+     */
+    origin: EntryDayOrigin,
     dayChangeHour: Int = 4,
     dayChangeMinute: Int = 0,
-    onSave: (DrinkDefinition, Int, Long, String) -> Unit,
+    onSave: (DrinkDefinition, Int, Long, Int, String) -> Unit,
     onDismiss: () -> Unit,
 ) {
     val isEdit = entry != null
@@ -141,12 +154,39 @@ fun AddEditEntryDialog(
     // 23:30, confirms 23:30, and the row still says 23:30 afterwards — the save
     // below builds a new instant from the frame they are in now, and the
     // repository records that frame with it.
-    val initDt = entry?.let {
-        DayResolver.localDateTime(it.timestampMillis, it.utcOffsetSeconds)
-    } ?: LocalDateTime.now()
-    var hour by remember { mutableIntStateOf(initDt.hour) }
-    var minute by remember { mutableIntStateOf(initDt.minute) }
+    val initReading = remember(entry, origin, logicalDay, dayChangeHour, dayChangeMinute) {
+        entry?.let {
+            val recorded = DayResolver.localDateTime(it.timestampMillis, it.utcOffsetSeconds)
+            EntryReading(recorded.toLocalDate(), recorded.hour, recorded.minute)
+        } ?: EntrySheetDate.initial(
+            origin = origin,
+            logicalDay = logicalDay,
+            changeHour = dayChangeHour,
+            changeMinute = dayChangeMinute,
+            now = LocalDateTime.now(DayResolver.clock()),
+        )
+    }
+    var date by remember { mutableStateOf(initReading.date) }
+    var hour by remember { mutableIntStateOf(initReading.hour) }
+    var minute by remember { mutableIntStateOf(initReading.minute) }
+    // Once the user has picked a date, the follow-up falls silent for the rest of
+    // the dialog. Without this they could not HOLD a date they had just chosen:
+    // the next turn of the time wheel would take it away again.
+    var dateTouched by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // The reading the two fields compose, and everything that follows from it.
+    // The offset is the frame the user is reading in NOW, except while an edit
+    // leaves the date alone: correcting a time inside a recorded reading must not
+    // reframe it, or the row would come back at an hour nobody typed.
+    val timestampMillis = date.atTime(hour, minute)
+        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    val utcOffsetSeconds = if (entry != null && date == initReading.date) {
+        entry.utcOffsetSeconds
+    } else {
+        DayResolver.utcOffsetSeconds(timestampMillis)
+    }
 
     val volume = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0
@@ -248,25 +288,44 @@ fun AddEditEntryDialog(
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                // ── Time picker ───────────────────────────────────────────────
-                // Tapping the HH:MM field opens the Material 3 clock-style picker
-                // (TimePickerDialog) — the same interaction as setting an alarm.
-                // The caption and the button were two stops — "Time", swipe,
-                // "19:51, button" — with nothing tying the second to the first.
-                // The button carries both, because the button is what a reader
-                // acts on; the caption beside it falls silent.
-                // The calendar date the view model will store this time on, when
-                // it is not the day the dialog was opened under (see `logicalDay`).
-                val placedDate: String? = logicalDay?.let { day ->
-                    DayResolver.instantOnLogicalDate(day, hour, minute, dayChangeHour, dayChangeMinute)
-                        ?.let { DayResolver.calendarDate(it) }
-                        ?.takeIf { it != day }
-                        ?.let { LocalDate.parse(it).format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale)) }
+                // ── Date and time ─────────────────────────────────────────────
+                // TWO CONTROLS, NOT ONE. A combined picker cannot say WHICH half
+                // the user turned, and the whole follow-up rule below hangs on
+                // that difference. Each opens the Material 3 dialog for its own
+                // half — the same interaction as setting an alarm.
+                //
+                // Each caption and its button were two stops for a screen reader —
+                // "Time", swipe, "19:51, button" — with nothing tying the second
+                // to the first. The button carries both, because the button is
+                // what a reader acts on; the caption beside it falls silent.
+                val dateLabel = date.format(
+                    DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale),
+                )
+                val spokenDate = stringResource(
+                    R.string.a11y_caption_value,
+                    stringResource(R.string.date),
+                    dateLabel,
+                )
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Text(
+                        stringResource(R.string.date),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.semantics { hideFromAccessibility() },
+                    )
+                    Spacer(Modifier.weight(1f))
+                    OutlinedButton(
+                        onClick = { showDatePicker = true },
+                        modifier = Modifier.semantics { contentDescription = spokenDate },
+                    ) {
+                        Text(dateLabel, modifier = Modifier.semantics { hideFromAccessibility() })
+                    }
                 }
+
                 val spokenTime = stringResource(
                     R.string.a11y_caption_value,
                     stringResource(R.string.time),
-                    "%02d:%02d".format(hour, minute) + (placedDate?.let { ", $it" } ?: ""),
+                    "%02d:%02d".format(hour, minute),
                 )
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.AccessTime, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -289,19 +348,45 @@ fun AddEditEntryDialog(
                         )
                     }
                 }
-                if (placedDate != null) {
-                    // Spoken as part of the button above; silent here.
+
+                // The note: one condition, no special cases. Adding, editing,
+                // typing a time, picking a date, arriving from the calendar — all
+                // of them end in a reading and a day the dialog was opened on, and
+                // `logicalDayDiffers` compares the two. The entry is not wrong
+                // when they part company, it just belongs elsewhere, so there is
+                // no warning colour, no symbol and nothing blocking the save.
+                val countsToward: String? = DayResolver
+                    .resolve(timestampMillis, utcOffsetSeconds, dayChangeHour, dayChangeMinute)
+                    .takeIf {
+                        DayResolver.logicalDayDiffers(
+                            timestampMillis = timestampMillis,
+                            utcOffsetSeconds = utcOffsetSeconds,
+                            changeHour = dayChangeHour,
+                            changeMinute = dayChangeMinute,
+                            logicalDay = logicalDay,
+                        )
+                    }
+                    ?.let {
+                        LocalDate.parse(it).format(
+                            DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM).withLocale(locale),
+                        )
+                    }
+                if (countsToward != null) {
+                    // A NODE OF ITS OWN, not folded into either button's
+                    // description: two controls can bring the note up, and a
+                    // sentence attached to one of them would be missed from the
+                    // other. `Polite` makes a screen reader announce its
+                    // appearance without dragging the focus off the picker the
+                    // user is in the middle of.
                     Text(
-                        placedDate,
+                        stringResource(R.string.entry_counts_toward, countsToward),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .semantics { hideFromAccessibility() },
-                        textAlign = TextAlign.End,
+                            .semantics { liveRegion = LiveRegionMode.Polite },
                     )
                 }
-
                 // ── Note ──────────────────────────────────────────────────────
                 OutlinedTextField(
                     value = noteText,
@@ -362,15 +447,10 @@ fun AddEditEntryDialog(
                 onClick = {
                     val drink = selectedDrink ?: return@TextButton
                     val vol = volumeText.toIntOrNull()?.takeIf { it > 0 } ?: return@TextButton
-                    // Today's calendar date + the user-selected time. Only the TIME
-                    // counts: every view model places it on the calendar day that
-                    // keeps the entry on the day the dialog was opened under
-                    // (DayResolver.instantOnLogicalDate), and `placedDate` above
-                    // shows that day when it differs.
-                    val ts = LocalDateTime.now()
-                        .withHour(hour).withMinute(minute).withSecond(0).withNano(0)
-                        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-                    onSave(drink, vol, ts, noteText.trim())
+                    // BOTH fields, composed here. The view models used to place a
+                    // bare time on a day of their own choosing; the dialog now
+                    // hands over the whole reading, and the day follows from it.
+                    onSave(drink, vol, timestampMillis, utcOffsetSeconds, noteText.trim())
                 },
                 enabled = canSave,
             ) { Text(stringResource(R.string.save)) }
@@ -387,11 +467,96 @@ fun AddEditEntryDialog(
             onConfirm = { h, m ->
                 hour = h
                 minute = m
+                // The date follows the time, until the user picks one themselves.
+                if (!dateTouched) {
+                    EntrySheetDate.followUp(
+                        origin = origin,
+                        logicalDay = logicalDay,
+                        changeHour = dayChangeHour,
+                        changeMinute = dayChangeMinute,
+                        hour = h,
+                        minute = m,
+                        now = LocalDateTime.now(DayResolver.clock()),
+                    )?.let { date = it }
+                }
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false },
         )
     }
+
+    // Calendar-style date picker, opened by tapping the date field above.
+    if (showDatePicker) {
+        EntryDatePickerDialog(
+            initialDate = date,
+            onConfirm = { picked ->
+                date = picked
+                // From here on the date is the user's. See `dateTouched`.
+                dateTouched = true
+                showDatePicker = false
+            },
+            onDismiss = { showDatePicker = false },
+        )
+    }
+}
+
+/**
+ * Modal dialog hosting the Material 3 [DatePicker], for the entry sheet's date.
+ *
+ * SELECTABLE UP TO TODAY, DISPLAYED WITHOUT LIMIT. A drink cannot be had in the
+ * future, so the picker refuses to offer one. It does NOT clamp what it is
+ * SHOWN: an entry whose timestamp already lies ahead — the previous release
+ * could write one — must not be moved merely by opening it, and the calendar
+ * follow-up legitimately puts a time before the day-change boundary on tomorrow's
+ * date. Both are at most a day out, both follow from rules the user just applied,
+ * and a warning about either would be a warning about what they themselves set.
+ *
+ * The bound is read in the DEVICE zone, like every other "today" on this screen.
+ *
+ * @param initialDate The date the picker opens on; shown even when it is beyond
+ *                    the selectable bound.
+ * @param onConfirm   The date the user picked.
+ * @param onDismiss   Cancelled or tapped outside.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EntryDatePickerDialog(
+    initialDate: LocalDate,
+    onConfirm: (LocalDate) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val today = LocalDate.now(DayResolver.clock())
+    val selectable = remember(today) {
+        object : SelectableDates {
+            override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+                !Instant.ofEpochMilli(utcTimeMillis).atZone(ZoneOffset.UTC).toLocalDate().isAfter(today)
+
+            override fun isSelectableYear(year: Int): Boolean = year <= today.year
+        }
+    }
+    // The picker works in UTC milliseconds throughout — that is its contract, not
+    // a frame it reads the date in. A date goes in as its own midnight UTC and
+    // comes back the same way; converting through the device zone here would move
+    // it by a day for anyone east or west of Greenwich.
+    val state = rememberDatePickerState(
+        initialSelectedDateMillis = initialDate.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli(),
+        selectableDates = selectable,
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.date)) },
+        text = { DatePicker(state = state) },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    state.selectedDateMillis?.let {
+                        onConfirm(Instant.ofEpochMilli(it).atZone(ZoneOffset.UTC).toLocalDate())
+                    }
+                },
+            ) { Text(stringResource(R.string.save)) }
+        },
+        dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } },
+    )
 }
 
 // ════════════════════════════════════════════════════════════════════════════

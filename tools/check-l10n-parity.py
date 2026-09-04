@@ -76,11 +76,12 @@ LANGUAGES = ["de", "da", "nl", "nb", "sv", "es", "fr", "it", "pt", "pt-BR", "ro"
              "cs", "pl", "ru", "uk", "el", "ja", "ko", "zh-Hans", "zh-Hant"]
 ANDROID_DIR = {"pt-BR": "pt-rBR", "zh-Hans": "zh-rCN", "zh-Hant": "zh-rTW"}
 
-# The eight CSV export captions, in the column order CsvExporter writes them. Each
+# The nine CSV export captions, in the column order CsvExporter writes them. Each
 # maps to the Android string name whose value CsvHeaderLabels must reproduce.
 CSV_COLUMN_ORDER = [
     "csv_col_date", "csv_col_time", "csv_col_drink", "csv_col_category",
     "csv_col_volume_ml", "csv_col_alcohol_pct", "csv_col_grams", "csv_col_note",
+    "csv_col_logical_date",
 ]
 
 # Proper nouns are shown verbatim, never translated: they legitimately match across

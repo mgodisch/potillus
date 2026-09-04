@@ -58,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import de.godisch.potillus.R
 import de.godisch.potillus.domain.AlcoholCalculator
 import de.godisch.potillus.domain.DayResolver
+import de.godisch.potillus.domain.EntryDayOrigin
 import de.godisch.potillus.domain.MonthGrid
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.fmt0
@@ -354,14 +355,20 @@ fun CalendarScreen(
         }
     }
 
-    if (showAdd) {
+    // The FAB that opens this exists only while a day is selected, so the second
+    // condition is a guard and not a branch a user reaches. It is spelled out
+    // because the dialog now needs the day itself, not merely to be told there is
+    // one: the day is what its date field follows.
+    val selectedDay = state.selectedDate
+    if (showAdd && selectedDay != null) {
         AddEditEntryDialog(
             entry = null,
             drinks = drinks,
-            logicalDay = state.selectedDate,
+            logicalDay = selectedDay,
+            origin = EntryDayOrigin.CALENDAR,
             dayChangeHour = state.dayChangeHour,
             dayChangeMinute = state.dayChangeMinute,
-            onSave = { drink, vol, ts, note ->
+            onSave = { drink, vol, ts, _, note ->
                 vm.addEntry(drink, vol, ts, note)
                 showAdd = false
             },
@@ -373,9 +380,10 @@ fun CalendarScreen(
             entry = entry,
             drinks = drinks,
             logicalDay = entry.logicalDate,
+            origin = EntryDayOrigin.EDIT,
             dayChangeHour = state.dayChangeHour,
             dayChangeMinute = state.dayChangeMinute,
-            onSave = { drink, vol, ts, note ->
+            onSave = { drink, vol, ts, offset, note ->
                 vm.updateEntry(
                     entry.copy(
                         drinkId = drink.id,
@@ -384,6 +392,8 @@ fun CalendarScreen(
                         alcoholPercent = drink.alcoholPercent,
                         gramsAlcohol = AlcoholCalculator.calculateGrams(vol, drink.alcoholPercent),
                         timestampMillis = ts,
+                        // See the twin in TodayScreen: the dialog owns the frame.
+                        utcOffsetSeconds = offset,
                         note = note,
                     ),
                 )

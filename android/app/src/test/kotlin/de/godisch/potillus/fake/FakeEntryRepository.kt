@@ -97,11 +97,26 @@ class FakeEntryRepository : IEntryRepository {
 
     // ── Write operations ──────────────────────────────────────────────────────
 
-    override suspend fun add(entry: ConsumptionEntry): Long {
+    /**
+     * Stores [entry] with its logical day DERIVED, as the real repository does.
+     *
+     * Deriving here rather than keeping what the caller put on the object is what
+     * makes a view-model test mean anything: a fake that stored the handed-in date
+     * would keep passing after the production path stopped honouring it.
+     */
+    override suspend fun add(entry: ConsumptionEntry, settings: AppSettings): Long {
         val id = nextId++
-        _entries.value = _entries.value + entry.copy(id = id)
+        _entries.value = _entries.value + entry.copy(id = id, logicalDate = derive(entry, settings))
         return id
     }
+
+    /** The stored day of [entry] under the boundary in [settings]. */
+    private fun derive(entry: ConsumptionEntry, settings: AppSettings): String = DayResolver.resolve(
+        entry.timestampMillis,
+        entry.utcOffsetSeconds,
+        settings.dayChangeHour,
+        settings.dayChangeMinute,
+    )
 
     override suspend fun addFromDrink(
         drink: DrinkDefinition,
@@ -109,32 +124,6 @@ class FakeEntryRepository : IEntryRepository {
         timestampMillis: Long,
         note: String,
         settings: AppSettings,
-    ): Long {
-        val logical = DayResolver.resolve(
-            timestampMillis,
-            settings.dayChangeHour,
-            settings.dayChangeMinute,
-        )
-        return add(
-            ConsumptionEntry(
-                drinkId = drink.id,
-                drinkName = drink.name,
-                volumeMl = volumeMl,
-                alcoholPercent = drink.alcoholPercent,
-                gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
-                timestampMillis = timestampMillis,
-                logicalDate = logical,
-                note = note,
-            ),
-        )
-    }
-
-    override suspend fun addFromDrinkWithDate(
-        drink: DrinkDefinition,
-        volumeMl: Int,
-        timestampMillis: Long,
-        note: String,
-        logicalDate: String,
     ): Long = add(
         ConsumptionEntry(
             drinkId = drink.id,
@@ -143,13 +132,20 @@ class FakeEntryRepository : IEntryRepository {
             alcoholPercent = drink.alcoholPercent,
             gramsAlcohol = AlcoholCalculator.calculateGrams(volumeMl, drink.alcoholPercent),
             timestampMillis = timestampMillis,
-            logicalDate = logicalDate,
+            logicalDate = "",
             note = note,
+            utcOffsetSeconds = DayResolver.utcOffsetSeconds(timestampMillis),
         ),
+        settings,
     )
 
-    override suspend fun update(entry: ConsumptionEntry) {
-        _entries.value = _entries.value.map { if (it.id == entry.id) entry else it }
+    override suspend fun update(entry: ConsumptionEntry, settings: AppSettings) {
+        val stored = entry.copy(
+            utcOffsetSeconds = DayResolver.utcOffsetSeconds(entry.timestampMillis),
+        )
+        _entries.value = _entries.value.map {
+            if (it.id == entry.id) stored.copy(logicalDate = derive(stored, settings)) else it
+        }
     }
 
     override suspend fun delete(entry: ConsumptionEntry) {
@@ -158,5 +154,18 @@ class FakeEntryRepository : IEntryRepository {
 
     override suspend fun deleteAll() {
         _entries.value = emptyList()
+    }
+
+    /**
+     * Rewrites every stored day under the boundary in [settings].
+     *
+     * NO KEY AND NO TRANSACTION. Both exist to survive an interruption, and a
+     * list in memory cannot be interrupted halfway. What a view-model test needs
+     * from this is the OBSERVABLE effect — that changing the day-change time
+     * moves the entries — and that is what it does. The key, the comparison and
+     * the repair are pinned against the real repository in `EntryRepositoryTest`.
+     */
+    override suspend fun realignDays(settings: AppSettings) {
+        _entries.value = _entries.value.map { it.copy(logicalDate = derive(it, settings)) }
     }
 }

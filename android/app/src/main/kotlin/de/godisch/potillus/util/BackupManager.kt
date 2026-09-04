@@ -253,11 +253,12 @@ object BackupManager {
                                 put("alcoholPercent", e.alcoholPercent)
                                 put("gramsAlcohol", e.gramsAlcohol)
                                 put("timestampMillis", e.timestampMillis)
-                                // Optional on the wire, and omitted rather than
-                                // guessed when the entry has none: a reader that
-                                // finds no offset derives the same fallback the
-                                // app derives for its own pre-column rows.
-                                e.utcOffsetSeconds?.let { put("utcOffsetSeconds", it) }
+                                // Written for every entry since schema 4: the
+                                // column is NOT NULL there, so there is no such
+                                // thing as an entry without a frame any more. The
+                                // key stays optional ON THE WIRE, because files
+                                // written before it exist and must stay readable.
+                                put("utcOffsetSeconds", e.utcOffsetSeconds)
                                 put("logicalDate", e.logicalDate)
                                 put("note", e.note)
                             },
@@ -587,18 +588,22 @@ object BackupManager {
                 }
                 val timestampMillis = obj.getLong("timestampMillis")
                     .also { require(it > 0) { "timestampMillis invalid: $it" } }
-                // ── Guard 3c: utcOffsetSeconds, optional ─────────────────────────
+                // ── Guard 3c: utcOffsetSeconds, optional on the wire ─────────────
                 // Absent in every file written before the field existed, and in a
                 // file written by an older build of the other platform, so its
-                // absence is not an error — `null` is carried through and read
-                // back through the fallback in DayResolver.localDateTime. When it
-                // IS present it must be a real offset: the widest zones in the
-                // IANA database run from -12:00 to +14:00.
+                // absence is not an error. It is FILLED HERE rather than carried
+                // as "unknown", because the column it lands in is NOT NULL since
+                // schema 4: the device zone's historical rules for that instant,
+                // which is the same replacement the app derived on every read
+                // while the column was nullable, and the same one MIGRATION_3_4
+                // froze into the local rows. When the key IS present it must be a
+                // real offset: the widest zones in the IANA database run from
+                // -12:00 to +14:00.
                 val utcOffsetSeconds = if (obj.has("utcOffsetSeconds") && !obj.isNull("utcOffsetSeconds")) {
                     obj.getInt("utcOffsetSeconds")
                         .also { require(it in -12 * 3600..14 * 3600) { "utcOffsetSeconds out of range: $it" } }
                 } else {
-                    null
+                    DayResolver.utcOffsetSeconds(timestampMillis)
                 }
                 // ── Guard 4: logicalDate – full calendar-semantic validation ─────
                 // Since the 0.84.0 review DayResolver.parseDate performs the same

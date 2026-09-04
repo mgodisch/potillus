@@ -60,8 +60,10 @@ final class BackupExporterTests: XCTestCase {
             ConsumptionEntry(
                 drinkId: drink.id, drinkName: drink.name, volumeMl: 500, alcoholPercent: 4.9,
                 gramsAlcohol: 19.3, timestampMillis: 1_767_384_840_000,
-                logicalDate: "2026-01-02", note: "on the terrace"
-            )
+                logicalDate: "2026-01-02", note: "on the terrace",
+                utcOffsetSeconds: 0
+            ),
+            settings: AppSettings()
         )
         return drink
     }

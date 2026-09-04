@@ -139,7 +139,9 @@ Unter _{{statistics}}_ steht _{{day_starts_at}}_, voreingestellt auf vier Uhr
 morgens. Diese Einstellung entscheidet, zu welchem Tag ein Getränk zählt: Wer
 um ein Uhr nachts noch ein Glas trinkt, bucht es damit auf den Abend davor,
 wo es hingehört. Diese Tagesgrenze gilt überall in der App, im Kalender wie
-in der Statistik und im Export.
+in der Statistik. Der CSV-Export zeigt als einziger beides: In der ersten
+Spalte steht der Kalendertag, an dem der Eintrag abgelesen wurde, und in einer
+Spalte am Ende der Tag, zu dem er zählt.
 
 Ebenfalls dort steht _{{stats_from_label}}_. Dieses Datum ist die untere
 Grenze aller Auswertungen: Einträge davor werden in jeder Statistik
@@ -192,10 +194,26 @@ Darunter stehen drei Felder:
 
 - die getrunkene Menge in Millilitern. Erlaubt ist 1 bis 5.000 ml; die
   Vorbelegung ist die Standardmenge des gewählten Getränks.
-- die Uhrzeit, voreingestellt auf jetzt. Änderbar, wenn etwas nachgetragen
-  werden soll.
+- _{{date}}_ und _{{time}}_, beide änderbar und beide auf jetzt voreingestellt,
+  wenn aus der Ansicht _{{today}}_ gebucht wird. Wer nur die Uhrzeit ändert,
+  dem folgt das Datum: Eine Uhrzeit nach der jetzigen meint gestern, „02:00“
+  um sechs Uhr morgens getippt liegt also vier Stunden zurück und nicht zwanzig
+  Stunden voraus. Wer das Datum selbst wählt, behält es, was er danach mit der
+  Uhrzeit auch tut.
 - als optionale Notiz eine freie Bemerkung, etwa zum Anlass oder zur
   Begleitung.
+
+Aus dem _{{calendar}}_ geöffnet, beginnt das Blatt auf dem angetippten Tag um
+acht Uhr abends, und das Datum führt so nach, dass der Eintrag auf diesem Tag
+bleibt: Wer die Uhr über _{{day_starts_at}}_ zurückdreht, bekommt den
+Folgetag als Datum — dorthin gehört ein Getränk um ein Uhr nachts.
+
+Zählt der Eintrag zu einem anderen Tag als dem, unter dem das Blatt geöffnet
+wurde, nennt eine Zeile unter den beiden Feldern diesen Tag. Das ist keine
+Warnung und hindert am Speichern nicht — der Eintrag ist richtig, er gehört
+nur woanders hin. In der Ansicht _{{today}}_ kann das heißen, dass ein Eintrag
+aus der Liste verschwindet, auf der er gerade angelegt wurde: „02:00“ um sechs
+Uhr morgens gebucht zählt zu gestern, und dort ist er dann auch zu finden.
 
 Der Alkoholgehalt gehört zum Getränk und lässt sich hier nicht abweichend
 eintragen. Wenn dieselbe Sorte einmal deutlich stärker ist, ist sie im
@@ -412,6 +430,13 @@ Tabelle mit einer Zeile je Eintrag, geeignet für Tabellenkalkulationen wie
 etwa [LibreOffice Calc](https://www.libreoffice.org/). Zahlen stehen im
 maschinenlesbaren Format mit Dezimalpunkt, unabhängig von der App-Sprache.
 
+Die ersten beiden Spalten sind Datum und Uhrzeit der Ablesung; zusammen
+benennen sie den Moment des Konsums. In der letzten Spalte steht der Tag, zu
+dem der Eintrag zählt — bei einem Nacht-Eintrag also der Vortag. Nur über
+diese Spalte verlässt die Zuordnung die App: Die Wechselzeit steht nicht in
+der Datei, und ohne sie ließe sie sich in einer Tabellenkalkulation nicht
+nachbauen.
+
 {{#android}}Die CSV-Datei landet im Download-Ordner, und die App bietet
 danach an, sie zu teilen.{{/android}}{{#ios}}Auch für die CSV-Datei öffnet
 sich die Dateiauswahl des Systems, in der bestimmt wird, wo die Datei
@@ -537,6 +562,14 @@ Ein Getränk gehört zu dem Tag, der unter _{{day_starts_at}}_ begonnen hat,
 nicht zu dem, den die Uhr anzeigt. Bei der Voreinstellung von vier Uhr zählt
 ein Glas um halb zwei nachts noch zum Vortag. Diese Regel gilt in der
 gesamten App einheitlich, auch über Zeitumstellungen hinweg.
+
+Ein Getränk behält außerdem die Uhrzeit, unter der es gebucht wurde. Nach
+einem Flug in eine andere Zeitzone steht das Bier von letzter Woche weiterhin
+auf halb zwölf, an dem Tag, an dem es getrunken wurde; über eine
+Sommerzeitumstellung hinweg gilt dasselbe. Was sich bewegt, ist das, was die
+App daraus errechnet: Wer _{{day_starts_at}}_ ändert, bei dem zählt jeder
+Eintrag zu dem Tag, auf den ihn die neue Grenze legt, die vergangenen
+eingeschlossen.
 
 ### Die gleitende Woche
 

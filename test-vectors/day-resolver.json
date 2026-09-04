@@ -3,8 +3,11 @@
     "Shared golden vectors for DayResolver. Loaded by BOTH the Android (JVM) and iOS",
     "(Swift) suites. The logical day boundary decides which day every entry belongs to,",
     "so a divergence here would silently corrupt every downstream figure.",
-    "resolve: epochMillis is absolute; zoneId is an IANA identifier. Cases cover DST",
-    "spring-forward/fall-back and cross-timezone instants.",
+    "resolve: epochMillis is absolute; utcOffsetSeconds is the frame the reading was",
+    "taken in, and the only frame the function has — it looks nothing up in a zone.",
+    "The five instants around the daylight-saving switches appear twice, once with",
+    "the offset before it and once with the offset after, because a fixed offset",
+    "knows no switch. One of those pairs falls on two different logical days.",
     "firstDayOfWeekIso: languageTag is BCP-47; expected is an ISO-8601 weekday number",
     "(1 = Monday ... 7 = Sunday), the scheme Kotlin's WeekFields returns and the one",
     "Swift converts to from Calendar.firstWeekday, which counts Sunday as 1. The four",
@@ -13,15 +16,18 @@
     "The number feeds the calendar grid's column order and the weekday histogram's bar",
     "order, so a divergence rotates one platform's week against the other's.",
     "",
-    "calendarDate: the CALENDAR date an instant falls on in a zone — what the entry",
-    "dialog shows beside a night-hour time that instantOnLogicalDate placed on the",
-    "following calendar day (v0.86.0)."
+    "logicalDayDiffers: the condition the entry sheet shows its note under. The",
+    "reading is the composed date and time in its frame; logicalDay is the day the",
+    "sheet was opened on. True means the entry counts toward another day.",
+    "",
+    "following calendar day (v0.86.0).",
+    "The instantOnLogicalDate and calendarDate sections are gone with the functions they pinned. Both existed because the entry sheet offered hours and minutes alone: something had to place a bare time on a calendar day and then say which day that was. The sheet composes the whole reading now, so nothing in the app maps a logical day back onto an instant. The one place that still needs the inverse is the repair of pre-0.85.0 calendar entries, which keeps a private copy per platform on purpose (see LegacyDayRepair)."
   ],
   "resolve": [
     {
       "description": "04:01 stays same day",
       "epochMillis": 1748052060000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
@@ -29,7 +35,7 @@
     {
       "description": "12:00 stays same day",
       "epochMillis": 1748080800000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
@@ -37,7 +43,7 @@
     {
       "description": "23:59 stays same day",
       "epochMillis": 1748123940000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
@@ -45,7 +51,7 @@
     {
       "description": "03:59 maps to previous day",
       "epochMillis": 1748051940000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-23"
@@ -53,7 +59,7 @@
     {
       "description": "02:30 maps to previous day",
       "epochMillis": 1748046600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-23"
@@ -61,7 +67,7 @@
     {
       "description": "midnight maps to previous day",
       "epochMillis": 1748037600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-23"
@@ -69,7 +75,7 @@
     {
       "description": "exactly at change time stays same day",
       "epochMillis": 1748052000000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
@@ -77,7 +83,7 @@
     {
       "description": "custom change time 06:00, before",
       "epochMillis": 1748059140000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 6,
       "changeMinute": 0,
       "expected": "2025-05-23"
@@ -85,7 +91,7 @@
     {
       "description": "custom change time 06:00, at",
       "epochMillis": 1748059200000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 6,
       "changeMinute": 0,
       "expected": "2025-05-24"
@@ -93,7 +99,7 @@
     {
       "description": "change time with minutes, before 04:30",
       "epochMillis": 1748053740000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 30,
       "expected": "2025-05-23"
@@ -101,7 +107,7 @@
     {
       "description": "change time with minutes, at 04:30",
       "epochMillis": 1748053800000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 30,
       "expected": "2025-05-24"
@@ -109,7 +115,7 @@
     {
       "description": "midnight Jan 1 maps to Dec 31",
       "epochMillis": 1735686000000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2024-12-31"
@@ -117,7 +123,7 @@
     {
       "description": "midnight Mar 1 maps to Feb 28 (non-leap)",
       "epochMillis": 1740783600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-02-28"
@@ -125,7 +131,7 @@
     {
       "description": "midnight Mar 1 maps to Feb 29 (leap year)",
       "epochMillis": 1709247600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2024-02-29"
@@ -133,144 +139,122 @@
     {
       "description": "midnight change boundary keeps calendar day",
       "epochMillis": 1748037600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 0,
       "changeMinute": 0,
       "expected": "2025-05-24"
     },
     {
-      "description": "DST spring-forward: 01:30 before the 02:00 gap",
+      "description": "spring-forward instant at +01:00: 01:30, before the change time",
       "epochMillis": 1743294600000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-03-29"
     },
     {
-      "description": "DST spring-forward: 03:30 after the gap, still before 04:00",
+      "description": "the same instant at +02:00: 02:30, still before the change time",
+      "epochMillis": 1743294600000,
+      "utcOffsetSeconds": 7200,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-29"
+    },
+    {
+      "description": "spring-forward instant at +01:00: 02:30",
       "epochMillis": 1743298200000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-03-29"
     },
     {
-      "description": "DST spring-forward: 04:30 after change time",
+      "description": "the same instant at +02:00: 03:30",
+      "epochMillis": 1743298200000,
+      "utcOffsetSeconds": 7200,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-29"
+    },
+    {
+      "description": "spring-forward instant at +01:00: 03:30, before the change time",
       "epochMillis": 1743301800000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-03-29"
+    },
+    {
+      "description": "22:00 at -04:00 stays same day",
+      "epochMillis": 1743301800000,
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-03-30"
     },
     {
-      "description": "DST fall-back day: 01:30 (ambiguous local time)",
+      "description": "03:00 at -04:00 maps to previous day",
       "epochMillis": 1761435000000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-10-25"
     },
     {
-      "description": "DST fall-back day: 05:00 after change time",
+      "description": "the same instant at +02:00: 01:30",
+      "epochMillis": 1761435000000,
+      "utcOffsetSeconds": 7200,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-10-25"
+    },
+    {
+      "description": "fall-back instant at +01:00: 05:00, past the change time",
       "epochMillis": 1761451200000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 3600,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-10-26"
     },
     {
-      "description": "New York 22:00 stays same day",
+      "description": "the same instant at +02:00: 06:00, past the change time",
+      "epochMillis": 1761451200000,
+      "utcOffsetSeconds": 7200,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "expected": "2025-10-26"
+    },
+    {
+      "description": "22:00 stays same day",
       "epochMillis": 1748138400000,
-      "zoneId": "America/New_York",
+      "utcOffsetSeconds": -14400,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
     },
     {
-      "description": "New York 03:00 maps to previous day",
+      "description": "03:00 maps to previous day",
       "epochMillis": 1748070000000,
-      "zoneId": "America/New_York",
+      "utcOffsetSeconds": -14400,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-23"
     },
     {
-      "description": "Same instant, New York: 23:00 -> same day",
+      "description": "Same instant read at -04:00: 23:00 -> same day",
       "epochMillis": 1748142000000,
-      "zoneId": "America/New_York",
+      "utcOffsetSeconds": -14400,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-24"
     },
     {
-      "description": "Same instant, Berlin: 05:00 next day -> next day",
+      "description": "Same instant read at +02:00: 05:00 -> next day",
       "epochMillis": 1748142000000,
-      "zoneId": "Europe/Berlin",
+      "utcOffsetSeconds": 7200,
       "changeHour": 4,
       "changeMinute": 0,
       "expected": "2025-05-25"
-    }
-  ],
-  "instantOnLogicalDate": [
-    {
-      "description": "an evening on a past logical day keeps that calendar day",
-      "logicalDate": "2026-08-30",
-      "hour": 20,
-      "minute": 0,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "Europe/Berlin",
-      "expected": 1788112800000
-    },
-    {
-      "description": "before the boundary belongs to the next calendar day",
-      "logicalDate": "2026-08-30",
-      "hour": 1,
-      "minute": 0,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "Europe/Berlin",
-      "expected": 1788130800000
-    },
-    {
-      "description": "the boundary itself stays on its own calendar day",
-      "logicalDate": "2026-08-30",
-      "hour": 4,
-      "minute": 0,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "Europe/Berlin",
-      "expected": 1788055200000
-    },
-    {
-      "description": "the same wall clock is a different instant in another zone",
-      "logicalDate": "2026-08-30",
-      "hour": 20,
-      "minute": 0,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "America/New_York",
-      "expected": 1788134400000
-    },
-    {
-      "description": "a small-hours entry on the fall-back day lands after the switch",
-      "logicalDate": "2026-10-25",
-      "hour": 2,
-      "minute": 30,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "Europe/Berlin",
-      "expected": 1792978200000
-    },
-    {
-      "description": "a small-hours entry in the spring-forward gap is moved past it by the gap's length",
-      "logicalDate": "2026-03-28",
-      "hour": 2,
-      "minute": 30,
-      "changeHour": 4,
-      "changeMinute": 0,
-      "zoneId": "Europe/Berlin",
-      "expected": 1774747800000
     }
   ],
   "effectivePeriodDays": [
@@ -604,36 +588,42 @@
       "expected": 7
     }
   ],
-  "calendarDate": [
+  "logicalDayDiffers": [
     {
-      "description": "the fall-back instant of the case above is the calendar 26th",
-      "timestampMillis": 1792978200000,
-      "zoneId": "Europe/Berlin",
-      "expected": "2026-10-26"
+      "description": "Today sheet on the 11th, 03:00 typed: derives the 10th",
+      "epochMillis": 1773194400000,
+      "utcOffsetSeconds": 3600,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "logicalDay": "2026-03-11",
+      "expected": true
     },
     {
-      "description": "the spring-forward instant is the calendar 29th",
-      "timestampMillis": 1774747800000,
-      "zoneId": "Europe/Berlin",
-      "expected": "2026-03-29"
+      "description": "Today sheet on the 10th, 23:00 tracked onto the 10th",
+      "epochMillis": 1773180000000,
+      "utcOffsetSeconds": 3600,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "logicalDay": "2026-03-10",
+      "expected": false
     },
     {
-      "description": "02:00 UTC on the 16th is still the 15th in New York",
-      "timestampMillis": 1786845600000,
-      "zoneId": "America/New_York",
-      "expected": "2026-08-15"
+      "description": "Calendar sheet for the 10th, 01:00 tracked onto the 11th",
+      "epochMillis": 1773187200000,
+      "utcOffsetSeconds": 3600,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "logicalDay": "2026-03-10",
+      "expected": false
     },
     {
-      "description": "the same instant is already the 16th in Tokyo",
-      "timestampMillis": 1786845600000,
-      "zoneId": "Asia/Tokyo",
-      "expected": "2026-08-16"
-    },
-    {
-      "description": "08:00 UTC on the 16th is the evening of the 15th in Honolulu",
-      "timestampMillis": 1786867200000,
-      "zoneId": "Pacific/Honolulu",
-      "expected": "2026-08-15"
+      "description": "Calendar sheet for the 10th, date moved to the 7th",
+      "epochMillis": 1772910000000,
+      "utcOffsetSeconds": 3600,
+      "changeHour": 4,
+      "changeMinute": 0,
+      "logicalDay": "2026-03-10",
+      "expected": true
     }
   ]
 }

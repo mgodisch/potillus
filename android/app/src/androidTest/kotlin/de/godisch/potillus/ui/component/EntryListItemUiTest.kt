@@ -130,6 +130,7 @@ class EntryListItemUiTest {
         timestampMillis = 1_700_000_000_000L,
         logicalDate = "2026-05-29",
         note = "after work",
+        utcOffsetSeconds = 0,
     )
 
     /**

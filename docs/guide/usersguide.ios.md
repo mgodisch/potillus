@@ -100,7 +100,9 @@ _Statistics_ holds _New Day Starts At_, set to four in the morning. This
 setting decides which day a drink counts towards: have a glass at one in the
 morning and it lands on the evening before, where it belongs. The day
 boundary applies throughout the app, in the calendar as much as in the
-statistics and in exports.
+statistics. The CSV export is the one place that shows both: its first column
+is the calendar day the entry was actually read at, and a column at the end
+gives the day it counts towards.
 
 The _Statistics From_ row sits in the same place. That date is the floor
 under every evaluation: entries before it are ignored in every figure. It
@@ -149,9 +151,24 @@ fields follow:
 
 - the volume drunk, in milliliters. From 1 to 5,000 ml; it starts at the
   chosen drink’s usual serving.
-- the time, set to now. Adjustable when you are logging something after the
-  fact.
+- the _Date_ and the _Time_, both adjustable, both set to now when you
+  log from the _Today_ screen. Adjust the time alone and the date follows
+  along: a time later than the current one means yesterday, so “02:00” typed
+  at six in the morning is four hours ago and not twenty hours away. Pick a
+  date yourself and it stays put, whatever you do with the time afterwards.
 - an optional note, a free remark on the occasion or the company.
+
+Opened from the _Calendar_, the sheet starts on the day you tapped, at
+eight in the evening, and the date follows the time so the entry stays on that
+day: turn the clock back past _New Day Starts At_ and the date moves to the
+morning after, which is where a one-in-the-morning drink belongs.
+
+Whenever the entry would count towards a different day than the one the sheet
+was opened on, a line under the two fields says which day that is. It is not a
+warning and it does not stop you saving — the entry is right, it just belongs
+elsewhere. On the _Today_ screen this can mean an entry disappears from
+the list you just made it on: log “02:00” at six in the morning and it counts
+towards yesterday, so yesterday is where you will find it.
 
 Strength belongs to the drink and cannot be entered differently here. If the
 same kind of drink is markedly stronger one evening, give it its own entry in
@@ -344,6 +361,13 @@ with one row per entry, ready for a spreadsheet such as [LibreOffice
 Calc](https://www.libreoffice.org/). Numbers are written machine-readably
 with a decimal point, whatever language the app is in.
 
+The first two columns are the date and the time the entry was read at, so
+together they name the moment the drink was had. The last column holds the day
+it counts towards, which for a night-time entry is the day before. That column
+is the only place the app’s attribution leaves it: the day-change time is not
+in the file, and without it there would be no way to work the attribution out
+again in a spreadsheet.
+
 For the CSV file, too, the system
 file picker opens, where you decide where the file goes: into Files, into
 cloud storage, or into another app.
@@ -454,6 +478,12 @@ A drink belongs to the day that began at _New Day Starts At_, not to the day
 the clock shows. With the default of four in the morning, a glass at half
 past one still counts toward the day before. The rule holds throughout the
 app, and across clock changes.
+
+A drink also keeps the wall clock it was logged at. Fly to another time zone
+and last week’s beer still reads half past eleven, on the day it was drunk;
+the same holds across a summer-time switch. What moves is what the app
+computes from that reading: change _New Day Starts At_ and every entry counts
+towards the day the new boundary puts it on, past ones included.
 
 ### The rolling week
 

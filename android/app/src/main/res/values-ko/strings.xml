@@ -78,6 +78,8 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="select_drink">음료 선택…</string>
     <string name="volume_ml">양</string>
     <string name="time">시간</string>
+    <string name="date">날짜</string>
+    <string name="entry_counts_toward">%1$s에 포함됩니다</string>
     <string name="pure_alcohol">g 순수 알코올</string>
     <string name="note">메모 (선택 사항)</string>
 
@@ -238,6 +240,7 @@ apply to it are stated in the accompanying COPYING.md file.
     <string name="csv_col_alcohol_pct">알코올_퍼센트</string>
     <string name="csv_col_grams">그램_알코올</string>
     <string name="csv_col_note">메모</string>
+    <string name="csv_col_logical_date">논리적_날짜</string>
     <string name="pdf_unit_g_per_day">g/일</string>
     <string name="drink_days_label">음주일 수 (최근 7일)</string>
     <string name="a11y_caption_value">%1$s: %2$s</string>

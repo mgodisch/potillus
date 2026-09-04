@@ -379,18 +379,23 @@ public enum BackupReader {
         guard let logicalDate = object["logicalDate"] as? String else {
             throw BackupError.missingField(object: "entry", key: "logicalDate")
         }
-        // OPTIONAL, and its absence is not an error: every file written before
-        // the field existed lacks it, as does one written by an older build of
-        // the other platform. `nil` is carried through and read back through the
-        // fallback in `DayResolver.displayTimeZone`. When it IS present it must
-        // be a real offset — the widest zones in the IANA database run from
-        // -12:00 to +14:00. Android's Guard 3c is the twin.
-        let utcOffsetSeconds = intValue(object["utcOffsetSeconds"])
-        if let offset = utcOffsetSeconds, !(-12 * 3600...14 * 3600).contains(offset) {
+        // OPTIONAL ON THE WIRE, and its absence is not an error: every file
+        // written before the field existed lacks it, as does one written by an
+        // older build of the other platform. It is FILLED HERE rather than
+        // carried as "unknown", because the column it lands in is NOT NULL from
+        // schema 4 on: the device zone's rules for that instant, which is the
+        // same replacement every read derived while the column was nullable and
+        // the same one the v4 migration froze into the local rows. When the key
+        // IS present it must be a real offset — the widest zones in the IANA
+        // database run from -12:00 to +14:00. Android's Guard 3c is the twin.
+        if let offset = intValue(object["utcOffsetSeconds"]),
+           !(-12 * 3600...14 * 3600).contains(offset) {
             throw BackupError.valueOutOfRange(
                 object: "entry", key: "utcOffsetSeconds", value: String(offset)
             )
         }
+        let utcOffsetSeconds = intValue(object["utcOffsetSeconds"])
+            ?? DayResolver.utcOffsetSeconds(timestampMillis: timestampMillis)
 
         // Same rationale as `parseDrink`: `gramsAlcohol` is the primary input to
         // every BAC and statistics computation, so a non-finite or negative value
@@ -577,12 +582,11 @@ public enum BackupWriter {
             "logicalDate": entry.logicalDate,
             "note": entry.note,
         ]
-        // Written only when the entry has one, and omitted rather than guessed
-        // when it has not: a reader that finds no offset derives the same
-        // fallback the app derives for its own pre-column rows.
-        if let offset = entry.utcOffsetSeconds {
-            object["utcOffsetSeconds"] = offset
-        }
+        // Written for every entry from schema 4 on: the column is NOT NULL there,
+        // so there is no such thing as an entry without a frame any more. The key
+        // stays optional ON THE WIRE, because files written before it exist and
+        // must stay readable.
+        object["utcOffsetSeconds"] = entry.utcOffsetSeconds
         return object
     }
 

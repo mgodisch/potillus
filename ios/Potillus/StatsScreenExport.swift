@@ -91,8 +91,8 @@ extension StatsScreen {
         // derivation applies.
         var today = model.state.today
         if today.isEmpty {
-            today = DayResolver.resolve(
-                timestampMillis: Int64(environment.clock.now().timeIntervalSince1970 * 1000.0),
+            today = DayResolver.today(
+                now: Int64(environment.clock.now().timeIntervalSince1970 * 1000.0),
                 changeHour: settings.dayChangeHour,
                 changeMinute: settings.dayChangeMinute
             )
