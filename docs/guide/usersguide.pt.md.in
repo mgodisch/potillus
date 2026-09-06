@@ -137,8 +137,10 @@ calcular.
 Em _{{statistics}}_ está _{{day_starts_at}}_, predefinido para as quatro da
 manhã. Esta definição decide a que dia conta uma bebida: se tomar um copo à
 uma da manhã, ele cai na noite anterior, que é onde pertence. O limite do dia
-vale em toda a aplicação, tanto no calendário como nas estatísticas e nas
-exportações.
+vale em toda a aplicação, tanto no calendário como nas estatísticas. A
+exportação CSV é o único sítio que mostra ambos: na primeira coluna está o
+dia de calendário em que o registo foi feito, e numa coluna no fim o dia a
+que ele conta.
 
 No mesmo sítio está a linha _{{stats_from_label}}_. Essa data é o chão de
 qualquer análise: os registos anteriores são ignorados em cada número.
@@ -188,8 +190,25 @@ estão três campos:
 
 - a quantidade bebida, em mililitros. De 1 a 5 000 ml; o campo parte da dose
   habitual da bebida escolhida.
-- a hora, definida para agora. Ajustável quando regista algo à posteriori.
+- a _{{date}}_ e a _{{time}}_, ambas ajustáveis e ambas definidas para agora
+  quando regista a partir do ecrã _{{today}}_. Se mudar apenas a hora, a data
+  vai atrás: uma hora posterior à atual significa ontem, pelo que «02:00»
+  escrito às seis da manhã fica quatro horas para trás e não vinte horas para
+  a frente. Se escolher a data você mesmo, ela fica, faça depois o que fizer
+  com a hora.
 - uma nota, se quiser, um comentário livre sobre a ocasião ou a companhia.
+
+Aberta a partir do _{{calendar}}_, a folha começa no dia que tocou, às oito
+da noite, e a data segue a hora para que o registo fique nesse dia: se rodar
+o relógio para trás para além de _{{day_starts_at}}_, obtém o dia seguinte
+como data — é aí que pertence um copo tomado à uma da manhã.
+
+Quando o registo conta para um dia diferente daquele sob o qual a folha foi
+aberta, uma linha por baixo dos dois campos nomeia esse dia. Não é um aviso e
+não impede guardar: o registo está certo, apenas pertence a outro sítio. No
+ecrã _{{today}}_ isso pode significar que um registo desaparece da lista em
+que acabou de o criar: «02:00» registado às seis da manhã conta para ontem, e
+é aí que o encontra.
 
 O teor alcoólico pertence à bebida e não pode ser introduzido de outra forma
 aqui. Se a mesma qualidade for numa noite bem mais forte, dê-lhe um lugar
@@ -396,6 +415,12 @@ linha por registo, pronta para uma folha de cálculo como [LibreOffice
 Calc](https://www.libreoffice.org/). Os números estão escritos de forma
 legível por máquina, com ponto decimal, seja qual for o idioma da aplicação.
 
+As duas primeiras colunas são a data e a hora do registo; juntas nomeiam o
+momento do consumo. Na última coluna está o dia a que o registo conta — num
+registo noturno, portanto, o dia anterior. Só por essa coluna a atribuição
+deixa a aplicação: a hora da mudança de dia não está no ficheiro, e sem ela
+não poderia ser reconstruída numa folha de cálculo.
+
 {{#android}}O ficheiro CSV vai parar à pasta de transferências, e a aplicação
 oferece-se depois para o partilhar.{{/android}}{{#ios}}Também para o ficheiro
 CSV se abre o seletor de ficheiros do sistema, onde decide para onde vai o
@@ -522,6 +547,13 @@ Uma bebida pertence ao dia que começou à hora indicada por
 _{{day_starts_at}}_, não ao dia que o relógio mostra. Com a predefinição das
 quatro horas, um copo à uma e meia da manhã conta ainda para o dia anterior.
 A regra vale em toda a aplicação, também através das mudanças de hora.
+
+Uma bebida guarda além disso a hora sob a qual foi registada. Depois de um
+voo para outro fuso, a cerveja da semana passada continua às onze e meia, no
+dia em que foi bebida; através de uma mudança de hora vale o mesmo. O que se
+move é aquilo que a aplicação calcula a partir desse registo: se mudar
+_{{day_starts_at}}_, cada entrada conta para o dia em que o novo limite a
+coloca, as passadas incluídas.
 
 ### A semana deslizante
 

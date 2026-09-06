@@ -135,8 +135,10 @@ för att räkna ut den saknas.
 Under _{{statistics}}_ står _{{day_starts_at}}_, förinställd på klockan fyra
 på morgonen. Den inställningen avgör vilken dag en dryck räknas till: tar du
 ett glas klockan ett på natten hamnar det på kvällen före, där det hör hemma.
-Dygnsgränsen gäller överallt i appen, i kalendern likaväl som i statistiken
-och i exporterna.
+Dygnsgränsen gäller överallt i appen, i kalendern likaväl som i statistiken.
+CSV-exporten är det enda ställe som visar bådadera: i första kolumnen står
+den kalenderdag posten avlästes på, och i en kolumn sist den dag den räknas
+till.
 
 På samma ställe står raden _{{stats_from_label}}_. Det datumet är golvet
 under varje sammanställning: poster före det ignoreras i varje siffra. Så kan
@@ -185,9 +187,25 @@ upplagd står dess namn där utan något att välja. Under den står tre fält:
 
 - den druckna mängden, i milliliter. Från 1 till 5 000 ml; fältet utgår från
   den valda dryckens vanliga portion.
-- klockslaget, satt till nu. Går att ändra när du registrerar något i
-  efterhand.
+- _{{date}}_ och _{{time}}_, båda går att ändra och båda står på nu när du
+  registrerar från skärmen _{{today}}_. Ändrar du bara klockslaget följer
+  datumet med: ett klockslag senare än det nuvarande betyder i går, så att
+  ”02:00” knappat klockan sex på morgonen ligger fyra timmar tillbaka och inte
+  tjugo timmar fram. Väljer du själv ett datum blir det stående, vad du än gör
+  med klockslaget sedan.
 - en anteckning, om du vill, en fri kommentar om tillfället eller sällskapet.
+
+Öppnat från _{{calendar}}_ börjar bladet på den dag du tryckte på, klockan
+åtta på kvällen, och datumet följer klockslaget så att posten stannar på den
+dagen: vrider du klockan tillbaka förbi _{{day_starts_at}}_ får du dagen
+efter som datum — där hör ett glas klockan ett på natten hemma.
+
+Räknas posten till en annan dag än den bladet öppnades under nämner en rad
+under de två fälten den dagen. Det är ingen varning och hindrar inte att
+spara: posten är riktig, den hör bara hemma någon annanstans. På skärmen
+_{{today}}_ kan det betyda att en post försvinner från listan där du just
+skapade den: ”02:00” registrerat klockan sex på morgonen räknas till i går,
+och där hittar du den.
 
 Alkoholhalten hör till drycken och går inte att ange avvikande här. Är samma
 sort en kväll märkbart starkare får den en egen plats i katalogen.
@@ -388,6 +406,12 @@ rad per post, färdig för ett kalkylprogram som [LibreOffice
 Calc](https://www.libreoffice.org/). Tal skrivs maskinläsbart med
 decimalpunkt, oavsett vilket språk appen står på.
 
+De två första kolumnerna är datum och klockslag för avläsningen; tillsammans
+nämner de ögonblicket då drycken dracks. I sista kolumnen står den dag posten
+räknas till — vid en nattpost alltså dagen före. Bara genom den kolumnen
+lämnar tillhörigheten appen: tidpunkten för dygnsskiftet står inte i filen,
+och utan den gick den inte att bygga upp igen i ett kalkylprogram.
+
 {{#android}}CSV-filen hamnar i mappen Hämtningar, och appen erbjuder sig
 efteråt att dela den.{{/android}}{{#ios}}Även för CSV-filen öppnas systemets
 filväljare, där du bestämmer var filen hamnar: i Filer, i molnlagring eller i
@@ -508,6 +532,12 @@ En dryck hör till den dag som började vid den tid _{{day_starts_at}}_ anger,
 inte till den dag klockan visar. Med förvalet klockan fyra räknas ett glas
 halv två på natten fortfarande till dagen före. Regeln gäller i hela appen,
 också över tidsomställningar.
+
+En dryck behåller dessutom det klockslag den registrerades på. Efter en flygtur
+till en annan tidszon står förra veckans öl fortfarande på halv tolv, den dag
+det dracks; över en tidsomställning gäller detsamma. Det som rör sig är vad
+appen räknar fram ur avläsningen: ändrar du _{{day_starts_at}}_ räknas varje
+post till den dag den nya gränsen lägger den på, de gångna inräknade.
 
 ### Den glidande veckan
 

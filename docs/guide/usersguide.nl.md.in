@@ -136,7 +136,9 @@ Onder _{{statistics}}_ staat _{{day_starts_at}}_, ingesteld op vier uur ’s
 ochtends. Deze instelling bepaalt bij welke dag een drankje hoort: drink je
 om een uur ’s nachts nog een glas, dan komt dat op de avond ervoor terecht,
 waar het hoort. Die daggrens geldt overal in de app, in de kalender net zo
-goed als in de statistieken en in de exports.
+goed als in de statistieken. De CSV-export is de enige plek die beide laat
+zien: in de eerste kolom staat de kalenderdag waarop de invoer is afgelezen,
+en in een kolom aan het eind de dag waarvoor hij telt.
 
 Op dezelfde plek staat de regel _{{stats_from_label}}_. Die datum is de
 ondergrens onder elke analyse: invoer van daarvoor wordt in elk cijfer
@@ -187,10 +189,26 @@ staan drie velden:
 
 - de gedronken hoeveelheid, in milliliter. Van 1 tot 5.000 ml; het veld
   begint op de gebruikelijke portie van de gekozen drank.
-- het tijdstip, ingesteld op nu. Aan te passen wanneer je iets achteraf
-  noteert.
+- de _{{date}}_ en het _{{time}}_, allebei aan te passen en allebei op nu
+  gezet wanneer je vanaf het scherm _{{today}}_ noteert. Verander je alleen
+  het tijdstip, dan gaat de datum mee: een tijdstip later dan het huidige
+  betekent gisteren, dus “02:00” dat je om zes uur ’s ochtends intypt ligt
+  vier uur terug en niet twintig uur vooruit. Kies je zelf een datum, dan
+  blijft die staan, wat je daarna ook met het tijdstip doet.
 - desgewenst een notitie, een vrije opmerking over de gelegenheid of het
   gezelschap.
+
+Vanuit de _{{calendar}}_ geopend begint het blad op de dag die je aantikte,
+om acht uur ’s avonds, en de datum volgt het tijdstip zodat de invoer op die
+dag blijft: draai je de klok terug voorbij _{{day_starts_at}}_, dan krijg je
+de volgende dag als datum — daar hoort een drankje van een uur ’s nachts.
+
+Telt de invoer voor een andere dag dan die waaronder het blad is geopend, dan
+noemt een regel onder de twee velden die dag. Het is geen waarschuwing en het
+belet het opslaan niet: de invoer klopt, hij hoort alleen ergens anders. Op
+het scherm _{{today}}_ kan dat betekenen dat een invoer verdwijnt uit de
+lijst waarop je hem net hebt gemaakt: “02:00” genoteerd om zes uur ’s
+ochtends telt voor gisteren, en daar vind je hem dan ook.
 
 Het alcoholpercentage hoort bij de drank en valt hier niet afwijkend in te
 vullen. Is dezelfde soort op een avond duidelijk sterker, geef die dan een
@@ -404,6 +422,13 @@ met één regel per invoer, klaar voor een spreadsheetprogramma zoals
 [LibreOffice Calc](https://www.libreoffice.org/). Getallen staan er
 machineleesbaar met een decimale punt, in welke taal de app ook staat.
 
+De eerste twee kolommen zijn de datum en het tijdstip van de aflezing; samen
+noemen ze het moment van drinken. In de laatste kolom staat de dag waarvoor
+de invoer telt — bij een nachtelijke invoer dus de dag ervoor. Alleen via die
+kolom verlaat de toewijzing de app: het tijdstip van de daggrens staat niet
+in het bestand, en zonder dat zou ze in een spreadsheet niet zijn na te
+bouwen.
+
 {{#android}}Het CSV-bestand belandt in de map Downloads, en de app biedt
 daarna aan het te delen.{{/android}}{{#ios}}Ook voor het CSV-bestand opent de
 bestandskiezer van het systeem, waarin je bepaalt waar het bestand
@@ -526,6 +551,13 @@ Een drankje hoort bij de dag die om _{{day_starts_at}}_ is begonnen, niet bij
 de dag die de klok aanwijst. Met de standaardwaarde van vier uur ’s ochtends
 telt een glas om half twee nog voor de dag ervoor. De regel geldt in de hele
 app, en ook over de omschakeling tussen zomer- en wintertijd heen.
+
+Een drankje houdt bovendien het tijdstip waarop het is genoteerd. Na een
+vlucht naar een andere tijdzone staat het biertje van vorige week nog steeds
+op half twaalf, op de dag waarop het is gedronken; over een omschakeling van
+de klok heen geldt hetzelfde. Wat verschuift, is wat de app uit die aflezing
+berekent: verander je _{{day_starts_at}}_, dan telt elke invoer voor de dag
+waarop de nieuwe grens hem legt, de voorbije meegerekend.
 
 ### De voortschrijdende week
 

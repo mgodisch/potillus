@@ -131,8 +131,9 @@ výpočet.
 V _{{statistics}}_ stojí _{{day_starts_at}}_, přednastavené na čtvrtou hodinu
 ranní. Toto nastavení rozhoduje, ke kterému dni se nápoj počítá: vypijete-li
 skleničku v jednu v noci, spadne na předchozí večer, kam patří. Hranice dne
-platí všude v aplikaci, v kalendáři stejně jako ve statistikách a v
-exportech.
+platí všude v aplikaci, v kalendáři stejně jako ve statistikách. Export CSV
+je jediné místo, kde je vidět obojí: v prvním sloupci stojí kalendářní den, v
+který byl záznam pořízen, a ve sloupci na konci den, ke kterému se počítá.
 
 Na témže místě stojí řádek _{{stats_from_label}}_. To datum je spodní hranicí
 každého rozboru: záznamy před ním se v žádném čísle neberou v úvahu. Umožní
@@ -179,8 +180,23 @@ jediný nápoj, stojí tam jeho název bez čeho vybírat. Pod ním stojí tři 
 
 - vypité množství, v mililitrech. Od 1 do 5 000 ml; pole vychází z obvyklé
   porce zvoleného nápoje.
-- čas, nastavený na teď. Lze jej změnit, zaznamenáváte-li něco dodatečně.
+- _{{date}}_ a _{{time}}_, obojí lze měnit a obojí je nastaveno na teď, když
+  zapisujete z obrazovky _{{today}}_. Změníte-li jen čas, datum jde s ním: čas
+  pozdější než ten současný znamená včerejšek, takže „02:00“ zadané v šest
+  ráno leží čtyři hodiny zpátky, ne dvacet hodin dopředu. Zvolíte-li datum
+  sami, zůstane stát, ať s časem děláte cokoli.
 - poznámka, chcete-li, volná zmínka o příležitosti nebo o společnosti.
+
+Otevřete-li blok z _{{calendar}}_, začíná na dni, na který jste klepli, v osm
+večer, a datum jde za časem tak, aby záznam na tom dni zůstal: otočíte-li
+hodiny zpět přes _{{day_starts_at}}_, dostanete jako datum následující den —
+tam patří nápoj v jednu v noci.
+
+Počítá-li se záznam k jinému dni, než pod kterým byl blok otevřen, uvede
+řádek pod oběma poli tento den. Není to varování a v uložení nebrání — záznam
+je správně, jen patří jinam. Na obrazovce _{{today}}_ to může znamenat, že
+záznam zmizí ze seznamu, na kterém právě vznikl: „02:00“ zapsané v šest ráno
+se počítá ke včerejšku, a tam ho také najdete.
 
 Obsah alkoholu patří k nápoji a nelze jej tu zadat jinak. Je-li týž druh
 jeden večer znatelně silnější, dejte mu v katalogu vlastní místo.
@@ -376,6 +392,12 @@ jedním řádkem na záznam, připravenou pro tabulkový procesor jako [LibreOff
 Calc](https://www.libreoffice.org/). Čísla v ní stojí strojově čitelně, s
 desetinnou tečkou, nezávisle na jazyku aplikace.
 
+První dva sloupce jsou datum a čas pořízení záznamu; společně pojmenovávají
+okamžik konzumace. V posledním sloupci stojí den, ke kterému se záznam počítá
+— u nočního záznamu tedy den předchozí. Jen tímto sloupcem opouští zařazení
+aplikaci: čas přechodu dne v souboru není, a bez něj by se v tabulkovém
+procesoru nedal znovu odvodit.
+
 {{#android}}Soubor CSV přistane ve složce stažených souborů a aplikace pak
 nabídne jeho sdílení.{{/android}}{{#ios}}I pro soubor CSV se otevře systémový
 výběr souborů, ve kterém určíte, kam soubor půjde: do Souborů, do cloudového
@@ -491,6 +513,12 @@ Nápoj patří ke dni, který začal v hodinu udanou v _{{day_starts_at}}_, ne k
 dni, který ukazují hodiny. Při výchozím nastavení čtvrté hodiny se sklenka o
 půl druhé v noci počítá ještě k předchozímu dni. Pravidlo platí v celé
 aplikaci, i přes změny času.
+
+Nápoj si navíc podrží čas, pod kterým byl zapsán. Po letu do jiného časového
+pásma stojí pivo z minulého týdne dál na půl dvanácté, v den, kdy bylo
+vypito; přes změnu času platí totéž. Pohybuje se to, co z toho aplikace
+počítá: změníte-li _{{day_starts_at}}_, počítá se každý záznam ke dni, na
+který ho nová hranice položí, ty minulé včetně.
 
 ### Klouzavý týden
 

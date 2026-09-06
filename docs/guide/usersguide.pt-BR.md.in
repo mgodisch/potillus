@@ -137,7 +137,9 @@ Em _{{statistics}}_ está _{{day_starts_at}}_, predefinido para as quatro da
 manhã. Essa configuração decide para qual dia uma bebida conta: se você tomar
 um copo à uma da manhã, ele cai na noite anterior, que é onde ele pertence. O
 limite do dia vale no app inteiro, tanto no calendário quanto nas
-estatísticas e nas exportações.
+estatísticas. A exportação CSV é o único lugar que mostra os dois: na
+primeira coluna está o dia de calendário em que o registro foi feito, e numa
+coluna no fim o dia para o qual ele conta.
 
 No mesmo lugar está a linha _{{stats_from_label}}_. Essa data é o piso de
 toda análise: registros anteriores a ela são ignorados em cada número. Ela
@@ -187,10 +189,26 @@ três campos:
 
 - a quantidade bebida, em mililitros. De 1 a 5.000 ml; o campo parte da dose
   habitual da bebida escolhida.
-- o horário, ajustado para agora. Dá para mudar quando você registra algo
-  depois.
+- a _{{date}}_ e o _{{time}}_, ambos ajustáveis e ambos definidos para agora
+  quando você registra pela tela _{{today}}_. Se mudar só o horário, a data
+  vai junto: um horário posterior ao atual significa ontem, então “02:00”
+  digitado às seis da manhã fica quatro horas para trás e não vinte horas para
+  a frente. Se você escolher a data, ela fica, faça o que fizer depois com o
+  horário.
 - uma observação, se quiser, um comentário livre sobre a ocasião ou a
   companhia.
+
+Aberta pelo _{{calendar}}_, a folha começa no dia que você tocou, às oito da
+noite, e a data segue o horário para que o registro fique nesse dia: se girar
+o relógio para trás além de _{{day_starts_at}}_, você recebe o dia seguinte
+como data — é aí que fica um copo tomado à uma da manhã.
+
+Quando o registro conta para um dia diferente daquele sob o qual a folha foi
+aberta, uma linha abaixo dos dois campos nomeia esse dia. Não é um aviso e
+não impede salvar: o registro está certo, só pertence a outro lugar. Na tela
+_{{today}}_ isso pode significar que um registro some da lista em que você
+acabou de criá-lo: “02:00” registrado às seis da manhã conta para ontem, e é
+lá que você o encontra.
 
 O teor alcoólico pertence à bebida e não pode ser digitado de outro jeito
 aqui. Se o mesmo tipo estiver bem mais forte numa noite, dê a ele um lugar
@@ -397,6 +415,12 @@ linha por registro, pronta para uma planilha como [LibreOffice
 Calc](https://www.libreoffice.org/). Os números vêm escritos de forma legível
 por máquina, com ponto decimal, seja qual for o idioma do app.
 
+As duas primeiras colunas são a data e o horário do registro; juntas nomeiam
+o momento do consumo. Na última coluna está o dia para o qual o registro
+conta — num registro noturno, portanto, o dia anterior. Só por essa coluna a
+atribuição deixa o app: o horário da virada do dia não está no arquivo, e sem
+ele não daria para reconstruí-la numa planilha.
+
 {{#android}}O arquivo CSV vai parar na pasta de downloads, e o app oferece
 depois compartilhá-lo.{{/android}}{{#ios}}Para o arquivo CSV também abre o
 seletor de arquivos do sistema, em que você decide para onde o arquivo vai:
@@ -520,6 +544,13 @@ Uma bebida pertence ao dia que começou no horário indicado por
 _{{day_starts_at}}_, não ao dia que o relógio mostra. Com o padrão de quatro
 horas, um copo à uma e meia da manhã ainda conta para o dia anterior. A regra
 vale no app inteiro, inclusive através das mudanças de horário.
+
+Uma bebida guarda além disso o horário sob o qual foi registrada. Depois de
+um voo para outro fuso, a cerveja da semana passada continua às onze e meia,
+no dia em que foi bebida; através de uma mudança de horário vale o mesmo. O
+que se move é aquilo que o app calcula a partir desse registro: se você mudar
+_{{day_starts_at}}_, cada entrada conta para o dia em que o novo limite a
+coloca, as passadas incluídas.
 
 ### A semana móvel
 

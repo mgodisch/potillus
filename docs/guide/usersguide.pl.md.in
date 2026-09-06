@@ -135,7 +135,9 @@ W _{{statistics}}_ stoi _{{day_starts_at}}_, ustawione domyślnie na czwartą
 rano. To ustawienie rozstrzyga, do którego dnia liczy się napój: jeśli
 wypijesz kieliszek o pierwszej w nocy, trafia on na poprzedni wieczór, gdzie
 jego miejsce. Granica doby obowiązuje wszędzie w aplikacji, w kalendarzu tak
-samo jak w statystykach i w eksportach.
+samo jak w statystykach. Eksport CSV jest jedynym miejscem, które pokazuje
+jedno i drugie: w pierwszej kolumnie stoi dzień kalendarzowy, w którym wpis
+został odczytany, a w kolumnie na końcu dzień, do którego się liczy.
 
 W tym samym miejscu stoi wiersz _{{stats_from_label}}_. Ta data to dolna
 granica każdej analizy: wpisy sprzed niej są pomijane w każdej liczbie.
@@ -184,8 +186,24 @@ wyboru. Poniżej stoją trzy pola:
 
 - wypita ilość, w mililitrach. Od 1 do 5 000 ml; pole wychodzi od zwykłej
   porcji wybranego napoju.
-- godzina, ustawiona na teraz. Do zmiany, gdy zapisujesz coś po fakcie.
+- _{{date}}_ i _{{time}}_, obie do zmiany i obie ustawione na teraz, gdy
+  zapisujesz z ekranu _{{today}}_. Jeśli zmienisz samą godzinę, data pójdzie
+  za nią: godzina późniejsza niż obecna oznacza wczoraj, więc „02:00” wpisane
+  o szóstej rano leży cztery godziny wstecz, a nie dwadzieścia godzin naprzód.
+  Jeśli sam wybierzesz datę, ta zostanie, cokolwiek zrobisz potem z godziną.
 - notatka, jeśli chcesz, swobodna uwaga o okazji albo o towarzystwie.
+
+Otwarty z _{{calendar}}_, arkusz zaczyna się na dniu, który dotknąłeś, o
+ósmej wieczorem, a data idzie za godziną tak, by wpis został na tym dniu:
+gdy cofniesz zegar poza _{{day_starts_at}}_, jako datę dostaniesz dzień
+następny — tam należy kieliszek o pierwszej w nocy.
+
+Gdy wpis liczy się do innego dnia niż ten, pod którym arkusz został otwarty,
+wiersz pod obydwoma polami nazywa ten dzień. To nie ostrzeżenie i nie
+przeszkadza w zapisie — wpis jest poprawny, należy tylko gdzie indziej. Na
+ekranie _{{today}}_ może to oznaczać, że wpis znika z listy, na której
+właśnie powstał: „02:00” zapisane o szóstej rano liczy się do wczoraj i tam
+też je znajdziesz.
 
 Zawartość alkoholu należy do napoju i nie da się jej tu wpisać inaczej. Jeśli
 ten sam gatunek jest pewnego wieczoru wyraźnie mocniejszy, daj mu własne
@@ -384,6 +402,12 @@ jednym wierszem na wpis, gotową dla arkusza kalkulacyjnego takiego jak
 [LibreOffice Calc](https://www.libreoffice.org/). Liczby stoją w postaci
 czytelnej dla maszyny, z kropką dziesiętną, niezależnie od języka aplikacji.
 
+Dwie pierwsze kolumny to data i godzina odczytu; razem nazywają moment
+spożycia. W ostatniej kolumnie stoi dzień, do którego wpis się liczy — przy
+wpisie nocnym zatem dzień poprzedni. Tylko tą kolumną przyporządkowanie
+opuszcza aplikację: godziny zmiany doby w pliku nie ma, a bez niej nie dałoby
+się jej odtworzyć w arkuszu kalkulacyjnym.
+
 {{#android}}Plik CSV ląduje w folderze pobranych, a aplikacja proponuje potem
 udostępnienie go.{{/android}}{{#ios}}Także dla pliku CSV otwiera się
 systemowy wybór plików, w którym decydujesz, dokąd trafia plik: do Plików, do
@@ -504,6 +528,12 @@ _{{day_starts_at}}_, a nie do dnia, który pokazuje zegar. Przy domyślnym
 ustawieniu czwartej kieliszek o wpół do drugiej w nocy liczy się jeszcze do
 dnia poprzedniego. Reguła obowiązuje w całej aplikacji, także przez zmiany
 czasu.
+
+Napój zachowuje ponadto godzinę, pod którą został zapisany. Po locie do innej
+strefy czasowej piwo sprzed tygodnia stoi nadal na wpół do dwunastej, w dniu,
+w którym zostało wypite; przez zmianę czasu obowiązuje to samo. Rusza się to,
+co aplikacja z tego odczytu wylicza: gdy zmienisz _{{day_starts_at}}_, każdy
+wpis liczy się do dnia, na którym kładzie go nowa granica, minione włącznie.
 
 ### Ruchomy tydzień
 

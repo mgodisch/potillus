@@ -135,7 +135,9 @@ Under _{{statistics}}_ står _{{day_starts_at}}_, forhåndsinnstilt på klokken
 fire om morgenen. Denne innstillingen avgjør hvilken dag en drikk teller til:
 tar du et glass klokken ett om natten, havner det på kvelden før, der det
 hører hjemme. Døgngrensen gjelder overalt i appen, i kalenderen så vel som i
-statistikken og i eksportene.
+statistikken. CSV-eksporten er det ene stedet som viser begge deler: i første
+kolonne står kalenderdagen posten ble avlest på, og i en kolonne til slutt
+den dagen den teller til.
 
 På samme sted står raden _{{stats_from_label}}_. Den datoen er gulvet under
 enhver oppstilling: registreringer fra før den blir sett bort fra i hvert
@@ -185,9 +187,25 @@ felter:
 
 - mengden du drakk, i milliliter. Fra 1 til 5 000 ml; feltet tar utgangspunkt
   i den valgte drikkens vanlige porsjon.
-- klokkeslettet, satt til nå. Kan justeres når du registrerer noe i
-  etterkant.
+- _{{date}}_ og _{{time}}_, begge kan endres, og begge står på nå når du
+  registrerer fra skjermen _{{today}}_. Endrer du bare klokkeslettet, følger
+  datoen med: et klokkeslett senere enn det nåværende betyr i går, slik at
+  «02:00» tastet klokken seks om morgenen ligger fire timer tilbake og ikke
+  tjue timer fram. Velger du selv en dato, blir den stående, uansett hva du
+  siden gjør med klokkeslettet.
 - et notat, om du vil, en fri merknad om anledningen eller selskapet.
+
+Åpnet fra _{{calendar}}_ starter arket på dagen du trykket på, klokken åtte
+om kvelden, og datoen følger klokkeslettet slik at posten blir liggende på
+den dagen: vrir du klokken tilbake forbi _{{day_starts_at}}_, får du dagen
+etter som dato — der hører en drikk klokken ett om natten hjemme.
+
+Teller posten til en annen dag enn den arket ble åpnet under, nevner en linje
+under de to feltene den dagen. Det er ingen advarsel og hindrer ikke lagring
+— posten er riktig, den hører bare til et annet sted. På skjermen _{{today}}_
+kan det bety at en post forsvinner fra listen den nettopp ble opprettet på:
+«02:00» registrert klokken seks om morgenen teller til i går, og der finner
+du den.
 
 Alkoholinnholdet hører til drikken og kan ikke legges inn avvikende her. Er
 samme sort en kveld merkbart sterkere, gir du den en egen plass i katalogen.
@@ -391,6 +409,12 @@ Knappen _{{export_csv}}_ på skjermen _{{statistics}}_ skriver en tabell med
 Calc](https://www.libreoffice.org/). Tall står maskinlesbart med
 desimalpunktum, uansett hvilket språk appen står på.
 
+De to første kolonnene er dato og klokkeslett for avlesningen; sammen nevner
+de øyeblikket drikken ble drukket. I den siste kolonnen står dagen posten
+teller til — ved en nattpost altså dagen før. Bare gjennom den kolonnen
+forlater tilhørigheten appen: tidspunktet for døgnskiftet står ikke i filen,
+og uten det lar det seg ikke bygge opp igjen i et regneark.
+
 {{#android}}CSV-filen havner i mappen Nedlastinger, og appen tilbyr etterpå å
 dele den.{{/android}}{{#ios}}Også for CSV-filen åpnes systemets filvelger,
 der du bestemmer hvor filen havner: i Filer, i skylagring eller i en annen
@@ -512,6 +536,13 @@ En drikk hører til den dagen som begynte på tidspunktet _{{day_starts_at}}_
 angir, ikke til den dagen klokken viser. Med standardvalget klokken fire
 teller et glass halv to om natten fortsatt til dagen før. Regelen gjelder i
 hele appen, også over tidsomstillinger.
+
+En drikk beholder dessuten klokkeslettet den ble registrert på. Etter en tur
+til en annen tidssone står ølet fra forrige uke fortsatt på halv tolv, på
+dagen det ble drukket; over en tidsomstilling gjelder det samme. Det som
+flytter seg, er det appen regner ut av avlesningen: endrer du
+_{{day_starts_at}}_, teller hver post til den dagen den nye grensen legger
+den på, de forgangne inkludert.
 
 ### Den glidende uken
 

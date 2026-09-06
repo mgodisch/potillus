@@ -138,7 +138,9 @@ Sotto _{{statistics}}_ c’è _{{day_starts_at}}_, preimpostato sulle quattro
 del mattino. Questa impostazione decide a quale giorno conta una bevanda: se
 bevi un bicchiere all’una di notte, finisce sulla sera prima, dove gli
 spetta. Il confine della giornata vale ovunque nell’app, nel calendario come
-nelle statistiche e nelle esportazioni.
+nelle statistiche. L’esportazione CSV è l’unico posto che mostra entrambe le
+cose: nella prima colonna sta il giorno di calendario in cui la registrazione
+è stata presa, e in una colonna alla fine il giorno a cui conta.
 
 Nello stesso punto sta la riga _{{stats_from_label}}_. Quella data è il fondo
 di ogni analisi: le registrazioni precedenti vengono ignorate in ogni numero.
@@ -188,9 +190,25 @@ campi:
 
 - la quantità bevuta, in millilitri. Da 1 a 5 000 ml; il campo parte dalla
   porzione abituale della bevanda scelta.
-- l’ora, impostata su adesso. Modificabile quando registri qualcosa in un
-  secondo momento.
+- la _{{date}}_ e l’_{{time}}_, entrambe modificabili ed entrambe impostate su
+  adesso quando registri dalla schermata _{{today}}_. Se cambi solo l’ora, la
+  data la segue: un’ora successiva a quella corrente significa ieri, così che
+  «02:00» digitato alle sei del mattino sta quattro ore indietro e non venti
+  ore avanti. Se scegli tu una data, quella resta, qualunque cosa tu faccia
+  poi con l’ora.
 - una nota, se vuoi, un commento libero sull’occasione o sulla compagnia.
+
+Aperto dal _{{calendar}}_, il foglio parte dal giorno che hai toccato, alle
+otto di sera, e la data segue l’ora perché la registrazione resti su quel
+giorno: se riporti l’orologio indietro oltre _{{day_starts_at}}_, ottieni il
+giorno dopo come data — è lì che sta un bicchiere bevuto all’una di notte.
+
+Quando la registrazione conta per un giorno diverso da quello sotto cui il
+foglio è stato aperto, una riga sotto i due campi nomina quel giorno. Non è un
+avviso e non impedisce di salvare: la registrazione è giusta, appartiene solo
+altrove. Sulla schermata _{{today}}_ questo può voler dire che una
+registrazione sparisce dall’elenco su cui l’hai appena creata: «02:00»
+registrato alle sei del mattino conta per ieri, ed è lì che lo ritrovi.
 
 Il contenuto alcolico appartiene alla bevanda e qui non si può inserire
 diverso. Se lo stesso tipo una sera è nettamente più forte, dagli un posto
@@ -405,6 +423,13 @@ tabella con una riga per registrazione, pronta per un foglio di calcolo come
 forma leggibile dalla macchina, con il punto decimale, qualunque sia la
 lingua dell’app.
 
+Le prime due colonne sono la data e l’ora della registrazione; insieme
+nominano il momento del consumo. Nell’ultima colonna sta il giorno a cui la
+registrazione conta — per una registrazione notturna, quindi, il giorno
+prima. Solo attraverso quella colonna l’attribuzione lascia l’app: l’ora di
+cambio giorno non è nel file, e senza di essa non si potrebbe ricostruire in
+un foglio di calcolo.
+
 {{#android}}Il file CSV finisce nella cartella dei download, e l’app propone
 poi di condividerlo.{{/android}}{{#ios}}Anche per il file CSV si apre il
 selettore file del sistema, in cui decidi dove va il file: in File, in un
@@ -528,6 +553,13 @@ Una bevanda appartiene al giorno cominciato all’ora indicata da
 _{{day_starts_at}}_, non al giorno che segna l’orologio. Con l’impostazione
 di serie delle quattro, un bicchiere all’una e mezza conta ancora al giorno
 prima. La regola vale in tutta l’app, anche attraverso i cambi d’ora.
+
+Una bevanda conserva inoltre l’ora sotto cui è stata registrata. Dopo un volo
+in un altro fuso, la birra della settimana scorsa segna ancora le undici e
+mezza, nel giorno in cui è stata bevuta; attraverso un cambio d’ora vale lo
+stesso. Ciò che si muove è quanto l’app calcola da quella registrazione: se
+cambi _{{day_starts_at}}_, ogni voce conta per il giorno su cui il nuovo
+confine la colloca, quelle passate comprese.
 
 ### La settimana mobile
 

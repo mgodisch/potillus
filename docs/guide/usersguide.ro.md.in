@@ -136,7 +136,9 @@ Sub _{{statistics}}_ stă _{{day_starts_at}}_, presetat la ora patru
 dimineața. Această setare hotărăște la ce zi se socotește o băutură: dacă bei
 un pahar la ora unu noaptea, el ajunge pe seara dinainte, acolo unde îi este
 locul. Granița zilei se aplică peste tot în aplicație, în calendar la fel ca
-în statistici și în exporturi.
+în statistici. Exportul CSV este singurul loc care le arată pe amândouă: în
+prima coloană stă ziua calendaristică în care a fost citită înregistrarea,
+iar într-o coloană la final ziua la care se socotește.
 
 În același loc stă rândul _{{stats_from_label}}_. Data aceea este pragul de
 jos al oricărei analize: înregistrările dinaintea ei sunt ignorate în fiecare
@@ -186,8 +188,25 @@ câmpuri:
 
 - cantitatea băută, în mililitri. De la 1 la 5 000 ml; câmpul pornește de la
   porția obișnuită a băuturii alese.
-- ora, pusă pe acum. Se poate schimba când înregistrezi ceva ulterior.
+- _{{date}}_ și _{{time}}_, amândouă se pot schimba și amândouă sunt puse pe
+  acum când înregistrezi din ecranul _{{today}}_. Dacă schimbi doar ora, data
+  merge după ea: o oră mai târzie decât cea curentă înseamnă ieri, așa că
+  „02:00” tastat la șase dimineața stă cu patru ore în urmă și nu cu douăzeci
+  de ore înainte. Dacă alegi singur o dată, ea rămâne, orice ai face pe urmă
+  cu ora.
 - o notă, dacă vrei, o remarcă liberă despre ocazie sau despre companie.
+
+Deschisă din _{{calendar}}_, fișa pornește de la ziua pe care ai atins-o, la
+ora opt seara, iar data urmează ora astfel încât înregistrarea să rămână pe
+acea zi: dacă dai ceasul înapoi dincolo de _{{day_starts_at}}_, primești ziua
+următoare ca dată — acolo îi este locul unui pahar băut la ora unu noaptea.
+
+Când înregistrarea se socotește la altă zi decât cea sub care a fost deschisă
+fișa, un rând sub cele două câmpuri numește acea zi. Nu este o avertizare și
+nu împiedică salvarea: înregistrarea este corectă, doar că îi este locul în
+altă parte. În ecranul _{{today}}_ asta poate însemna că o înregistrare
+dispare din lista pe care tocmai ai creat-o: „02:00” înregistrat la șase
+dimineața se socotește la ieri, și acolo o vei găsi.
 
 Conținutul de alcool ține de băutură și nu poate fi introdus altfel aici.
 Dacă același soi este într-o seară vădit mai tare, dă-i un loc al lui în
@@ -396,6 +415,12 @@ rând pentru fiecare înregistrare, gata pentru un program de calcul tabelar
 precum [LibreOffice Calc](https://www.libreoffice.org/). Numerele sunt scrise
 citibil de mașină, cu punct zecimal, indiferent de limba aplicației.
 
+Primele două coloane sunt data și ora citirii; împreună numesc momentul
+consumului. În ultima coloană stă ziua la care se socotește înregistrarea —
+la o înregistrare de noapte, așadar, ziua dinainte. Numai prin acea coloană
+părăsește atribuirea aplicația: ora schimbării zilei nu se află în fișier, iar
+fără ea nu ar putea fi reconstituită într-un program de calcul tabelar.
+
 {{#android}}Fișierul CSV ajunge în dosarul de descărcări, iar aplicația se
 oferă apoi să îl partajeze.{{/android}}{{#ios}}Și pentru fișierul CSV se
 deschide selectorul de fișiere al sistemului, în care hotărăști unde ajunge
@@ -520,6 +545,13 @@ O băutură ține de ziua care a început la ora arătată de _{{day_starts_at}}
 nu de ziua pe care o arată ceasul. Cu presetarea de ora patru, un pahar la
 unu și jumătate noaptea se socotește tot la ziua dinainte. Regula se aplică
 în toată aplicația, și peste schimbările de oră.
+
+O băutură păstrează pe deasupra ora sub care a fost înregistrată. După un
+zbor în alt fus orar, berea de săptămâna trecută stă tot la unsprezece și
+jumătate, în ziua în care a fost băută; peste o schimbare de oră este la fel.
+Ceea ce se mișcă este ce calculează aplicația din acea citire: dacă schimbi
+_{{day_starts_at}}_, fiecare înregistrare se socotește la ziua pe care o
+așază noua graniță, cele trecute inclusiv.
 
 ### Săptămâna glisantă
 

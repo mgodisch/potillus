@@ -143,7 +143,9 @@ Sous _{{statistics}}_ figure _{{day_starts_at}}_, réglé sur quatre heures du
 matin. Ce réglage décide à quelle journée compte une boisson : un verre pris
 à une heure du matin atterrit sur la soirée précédente, là où il a sa place.
 Cette limite de journée vaut partout dans l’application, dans le calendrier
-comme dans les statistiques et dans les exports.
+comme dans les statistiques. L’export CSV est le seul endroit qui montre les
+deux : dans la première colonne figure le jour civil où l’entrée a été
+relevée, et dans une colonne à la fin le jour auquel elle compte.
 
 À la même place figure la ligne _{{stats_from_label}}_. Cette date est le
 plancher de toute analyse : les entrées antérieures sont ignorées dans chaque
@@ -198,10 +200,29 @@ champs suivent :
 
 - la quantité bue, en millilitres. De 1 à 5 000 ml ; le champ part de la
   portion habituelle de la boisson choisie.
-- l’heure, réglée sur maintenant. Modifiable quand vous enregistrez quelque
-  chose après coup.
+- la _{{date}}_ et l’_{{time}}_, toutes deux modifiables et toutes deux
+  réglées sur maintenant quand vous enregistrez depuis l’écran _{{today}}_. Si
+  vous ne changez que l’heure, la date suit : une heure postérieure à l’heure
+  actuelle signifie hier, si bien que « 02:00 » saisi à six heures du matin se
+  situe quatre heures en arrière et non vingt heures en avant. Si vous
+  choisissez vous-même une date, elle reste, quoi que vous fassiez ensuite de
+  l’heure.
 - une note, si vous le souhaitez, une remarque libre sur l’occasion ou la
   compagnie.
+
+Ouverte depuis le _{{calendar}}_, la fiche commence au jour que vous avez
+touché, à huit heures du soir, et la date suit l’heure pour que l’entrée
+reste sur ce jour : si vous ramenez l’horloge en deçà de _{{day_starts_at}}_,
+vous obtenez le lendemain comme date — c’est là qu’un verre pris à une heure
+du matin a sa place.
+
+Lorsque l’entrée compte pour un autre jour que celui sous lequel la fiche a
+été ouverte, une ligne sous les deux champs nomme ce jour. Ce n’est pas un
+avertissement et cela n’empêche pas d’enregistrer : l’entrée est juste, elle
+a simplement sa place ailleurs. Sur l’écran _{{today}}_, cela peut vouloir
+dire qu’une entrée disparaît de la liste où vous venez de la créer : « 02:00 »
+enregistré à six heures du matin compte pour hier, et c’est là que vous la
+retrouverez.
 
 La teneur en alcool appartient à la boisson et ne peut pas être saisie
 autrement ici. Si la même sorte est nettement plus forte un soir, donnez-lui
@@ -421,6 +442,13 @@ Calc](https://www.libreoffice.org/). Les nombres y sont écrits de façon
 lisible par une machine, avec un point décimal, quelle que soit la langue de
 l’application.
 
+Les deux premières colonnes sont la date et l’heure du relevé ; ensemble
+elles nomment le moment de la consommation. La dernière colonne porte le jour
+auquel l’entrée compte — pour une entrée nocturne, donc, la veille. Ce n’est
+que par cette colonne que l’attribution quitte l’application : l’heure de
+changement de jour ne figure pas dans le fichier, et sans elle on ne pourrait
+pas la reconstituer dans un tableur.
+
 {{#android}}Le fichier CSV atterrit dans le dossier Téléchargements, et
 l’application propose ensuite de le partager.{{/android}}{{#ios}}Pour le
 fichier CSV aussi, le sélecteur de fichiers du système s’ouvre, où vous
@@ -548,6 +576,14 @@ _{{day_starts_at}}_, non au jour qu’affiche l’horloge. Avec le réglage par
 défaut de quatre heures, un verre pris à une heure et demie compte encore
 pour la veille. La règle vaut dans toute l’application, et aussi par-dessus
 les changements d’heure.
+
+Une boisson conserve en outre l’heure sous laquelle elle a été enregistrée.
+Après un vol vers un autre fuseau, la bière de la semaine dernière marque
+toujours onze heures et demie, le jour où elle a été bue ; par-dessus un
+changement d’heure, il en va de même. Ce qui bouge, c’est ce que
+l’application calcule à partir de ce relevé : si vous changez
+_{{day_starts_at}}_, chaque entrée compte pour le jour où la nouvelle limite
+la place, les passées comprises.
 
 ### La semaine glissante
 

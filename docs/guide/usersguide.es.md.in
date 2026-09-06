@@ -138,7 +138,9 @@ Bajo _{{statistics}}_ está _{{day_starts_at}}_, preajustado a las cuatro de
 la madrugada. Ese ajuste decide a qué día cuenta una bebida: si te tomas una
 copa a la una de la madrugada, aterriza en la noche anterior, que es donde le
 corresponde. El límite del día rige en toda la aplicación, tanto en el
-calendario como en las estadísticas y en las exportaciones.
+calendario como en las estadísticas. La exportación CSV es el único sitio que
+muestra las dos cosas: en la primera columna está el día natural en que se
+tomó la lectura, y en una columna al final el día al que cuenta.
 
 En el mismo sitio está la fila _{{stats_from_label}}_. Esa fecha es el suelo
 de todo análisis: las entradas anteriores se ignoran en cada cifra. Te
@@ -189,9 +191,26 @@ Debajo hay tres campos:
 
 - la cantidad bebida, en mililitros. De 1 a 5 000 ml; el campo parte de la
   ración habitual de la bebida elegida.
-- la hora, puesta en ahora. Se puede cambiar cuando registras algo a
-  posteriori.
+- la _{{date}}_ y la _{{time}}_, ambas ajustables y ambas puestas en ahora
+  cuando registras desde la pantalla _{{today}}_. Si cambias solo la hora, la
+  fecha va detrás: una hora posterior a la actual significa ayer, así que
+  «02:00» tecleado a las seis de la mañana queda cuatro horas atrás y no
+  veinte horas por delante. Si eliges tú la fecha, se queda, hagas después lo
+  que hagas con la hora.
 - una nota, si quieres, un comentario libre sobre la ocasión o la compañía.
+
+Abierta desde el _{{calendar}}_, la hoja empieza en el día que tocaste, a las
+ocho de la tarde, y la fecha sigue a la hora para que la entrada se quede en
+ese día: si giras el reloj hacia atrás pasando _{{day_starts_at}}_, obtienes
+el día siguiente como fecha — ahí es donde va una copa de la una de la
+madrugada.
+
+Cuando la entrada cuenta para un día distinto de aquel bajo el que se abrió
+la hoja, una línea debajo de los dos campos nombra ese día. No es un aviso ni
+impide guardar: la entrada es correcta, solo pertenece a otro sitio. En la
+pantalla _{{today}}_ eso puede significar que una entrada desaparece de la
+lista en la que acabas de crearla: «02:00» registrado a las seis de la mañana
+cuenta para ayer, y ahí la encontrarás.
 
 El contenido de alcohol pertenece a la bebida y aquí no se puede introducir
 de otra manera. Si la misma clase es una noche claramente más fuerte, dale su
@@ -407,6 +426,13 @@ Calc](https://www.libreoffice.org/). Los números están escritos de forma
 legible por máquina, con punto decimal, sea cual sea el idioma de la
 aplicación.
 
+Las dos primeras columnas son la fecha y la hora de la lectura; juntas
+nombran el momento del consumo. En la última columna está el día al que
+cuenta la entrada — en una entrada nocturna, por tanto, el día anterior. Solo
+por esa columna sale de la aplicación la asignación: la hora de cambio de día
+no está en el archivo, y sin ella no podría reconstruirse en una hoja de
+cálculo.
+
 {{#android}}El archivo CSV acaba en la carpeta de descargas, y la aplicación
 ofrece luego compartirlo.{{/android}}{{#ios}}También para el archivo CSV se
 abre el selector de archivos del sistema, en el que decides adónde va el
@@ -535,6 +561,13 @@ _{{day_starts_at}}_, no al día que marca el reloj. Con el valor por omisión
 de las cuatro, una copa a la una y media de la madrugada cuenta todavía para
 el día anterior. La regla rige en toda la aplicación, también a través de los
 cambios de hora.
+
+Una bebida conserva además la hora bajo la que se registró. Después de un
+vuelo a otro huso horario, la cerveza de la semana pasada sigue marcando las
+once y media, el día en que se bebió; a través de un cambio de hora vale lo
+mismo. Lo que se mueve es lo que la aplicación calcula de esa lectura: si
+cambias _{{day_starts_at}}_, cada entrada cuenta para el día en que la nueva
+frontera la coloca, las pasadas incluidas.
 
 ### La semana deslizante
 

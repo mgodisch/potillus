@@ -109,8 +109,7 @@ Derive the logical day from the reading
   to the day that time falls on.
 - The CSV export opens with the calendar date of the reading and closes with
   the day the entry counts toward.
-- The user's guide describes the entry sheet's date field in English and
-  German.
+- The user's guide describes the entry sheet's date field in all 21 languages.
 - A build with assertions on checks that a stored logical day follows from the
   entry's own reading.
 - The instrumented tests build against androidx.test 1.7.0, Espresso 3.7.0 and
