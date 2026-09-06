@@ -140,7 +140,7 @@ public enum CsvExporter {
                 // THE CALENDAR DAY OF THE READING, not the logical one. Columns 1
                 // and 2 describe the same moment: an entry read at 01:00 exports
                 // its own date beside its own time. The logical day it counts
-                // toward has a column of its own at the end. Before v0.87.0 column
+                // toward has a column of its own at the end. Before v0.86.0 column
                 // 1 held the logical day, so a night entry's date and time
                 // contradicted each other and nothing in the file said why.
                 dateFormatter(for: entry).string(from: instant),

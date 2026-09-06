@@ -221,7 +221,7 @@ object CsvExporter {
                 // and 2 describe the same moment: an entry read at 01:00 exports
                 // its own date beside its own time, and a reader who puts the two
                 // together gets the instant the drink was had. The logical day it
-                // counts toward has a column of its own at the end. Before v0.87.0
+                // counts toward has a column of its own at the end. Before v0.86.0
                 // column 1 held the logical day, so a night entry's date and time
                 // contradicted each other and nothing in the file said why.
                 DayResolver.formatDate(local.toLocalDate()),

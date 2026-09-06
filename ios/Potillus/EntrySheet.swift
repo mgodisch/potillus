@@ -369,8 +369,8 @@ struct EntrySheet: View {
         guard let drink = selection, let volume else { return }
         isSaving = true
         Task {
-            let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
-            let stored = await onSave(drink, volume, millis, utcOffsetSeconds, note)
+            let reading = composed
+            let stored = await onSave(drink, volume, reading.timestampMillis, reading.utcOffsetSeconds, note)
             isSaving = false
             if stored { dismiss() }
         }
@@ -428,17 +428,23 @@ extension EntrySheet {
         )
     }
 
-    /// The frame the composed reading is read in.
+    /// The instant the two fields compose, and the frame it is recorded in.
     ///
-    /// The one the user is in NOW, except while an edit leaves the date alone:
-    /// correcting a time inside a recorded reading must not reframe it, or the
-    /// row would come back at an hour nobody typed.
-    private var utcOffsetSeconds: Int {
-        let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
-        if let editing, !dateTouched, sameDay(timestamp, initialTimestamp) {
-            return editing.utcOffsetSeconds
-        }
-        return DayResolver.utcOffsetSeconds(timestampMillis: millis)
+    /// `timestamp` is a `Date` the pickers bind to, held in the device zone; what
+    /// gets SAVED is not that instant but the reading it shows, composed by
+    /// `EntrySheetDate.compose` in the frame that applies. While an edit leaves
+    /// the date alone that is the entry's recorded frame — a Berlin entry
+    /// corrected from Tokyo stays a Berlin reading — otherwise it is the device
+    /// zone. Instant and offset come out of one call and are never taken apart;
+    /// the 0.86.0 review found them composed here in two frames.
+    ///
+    /// The date counts as left alone by its VALUE, not by whether the picker was
+    /// touched: a date moved and put back is the same reading, as on Android.
+    private var composed: ComposedReading {
+        let parts = Calendar(identifier: .gregorian).dateComponents([.hour, .minute], from: timestamp)
+        let reading = EntryReading(date: timestamp, hour: parts.hour ?? 0, minute: parts.minute ?? 0)
+        let recorded = editing.flatMap { sameDay(timestamp, initialTimestamp) ? $0.utcOffsetSeconds : nil }
+        return EntrySheetDate.compose(reading: reading, recordedOffsetSeconds: recorded)
     }
 
     private func sameDay(_ lhs: Date, _ rhs: Date) -> Bool {
@@ -448,14 +454,13 @@ extension EntrySheet {
     /// The logical day the composed reading counts toward, formatted, or `nil`
     /// while it is the day the sheet was opened on.
     private var countsToward: String? {
-        let millis = Int64((timestamp.timeIntervalSince1970 * 1000).rounded())
-        let offset = utcOffsetSeconds
+        let reading = composed
         guard DayResolver.logicalDayDiffers(
-            timestampMillis: millis, utcOffsetSeconds: offset,
+            timestampMillis: reading.timestampMillis, utcOffsetSeconds: reading.utcOffsetSeconds,
             changeHour: dayChangeHour, changeMinute: dayChangeMinute, logicalDay: logicalDay
         ) else { return nil }
         let day = DayResolver.resolve(
-            timestampMillis: millis, utcOffsetSeconds: offset,
+            timestampMillis: reading.timestampMillis, utcOffsetSeconds: reading.utcOffsetSeconds,
             changeHour: dayChangeHour, changeMinute: dayChangeMinute
         )
         guard let date = DayResolver.parseDate(day) else { return nil }

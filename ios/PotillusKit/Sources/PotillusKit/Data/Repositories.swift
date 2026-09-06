@@ -523,6 +523,12 @@ public struct EntryRepository: EntryRepositoryProtocol {
     /// reports `entries` as changed and every observation re-emits by itself. In
     /// the window between the setting being written and the commit, the screens
     /// show the old days — what the app showed permanently before this existed.
+    ///
+    /// HOW LONG IT TAKES IS NOT MEASURED. Ten thousand rows are estimated at a
+    /// fraction of a second, and that is an estimate about a write transaction
+    /// over every row with two indices and a growing WAL. The requirement is
+    /// stated so that it does not depend on the number: off the main actor, the
+    /// settings screen stays usable, the observations refresh at the commit.
     public func realignDays(settings: AppSettings) throws {
         try database.write { db in
             let key = try LogicalDayKey.fetchOne(db)

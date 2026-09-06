@@ -25,12 +25,9 @@
  */
 package de.godisch.potillus.domain
 
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import java.time.Clock
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -44,19 +41,6 @@ import java.time.ZoneId
  * `EntrySheetDateTests.swift` is the twin.
  */
 class EntrySheetDateTest {
-
-    /**
-     * [EntrySheetDate.initial] asks [DayResolver.today] whether the tapped day is
-     * the running one, and that reads the wall clock. Pinning it makes the
-     * calendar cases answerable at any hour of the test run.
-     */
-    private fun pinClock(at: String) {
-        DayResolver.clockOverride = Clock.fixed(Instant.parse(at), ZoneId.of("UTC"))
-    }
-
-    @After fun clearClock() {
-        DayResolver.clockOverride = null
-    }
 
     private fun at(text: String): LocalDateTime = LocalDateTime.parse(text)
 
@@ -112,7 +96,6 @@ class EntrySheetDateTest {
     // ── The calendar ─────────────────────────────────────────────────────────
 
     @Test fun `a tapped day opens in the evening`() {
-        pinClock("2026-03-15T12:00:00Z")
         val reading = EntrySheetDate.initial(
             origin = EntryDayOrigin.CALENDAR,
             logicalDay = "2026-03-10",
@@ -127,7 +110,6 @@ class EntrySheetDateTest {
         // With a 21:00 boundary, 20:00 belongs to the day before — so the sheet
         // offers the calendar 11th to keep the entry on the logical 10th. The
         // default hour is taste; this is what makes it safe for every setting.
-        pinClock("2026-03-15T12:00:00Z")
         val reading = EntrySheetDate.initial(
             origin = EntryDayOrigin.CALENDAR,
             logicalDay = "2026-03-10",
@@ -141,7 +123,6 @@ class EntrySheetDateTest {
     @Test fun `tapping today opens on the present moment`() {
         // Otherwise tapping today in the calendar would jump the clock to the
         // evening, which is not what someone logging a drink now means.
-        pinClock("2026-03-10T12:00:00Z")
         val reading = EntrySheetDate.initial(
             origin = EntryDayOrigin.CALENDAR,
             logicalDay = "2026-03-10",
@@ -180,7 +161,6 @@ class EntrySheetDateTest {
     // ── Guards ───────────────────────────────────────────────────────────────
 
     @Test fun `a day that is not a canonical date falls back to the present moment`() {
-        pinClock("2026-03-15T12:00:00Z")
         assertEquals(
             EntryReading(date("2026-03-15"), 12, 0),
             EntrySheetDate.initial(EntryDayOrigin.CALENDAR, "2026-3-10", 4, 0, at("2026-03-15T12:00")),
@@ -188,5 +168,48 @@ class EntrySheetDateTest {
         assertNull(
             EntrySheetDate.followUp(EntryDayOrigin.CALENDAR, "2026-3-10", 4, 0, 1, 0, at("2026-03-15T12:00")),
         )
+    }
+
+    // ── Composing the instant ─────────────────────────────────────────────────
+
+    private val berlinWinter = 3600
+    private val tokyo: ZoneId = ZoneId.of("Asia/Tokyo")
+
+    @Test fun `a correction inside a recorded reading stays in its frame`() {
+        // A Berlin entry (+01:00) edited from Tokyo (+09:00), date left alone:
+        // 22:00 is still 22:00 Berlin time, so the instant is 21:00Z and the
+        // offset is the recorded one. Composing in the device zone here would
+        // have put the row at 13:00Z, reading 14:00 in its own frame.
+        val composed = EntrySheetDate.compose(
+            reading = EntryReading(date("2026-01-15"), 22, 0),
+            recordedOffsetSeconds = berlinWinter,
+            zoneId = tokyo,
+        )
+        assertEquals(1_768_510_800_000L, composed.timestampMillis) // 2026-01-15T21:00Z
+        assertEquals(berlinWinter, composed.utcOffsetSeconds)
+    }
+
+    @Test fun `a new reading is taken in the device zone`() {
+        // Logging, or moving an entry to another date: the frame is where the
+        // user is now, and the offset is the one that zone had at the instant.
+        val composed = EntrySheetDate.compose(
+            reading = EntryReading(date("2026-01-15"), 22, 0),
+            recordedOffsetSeconds = null,
+            zoneId = tokyo,
+        )
+        assertEquals(1_768_482_000_000L, composed.timestampMillis) // 2026-01-15T13:00Z
+        assertEquals(9 * 3600, composed.utcOffsetSeconds)
+    }
+
+    @Test fun `a new reading records the offset of its own date, not of today`() {
+        // The zone's historical rules answer for the reading's instant: a winter
+        // date composed in Berlin gets +01:00 even if the test runs in summer.
+        val composed = EntrySheetDate.compose(
+            reading = EntryReading(date("2026-01-15"), 22, 0),
+            recordedOffsetSeconds = null,
+            zoneId = ZoneId.of("Europe/Berlin"),
+        )
+        assertEquals(berlinWinter, composed.utcOffsetSeconds)
+        assertEquals(1_768_510_800_000L, composed.timestampMillis)
     }
 }

@@ -9,7 +9,7 @@
     "(logicalDate, time, category, numbers) are not, exactly as on Android.",
     "The UTF-8 BOM is added when writing the file, not by buildCsv.",
     "utcOffsetSeconds renders the HH:mm column: the entry carries the frame its clock time was read in, and the same instant is a different clock time in a different frame. The cases used to name a zoneId instead, which stood in for entries that recorded no offset; schema 4 gave every row one, so the offset is stated per entry. Each value is mechanically the offset Europe/Berlin had at that instant, so every expected string is unchanged.",
-    "From v0.87.0 column 1 is the CALENDAR day of the reading and a ninth column at the end carries the logical day. The two agree for every entry outside the small hours; where they differ, the row's date and time now describe the same moment and the attribution has a column of its own."
+    "From v0.86.0 column 1 is the CALENDAR day of the reading and a ninth column at the end carries the logical day. The two agree for every entry outside the small hours; where they differ, the row's date and time now describe the same moment and the attribution has a column of its own."
   ],
   "escapeField": [
     {
@@ -79,8 +79,8 @@
     },
     {
       "description": "a quote is doubled even when a combining mark follows it",
-      "input": "say \"́ now",
-      "expected": "\"say \"\"́ now\""
+      "input": "say \"\u0301 now",
+      "expected": "\"say \"\"\u0301 now\""
     },
     {
       "description": "hyperlink attack is neutralised",

@@ -42,7 +42,7 @@ apply to it are stated in the accompanying COPYING.md file.
 
 ## v0.86.0
 
-Two apps, one set of rules
+Derive the logical day from the reading
 
 ### Added
 
@@ -59,19 +59,18 @@ Two apps, one set of rules
 
 - The biometric lock fails closed on Android when the device has lost every
   credential, as it already did on iOS.
-- The iOS preferences store no longer treats a Keychain or file that is locked
-  as unusable, so a write can no longer replace settings it could not read.
-- The abstinence streaks apply the statistics floor themselves, so a drink day
-  before the floor can no longer extend a streak across it.
-- Android computes the calendar's month alignment in the domain now.
-- The weekday chart no longer counts a running day without alcohol as a dry
-  day.
+- The iOS preferences store keeps settings it could not read while the
+  Keychain or the file is locked.
+- The abstinence streaks apply the statistics floor themselves; a drink day
+  before the floor stays outside every streak.
+- Android computes the calendar's month alignment in the domain.
+- The weekday chart counts a running day without alcohol as undecided, not as
+  a dry day.
 - The trend arrow shows a rise against a previous period that existed but was
   abstinent.
 - A Nynorsk device locale selects the Bokmål translation on Android.
 - A backup with two drinks sharing one id, or an entry without a drink
-  reference, is rejected on both platforms instead of being imported onto the
-  wrong drink.
+  reference, is rejected on both platforms.
 - A restored backup arms the biometric lock only on a device that can
   authenticate, and the import message says when it did not.
 - On iOS a restored backup leaves the local language, body weight and
@@ -79,48 +78,41 @@ Two apps, one set of rules
 - The report charts' headroom factors live in `ReportChart` on both platforms
   and are pinned by a shared vector.
 - The iOS report orders the weekday columns by the report's language, as
-  Android does, instead of by the device region.
+  Android does.
 - The Statistics screen's hour and category aggregations and the progress
-  bars' rules live in the Android domain now.
+  bars' rules live in the Android domain.
 - Paging the Android calendar clears the selected day, as iOS does.
-- Starring a drink on iOS no longer re-validates it.
+- Starring a drink on iOS leaves its validation untouched.
 - One contrast figure in the Android colour comments named the predecessor
   shade; corrected.
 - The Statistics chart samples its axis labels through the same domain
   function as the report on both platforms.
 - TalkBack announces the selected language in the language picker.
-- Android no longer writes the detected language into the preferences at first
-  start; an unset language follows the system, as on iOS.
+- An unset language follows the system on every start on Android, as on iOS.
 - A Nynorsk system language reads the Bokmål catalogue on iOS, as on Android.
 - A backup written on iOS carries the same licence header as one written on
   Android; the Android day plurals are held to the shared vector too.
 - iOS draws its status colours from the measured palette Android uses, so
   green and amber text and dots are readable in light mode; the empty year
   cell is visible in dark mode.
-- An entry stays on the day it was logged or edited under: a time before the
-  day-change hour is stored on the following calendar day, and the entry
-  dialog shows that date; editing on Android no longer moves an entry to the
-  day before.
 - Editing an entry on iOS lets you change its drink, as on Android.
 - The bundled fastlane was updated to 2.238.0.
-- The logical day of an entry follows the offset recorded with it, not the
-  device zone.
 - iOS derives the running logical day through `DayResolver.today`, as Android
   does.
 - The abstinence streaks sit in an extension of the iOS `DayResolver`.
-- The logical day of an entry follows from its timestamp and offset, and the
-  day-change time is stored beside it.
+- The logical day of an entry follows from its timestamp and recorded offset,
+  and the day-change time it was derived under is stored beside it.
 - Changing the day-change time moves every entry to the day it falls on.
 - The entry sheet carries a date beside the time, and names the day an entry
   counts toward when the two part company.
-- Editing the time of an entry moves it to the day that time falls on.
+- Editing the time of an entry keeps the frame it was recorded in and moves it
+  to the day that time falls on.
 - The CSV export opens with the calendar date of the reading and closes with
   the day the entry counts toward.
 - The user's guide describes the entry sheet's date field in English and
   German.
 - A build with assertions on checks that a stored logical day follows from the
   entry's own reading.
-- The rules behind the derived logical day sit in the code they govern.
 - The instrumented tests build against androidx.test 1.7.0, Espresso 3.7.0 and
   ext:junit 1.3.0.
 - The screenshot run waits out an Activity that is being recreated.

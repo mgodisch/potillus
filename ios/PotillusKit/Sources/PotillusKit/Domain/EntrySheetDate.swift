@@ -79,6 +79,24 @@ public struct EntryReading: Sendable, Equatable {
     public let date: Date
     public let hour: Int
     public let minute: Int
+
+    /// Spelled out because the app target composes readings for `compose`;
+    /// a memberwise initialiser is internal and would not reach it.
+    public init(date: Date, hour: Int, minute: Int) {
+        self.date = date
+        self.hour = hour
+        self.minute = minute
+    }
+}
+
+/// A reading as the sheet SAVES it: the instant, and the frame it is recorded in.
+///
+/// The pair `onSave` hands to the model. The two are composed together by
+/// `EntrySheetDate.compose` and must not be taken apart: an instant read in one
+/// frame and stored with another comes back at an hour nobody typed.
+public struct ComposedReading: Sendable, Equatable {
+    public let timestampMillis: Int64
+    public let utcOffsetSeconds: Int
 }
 
 /// The date and time an entry sheet opens with, and how the date follows the time.
@@ -86,6 +104,64 @@ public enum EntrySheetDate {
 
     /// The time a calendar sheet offers when the tapped day is not today.
     private static let calendarDefaultHour = 20
+
+    /// The instant `reading` falls on, and the frame it is recorded in.
+    ///
+    /// TWO FRAMES, AND THE SHEET SAYS WHICH. A reading is a date and a time of
+    /// day; to become an instant it needs a frame, and there are two candidates:
+    ///
+    ///  - `recordedOffsetSeconds` given: the user is correcting a time INSIDE a
+    ///    recorded reading — editing an entry and leaving its date alone. The
+    ///    reading is composed in the frame the entry recorded, and that frame
+    ///    is kept. The device zone plays no part: a Berlin entry corrected from
+    ///    Tokyo is still a Berlin reading, and a row whose offset was backfilled
+    ///    from another zone keeps the frame it was given.
+    ///
+    ///  - `nil`: a new reading — logging a drink, or moving an entry to another
+    ///    date. It is composed in `timeZone`, the device zone in production,
+    ///    and the offset that zone had at the resulting instant is recorded
+    ///    with it. This is the rule a date change follows everywhere in the
+    ///    app; see `DayResolver.utcOffsetSeconds` for why the zone and not the
+    ///    old offset.
+    ///
+    /// Composing the instant in one frame while keeping the offset of another
+    /// was the defect of the 0.86.0 review: the sheet built every instant in
+    /// the device zone and then attached the recorded offset to it, so an
+    /// untouched edit could move a reading by the difference between the two.
+    ///
+    /// The calendar day is read off `reading.date` in `timeZone` — the zone
+    /// the sheet's `Date` is held in — whichever frame the instant is then
+    /// composed in. A time that does not exist in `timeZone` (the
+    /// spring-forward gap) resolves to what `Calendar` offers instead; a fixed
+    /// offset has no gaps. `EntrySheetDate.compose` in Kotlin is the twin.
+    public static func compose(
+        reading: EntryReading,
+        recordedOffsetSeconds: Int?,
+        timeZone: TimeZone = .current
+    ) -> ComposedReading {
+        var shown = Calendar(identifier: .gregorian)
+        shown.timeZone = timeZone
+        var parts = shown.dateComponents([.year, .month, .day], from: reading.date)
+        parts.hour = reading.hour
+        parts.minute = reading.minute
+        parts.second = 0
+
+        if let recorded = recordedOffsetSeconds,
+           let frame = TimeZone(secondsFromGMT: recorded) {
+            var fixed = Calendar(identifier: .gregorian)
+            fixed.timeZone = frame
+            let instant = fixed.date(from: parts) ?? reading.date
+            return ComposedReading(
+                timestampMillis: Int64((instant.timeIntervalSince1970 * 1000).rounded()),
+                utcOffsetSeconds: recorded
+            )
+        }
+        let instant = shown.date(from: parts) ?? reading.date
+        return ComposedReading(
+            timestampMillis: Int64((instant.timeIntervalSince1970 * 1000).rounded()),
+            utcOffsetSeconds: timeZone.secondsFromGMT(for: instant)
+        )
+    }
 
     /// The reading a sheet opens with.
     ///

@@ -37,7 +37,9 @@ import de.godisch.potillus.data.db.AppDatabase
 //   table and then records what it rewrote it to, in `logical_day_key`. The two
 //   writes must land together or not at all — a key that describes rows which
 //   were never written is worse than no key. That means a transaction, and a
-//   transaction means `RoomDatabase.withTransaction`.
+//   transaction means `RoomDatabase.withTransaction`. `add` and `update` need
+//   the same thing in miniature: they read the key to learn which boundary to
+//   derive under and must write before that answer can change.
 //
 //   Giving the repository an `AppDatabase` would have been the shortest route
 //   and the wrong one: the repository would then depend on Room's runtime, and

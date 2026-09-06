@@ -168,10 +168,11 @@ object LegacyDayRepair {
      *
      * A logical day runs from one boundary to the next, so a time before the
      * boundary belongs to the following CALENDAR day: with a 04:00 boundary,
-     * 01:00 on the logical 30th is 01:00 on the calendar 31st. This is the
-     * `DayResolver` carried a public twin of this until the entry sheet grew a
-     * date field and stopped needing one; the copy here was never that twin, and
-     * outlives it for the reason in the file header.
+     * 01:00 on the logical 30th is 01:00 on the calendar 31st.
+     *
+     * `DayResolver` carried a public function of the same shape until the entry
+     * sheet grew a date field and stopped needing one. The copy here was never
+     * that function and outlives it, for the reason in the file header.
      *
      * A time that does not exist in the zone (the spring-forward gap) resolves to
      * what the zone offers instead, which is `ZonedDateTime`'s own behaviour.

@@ -136,6 +136,13 @@ object BackupManager {
      *       apps that only know versions 1–2 reject a v3 file via the
      *       VersionTooHigh guard rather than silently dropping the settings.
      *
+     * STILL 3 AFTER `logicalDate` BECAME A DERIVATION (schema 4). The entry
+     * field kept its name, its shape and its required status; what changed is
+     * what a reader does with it, and a reader that predates the change does
+     * the right thing without knowing — it stores the day the file names, which
+     * is what the field has always meant. See the comment at the field in the
+     * writer below for the meaning and the import path for what happens to it.
+     *
      * BACKWARD-COMPATIBILITY FLOOR: since the first F-Droid release (v0.77.4) the
      * importer is guaranteed to read every backup written by v0.77.4 or newer —
      * required fields via `getXxx`, optional/newer fields via `optXxx(key,
@@ -259,6 +266,16 @@ object BackupManager {
                                 // key stays optional ON THE WIRE, because files
                                 // written before it exist and must stay readable.
                                 put("utcOffsetSeconds", e.utcOffsetSeconds)
+                                // WHAT THIS FIELD MEANS ON THE WIRE: the day the
+                                // entry counted toward under the day-change time of
+                                // the app that wrote the file — the stored column,
+                                // verbatim. The day-change time itself is in the
+                                // settings block. On import the value is evidence,
+                                // not truth: `LegacyDayRepair` reads it to put a
+                                // pre-0.85.0 calendar entry back onto the day the
+                                // file names, and then the next realignment derives
+                                // every imported row's day afresh under THIS
+                                // device's boundary (see `BackupRepository`).
                                 put("logicalDate", e.logicalDate)
                                 put("note", e.note)
                             },
@@ -609,10 +626,12 @@ object BackupManager {
                 // Since the 0.84.0 review DayResolver.parseDate performs the same
                 // round-trip, so this is belt over braces. It stays because it names
                 // the offending value in the error the importer shows the reader.
-                // logicalDate is used in all SQL WHERE and ORDER BY clauses as a
-                // plain String comparison (ISO-8601 lexicographic order = chronological
-                // order). An arbitrary string injected here would silently corrupt
-                // every date-scoped query.
+                // The imported value is consulted only by `LegacyDayRepair`, which
+                // compares it with the day derived from the timestamp; after that
+                // the realignment overwrites it. It still has to be a real date:
+                // the repair does arithmetic on it, and a row that reaches the
+                // table before the realignment runs sits in a column that every
+                // date-scoped query compares as a plain ISO-8601 string.
                 //
                 // A shape-only regex \d{4}-\d{2}-\d{2} would accept
                 // physically impossible values such as "9999-99-99" or "2024-02-31".

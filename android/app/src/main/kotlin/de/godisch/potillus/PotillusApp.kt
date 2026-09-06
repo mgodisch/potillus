@@ -47,6 +47,7 @@ package de.godisch.potillus
 
 import android.app.Application
 import android.content.res.Resources
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import de.godisch.potillus.data.db.AppDatabase
@@ -62,6 +63,7 @@ import de.godisch.potillus.data.repository.RoomTransactor
 import de.godisch.potillus.domain.LocaleDetector
 import de.godisch.potillus.domain.model.AppSettings
 import de.godisch.potillus.l10n.SupportedLocales
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -193,10 +195,28 @@ class PotillusApp : Application() {
      * THREAD: Dispatchers.IO. The collection reads DataStore and the realignment
      * writes the database; neither belongs on the main thread, and the settings
      * screen stays responsive while a large rewrite runs.
+     *
+     * WHY A FAILURE IS CAUGHT AND THE COLLECTION GOES ON. [applicationScope] has
+     * no exception handler, so a throw out of this collector would reach the
+     * thread's uncaught-exception handler and end the process — at every start,
+     * for as long as the cause persists. Nothing the user could do would help,
+     * and the design does not need it to: the transaction has rolled back, the
+     * key still holds its old value, and the next emission disagrees with the
+     * setting again and retries. What the user sees in the meantime is the days
+     * as stored, which is what the previous release showed permanently. The
+     * iOS `DayRealignment.run` swallows the failure for the same reason; here
+     * it is at least logged in a debug build. `CancellationException` is not a
+     * failure and is rethrown, so the scope can still stop the collector.
      */
     private suspend fun keepLogicalDaysAligned() {
         appPreferences.settingsFlow.collect { settings ->
-            entryRepository.realignDays(settings)
+            try {
+                entryRepository.realignDays(settings)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (BuildConfig.DEBUG) Log.w(TAG, "realignDays failed; retrying on the next settings emission", e)
+            }
         }
     }
 
@@ -258,6 +278,8 @@ class PotillusApp : Application() {
     }
 
     companion object {
+        private const val TAG = "PotillusApp"
+
         /**
          * The supported language the phone's SYSTEM locale maps to, via
          * [LocaleDetector]. Used at launch while no language is chosen, and by

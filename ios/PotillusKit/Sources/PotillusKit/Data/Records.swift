@@ -160,6 +160,14 @@ public struct Entry: Codable, Sendable, Equatable, Identifiable {
     /// setting is answered by recomputing rather than by guessing. A key of nil
     /// means "not computed yet" and is what a migration or an import leaves
     /// behind; the next realignment picks it up.
+    ///
+    /// WHY STORED AT ALL. Deriving the day at read time instead would turn
+    /// every date-scoped query into a range scan with grouping in code and the
+    /// drink-day projection into a walk over the whole table, measured at
+    /// roughly four times the cost of the indexed column at ten thousand rows
+    /// and growing linearly; the numbers and the reason (the per-row transport
+    /// across the driver boundary) are in the header of Android's
+    /// `EntryEntity.kt`, which this record mirrors.
     public var logicalDate: String
 
     /// Optional user note. Empty string, never NULL, so `notNull` holds and

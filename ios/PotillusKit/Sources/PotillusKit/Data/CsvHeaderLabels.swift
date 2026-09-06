@@ -51,7 +51,7 @@ public enum CsvHeaderLabels {
     /// The nine column captions in the order `CsvExporter` writes them: date,
     /// time, drink, category, volume, alcohol percent, grams, note, logical day.
     ///
-    /// The ninth arrived with v0.87.0, when column 1 became the calendar day of
+    /// The ninth arrived with v0.86.0, when column 1 became the calendar day of
     /// the reading: the logical day the entry counts toward needed a column of
     /// its own, and the export is the only place a user takes that attribution
     /// out of the app.

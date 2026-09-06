@@ -400,10 +400,14 @@ class CalendarViewModel(
     }
 
     /**
-     * Logs a new entry on the currently selected calendar day.
+     * Logs a new entry as the sheet composed it.
      *
-     * If no day is selected the entry falls back to today's logical date (this
-     * should not happen via the normal UI flow and is logged in debug builds).
+     * The selected calendar day is not read here. The sheet was opened on it
+     * and placed its date field accordingly ([de.godisch.potillus.domain.EntrySheetDate]),
+     * so the instant handed in already carries the day the user tapped, and the
+     * repository derives the logical day from that instant. A selected day that
+     * this method consulted on its own would be a second source for the same
+     * fact, and the two could only ever disagree.
      *
      * @param drink           The selected drink definition.
      * @param volumeMl        Serving volume in millilitres (> 0).
@@ -420,19 +424,6 @@ class CalendarViewModel(
         }
         viewModelScope.launch {
             val settings = prefs.settingsFlow.first()
-            // Log a warning when no date is selected and we fall back to
-            // "today". On the Calendar screen this should not normally happen because
-            // the UI only shows the Add-entry dialog when a day is selected. If it
-            // does happen (e.g. a future deep-link bypasses the selection step), the
-            // fallback is safe but worth flagging in debug builds so the caller can
-            // be corrected without silent misbehaviour.
-            val logicalDate = _selectedDate.value ?: run {
-                val today = DayResolver.today(settings.dayChangeHour, settings.dayChangeMinute)
-                if (BuildConfig.DEBUG) {
-                    Log.w(TAG, "addEntry: no date selected, falling back to today ($today)")
-                }
-                today
-            }
             // THE INSTANT IS PASSED THROUGH, NOT PLACED. The sheet composes it
             // from its own date and time fields — and its date follows the tapped
             // day, so an entry booked onto the 12th still lands on the 12th. This

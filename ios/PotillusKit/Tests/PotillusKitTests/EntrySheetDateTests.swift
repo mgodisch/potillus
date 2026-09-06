@@ -195,4 +195,47 @@ final class EntrySheetDateTests: XCTestCase {
             hour: 1, minute: 0, now: at("2026-03-15 12:00"), timeZone: utc
         ))
     }
+
+    // ── Composing the instant ─────────────────────────────────────────────────
+
+    private let berlinWinter = 3600
+    private let tokyo = TimeZone(identifier: "Asia/Tokyo")!
+
+    /// A Berlin entry (+01:00) edited from Tokyo (+09:00), date left alone:
+    /// 22:00 is still 22:00 Berlin time, so the instant is 21:00Z and the offset
+    /// is the recorded one. Composing in the device zone here would have put the
+    /// row at 13:00Z, reading 14:00 in its own frame.
+    func testACorrectionInsideARecordedReadingStaysInItsFrame() {
+        let composed = EntrySheetDate.compose(
+            reading: EntryReading(date: at("2026-01-15 12:00"), hour: 22, minute: 0),
+            recordedOffsetSeconds: berlinWinter,
+            timeZone: tokyo
+        )
+        XCTAssertEqual(composed.timestampMillis, 1_768_510_800_000)  // 2026-01-15T21:00Z
+        XCTAssertEqual(composed.utcOffsetSeconds, berlinWinter)
+    }
+
+    /// Logging, or moving an entry to another date: the frame is where the user
+    /// is now, and the offset is the one that zone had at the instant.
+    func testANewReadingIsTakenInTheDeviceZone() {
+        let composed = EntrySheetDate.compose(
+            reading: EntryReading(date: at("2026-01-15 12:00"), hour: 22, minute: 0),
+            recordedOffsetSeconds: nil,
+            timeZone: tokyo
+        )
+        XCTAssertEqual(composed.timestampMillis, 1_768_482_000_000)  // 2026-01-15T13:00Z
+        XCTAssertEqual(composed.utcOffsetSeconds, 9 * 3600)
+    }
+
+    /// The zone's historical rules answer for the reading's instant: a winter
+    /// date composed in Berlin gets +01:00 even if the test runs in summer.
+    func testANewReadingRecordsTheOffsetOfItsOwnDateNotOfToday() {
+        let composed = EntrySheetDate.compose(
+            reading: EntryReading(date: at("2026-01-15 12:00"), hour: 22, minute: 0),
+            recordedOffsetSeconds: nil,
+            timeZone: TimeZone(identifier: "Europe/Berlin")!
+        )
+        XCTAssertEqual(composed.utcOffsetSeconds, berlinWinter)
+        XCTAssertEqual(composed.timestampMillis, 1_768_510_800_000)
+    }
 }

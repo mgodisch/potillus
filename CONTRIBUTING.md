@@ -673,6 +673,9 @@ The three surfaces and their rules:
 - Add a `migrate(N-1)To(N)_…()` case to `MigrationTest` (androidTest) following
   the existing pattern. `runMigrationsAndValidate` will fail the build if the
   migration does not reproduce the committed schema.
+- Add the iOS counterpart to `MigrationTests` (PotillusKitTests): migrate a
+  seeded in-memory database up to the previous step, run the new one, and pin
+  what the rows look like afterwards.
 - **Never** add `fallbackToDestructiveMigration()` — it silently wipes user data.
 - The denormalised columns on `entries` (drinkName/volumeMl/alcoholPercent/
   gramsAlcohol) are intentional: historical records must not change when a drink

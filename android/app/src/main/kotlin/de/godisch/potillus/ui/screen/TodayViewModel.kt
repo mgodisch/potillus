@@ -423,17 +423,15 @@ class TodayViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), TodayUiState())
 
     /**
-     * Logs a new consumption entry for the current logical day.
+     * Logs a new consumption entry as the sheet composed it.
      *
-     * THE DAY IS THE SCREEN'S, THE TIME IS THE USER'S (v0.86.0). The dialog offers
-     * hours and minutes only, so the entry belongs to the logical day this screen
-     * shows — today — and the typed time is placed on the calendar day that keeps
-     * it there: "02:00" logged at 05:00 on the 11th under a 04:00 day change is
-     * 02:00 on the calendar 12th, still logically the 11th. Before v0.86.0 the
-     * instant was today's calendar date plus the time, and the entry then
-     * resolved to YESTERDAY and vanished from the screen it was logged on. The
-     * calendar has always placed its entries this way;
-     * the dialog shows the calendar date it is about to store when it differs.
+     * THE DAY FOLLOWS FROM THE READING, NOT FROM THE SCREEN (v0.86.0). The sheet
+     * carries a date beside its time and hands over the whole instant; the
+     * repository derives the logical day from it. An entry logged here can
+     * therefore count toward a day other than the one this screen shows —
+     * "02:00" typed at 06:00 is four hours ago, on yesterday's logical day —
+     * and the sheet says so before the save ([R.string.entry_counts_toward]).
+     * Nothing here moves the instant to keep the entry on today.
      *
      * Invalid input (non-positive volume or timestamp) is rejected as a
      * belt-and-suspenders guard even though the UI validates first.

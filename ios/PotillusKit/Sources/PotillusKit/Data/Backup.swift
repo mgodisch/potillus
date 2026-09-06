@@ -40,6 +40,12 @@ import Foundation
 //   2 → adds `category` on drink objects.
 //   3 → adds a top-level `settings` object (theme, limits, day-change time,
 //       body weight, language, …).
+//   Still 3 after `logicalDate` became a derived column (schema 4): the field
+//   kept its name, shape and required status. On the wire it means the day the
+//   entry counted toward under the writing app's day-change time; on import it
+//   is evidence for `LegacyDayRepair`, and the next realignment derives every
+//   imported row's day under this device's boundary. Android's
+//   `BackupManager.kt` says the same at the field.
 //
 // COMPATIBILITY RULES, mirrored exactly from the Kotlin importer:
 //   - Required fields are read strictly; a missing one is a hard error.
@@ -439,9 +445,10 @@ public enum BackupReader {
             throw BackupError.valueOutOfRange(object: "entry", key: "timestampMillis", value: String(timestampMillis))
         }
 
-        // A malformed logical date would silently mis-bucket every statistic, and
-        // `logicalDate` is compared as a plain string in every date-scoped SQL
-        // query. Parsing alone is NOT enough: a lenient formatter can CLAMP an
+        // The imported value is consulted only by `LegacyDayRepair`, which does
+        // arithmetic on it, and then overwritten by the realignment; until that
+        // runs it sits in a column every date-scoped query compares as a plain
+        // string. Parsing alone is NOT enough: a lenient formatter can CLAMP an
         // impossible day ("2026-02-30" -> "2026-02-28") rather than reject it. So
         // we also require a parse -> format round-trip to reproduce the input
         // exactly, which rejects any clamped or non-canonical date — mirroring

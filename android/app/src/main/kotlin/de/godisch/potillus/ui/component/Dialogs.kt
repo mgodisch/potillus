@@ -84,7 +84,6 @@ import de.godisch.potillus.l10n.formattingLocale
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -152,8 +151,8 @@ fun AddEditEntryDialog(
     // Editing shows the time the entry RECORDS, not what its instant reads in the
     // device's present frame. The picker is then round-trip honest: the user sees
     // 23:30, confirms 23:30, and the row still says 23:30 afterwards — the save
-    // below builds a new instant from the frame they are in now, and the
-    // repository records that frame with it.
+    // below composes the instant in that same recorded frame for as long as the
+    // date is left alone (see `composed`).
     val initReading = remember(entry, origin, logicalDay, dayChangeHour, dayChangeMinute) {
         entry?.let {
             val recorded = DayResolver.localDateTime(it.timestampMillis, it.utcOffsetSeconds)
@@ -177,16 +176,17 @@ fun AddEditEntryDialog(
     var showDatePicker by remember { mutableStateOf(false) }
 
     // The reading the two fields compose, and everything that follows from it.
-    // The offset is the frame the user is reading in NOW, except while an edit
-    // leaves the date alone: correcting a time inside a recorded reading must not
-    // reframe it, or the row would come back at an hour nobody typed.
-    val timestampMillis = date.atTime(hour, minute)
-        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    val utcOffsetSeconds = if (entry != null && date == initReading.date) {
-        entry.utcOffsetSeconds
-    } else {
-        DayResolver.utcOffsetSeconds(timestampMillis)
-    }
+    // While an edit leaves the date alone the reading is a correction INSIDE the
+    // entry's recorded frame and is composed there; otherwise it is a new
+    // reading in the frame the user is in now. `EntrySheetDate.compose` keeps
+    // instant and offset together either way — see there for what went wrong
+    // when the dialog composed the one and attached the other.
+    val composed = EntrySheetDate.compose(
+        reading = EntryReading(date, hour, minute),
+        recordedOffsetSeconds = entry?.utcOffsetSeconds?.takeIf { date == initReading.date },
+    )
+    val timestampMillis = composed.timestampMillis
+    val utcOffsetSeconds = composed.utcOffsetSeconds
 
     val volume = volumeText.toIntOrNull() ?: 0
     val previewGrams = selectedDrink?.let { AlcoholCalculator.calculateGrams(volume, it.alcoholPercent) } ?: 0.0

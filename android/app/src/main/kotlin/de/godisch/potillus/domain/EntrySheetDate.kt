@@ -27,6 +27,8 @@ package de.godisch.potillus.domain
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 // =============================================================================
 // EntrySheetDate.kt – what the entry sheet fills its date field with
@@ -80,8 +82,70 @@ enum class EntryDayOrigin {
 /** A wall-clock reading as the sheet holds it: a calendar date and a time of day. */
 data class EntryReading(val date: LocalDate, val hour: Int, val minute: Int)
 
+/**
+ * A reading as the sheet SAVES it: the instant, and the frame it is recorded in.
+ *
+ * The pair `onSave` hands to the view model. The two are composed together by
+ * [EntrySheetDate.compose] and must not be taken apart: an instant read in one
+ * frame and stored with another comes back at an hour nobody typed.
+ */
+data class ComposedReading(val timestampMillis: Long, val utcOffsetSeconds: Int)
+
 /** The date and time an entry sheet opens with, and how the date follows the time. */
 object EntrySheetDate {
+
+    /**
+     * The instant [reading] falls on, and the frame it is recorded in.
+     *
+     * TWO FRAMES, AND THE SHEET SAYS WHICH. A reading is a date and a time of
+     * day; to become an instant it needs a frame, and there are two candidates:
+     *
+     *  - [recordedOffsetSeconds] non-null: the user is correcting a time INSIDE
+     *    a recorded reading — editing an entry and leaving its date alone. The
+     *    reading is composed in the frame the entry recorded, and that frame is
+     *    kept. The device zone plays no part: a Berlin entry corrected from
+     *    Tokyo is still a Berlin reading, and a row whose offset was backfilled
+     *    from another zone keeps the frame it was given.
+     *
+     *  - `null`: a new reading — logging a drink, or moving an entry to another
+     *    date. It is composed in [zoneId], the device zone in production, and
+     *    the offset that zone had at the resulting instant is recorded with it.
+     *    This is the rule a date change follows everywhere in the app; see
+     *    `DayResolver.utcOffsetSeconds` for why the zone and not the old offset.
+     *
+     * Composing the instant in one frame while keeping the offset of another
+     * was the defect of the 0.86.0 review: the sheet built every instant in the
+     * device zone and then attached the recorded offset to it, so an untouched
+     * edit could move a reading by the difference between the two.
+     *
+     * A time that does not exist in [zoneId] (the spring-forward gap) resolves
+     * to what the zone offers instead, which is `ZonedDateTime`'s own behaviour;
+     * a fixed offset has no gaps.
+     *
+     * @param reading               The date and time as the sheet shows them.
+     * @param recordedOffsetSeconds The entry's recorded frame when the reading
+     *                              is a correction inside it, `null` otherwise.
+     * @param zoneId                The zone a NEW reading is taken in.
+     */
+    fun compose(
+        reading: EntryReading,
+        recordedOffsetSeconds: Int?,
+        zoneId: ZoneId = ZoneId.systemDefault(),
+    ): ComposedReading {
+        val local = reading.date.atTime(reading.hour, reading.minute)
+        if (recordedOffsetSeconds != null) {
+            val frame = ZoneOffset.ofTotalSeconds(recordedOffsetSeconds)
+            return ComposedReading(
+                timestampMillis = local.atOffset(frame).toInstant().toEpochMilli(),
+                utcOffsetSeconds = recordedOffsetSeconds,
+            )
+        }
+        val zoned = local.atZone(zoneId)
+        return ComposedReading(
+            timestampMillis = zoned.toInstant().toEpochMilli(),
+            utcOffsetSeconds = zoned.offset.totalSeconds,
+        )
+    }
 
     /** The time a calendar sheet offers when the tapped day is not today. */
     private const val CALENDAR_DEFAULT_HOUR = 20
@@ -105,7 +169,15 @@ object EntrySheetDate {
      * @param logicalDay   The logical day the sheet was opened on.
      * @param changeHour   Hour of the day-change boundary (0–23).
      * @param changeMinute Minute of that boundary (0–59).
-     * @param now          The current local date and time.
+     * @param now          The current local date and time. The running logical
+     *                     day is read off THIS, not off the wall clock, so the
+     *                     function stays pure and a test can state its "now"
+     *                     without pinning `DayResolver.clock`. `EntrySheetDate.swift`
+     *                     reads its `now` the same way.
+     * @param zoneId       The zone [now] is a reading in; the device zone in
+     *                     production. Only used to turn [now] into an instant
+     *                     for `DayResolver.resolve`, which reads it back in the
+     *                     same offset, so the answer does not depend on it.
      */
     fun initial(
         origin: EntryDayOrigin,
@@ -113,12 +185,19 @@ object EntrySheetDate {
         changeHour: Int,
         changeMinute: Int,
         now: LocalDateTime,
+        zoneId: ZoneId = ZoneId.systemDefault(),
     ): EntryReading {
         val here = EntryReading(now.toLocalDate(), now.hour, now.minute)
         if (origin != EntryDayOrigin.CALENDAR) return here
 
         val day = parseOrNull(logicalDay) ?: return here
-        val runningDay = DayResolver.today(changeHour, changeMinute)
+        val nowZoned = now.atZone(zoneId)
+        val runningDay = DayResolver.resolve(
+            nowZoned.toInstant().toEpochMilli(),
+            nowZoned.offset.totalSeconds,
+            changeHour,
+            changeMinute,
+        )
         if (logicalDay == runningDay) return here
 
         return EntryReading(

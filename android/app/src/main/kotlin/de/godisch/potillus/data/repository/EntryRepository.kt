@@ -53,7 +53,8 @@ import kotlinx.coroutines.flow.map
  *
  * @param dao         Room DAO injected by [de.godisch.potillus.PotillusApp].
  * @param keyDao      DAO for the one-row `logical_day_key` table.
- * @param transactor  Runs the realignment as one atomic unit; see [Transactor].
+ * @param transactor  Runs every write that reads the key — [add], [update] and
+ *                    the realignment — as one atomic unit; see [Transactor].
  */
 class EntryRepository(
     private val dao: EntryDao,
@@ -141,10 +142,18 @@ class EntryRepository(
      * the caller does own is the reading — the timestamp and the offset — and the
      * day follows from it.
      *
+     * IN ONE TRANSACTION WITH THE KEY READ. [withDerivedDay] reads the key row to
+     * learn which boundary to derive under, and the insert must land before that
+     * answer can go stale: a realignment committing between the two would leave
+     * this row derived under a boundary the key no longer names. `Repositories.swift`
+     * makes the same pair atomic through `database.write`.
+     *
      * @param entry     The entry to store; its `logicalDate` is overwritten.
      * @param settings  Current user settings, for the day-change boundary.
      */
-    override suspend fun add(entry: ConsumptionEntry, settings: AppSettings): Long = dao.insert(withDerivedDay(entry, settings).toEntity())
+    override suspend fun add(entry: ConsumptionEntry, settings: AppSettings): Long = transactor.inTransaction {
+        dao.insert(withDerivedDay(entry, settings).toEntity())
+    }
 
     /**
      * Creates and persists a new entry from a drink definition and a timestamp.
@@ -215,7 +224,10 @@ class EntryRepository(
      * @param settings  Current user settings, for the day-change boundary.
      */
     override suspend fun update(entry: ConsumptionEntry, settings: AppSettings) {
-        dao.update(withDerivedDay(entry, settings).toEntity())
+        // Same transaction as [add], for the same reason.
+        transactor.inTransaction {
+            dao.update(withDerivedDay(entry, settings).toEntity())
+        }
     }
 
     /** Deletes [entry] from the database. */
@@ -283,6 +295,15 @@ class EntryRepository(
      *
      * THREAD. The caller decides; nothing here touches the main thread on its
      * own. `PotillusApp` collects the settings on `Dispatchers.IO`.
+     *
+     * HOW LONG IT TAKES IS NOT MEASURED. The working estimate is that ten
+     * thousand rows are a fraction of a second, and it is an estimate: this is
+     * a write transaction over every row, with two indices to maintain and a
+     * growing WAL, and writes depend on the device more than reads do. The
+     * requirement is therefore stated so that it does not depend on the
+     * number — off the main thread, the settings screen stays usable, the
+     * screens refresh when the commit lands. Whatever the duration turns out
+     * to be on a given phone, it is a matter of comfort, not of correctness.
      */
     override suspend fun realignDays(settings: AppSettings) {
         transactor.inTransaction {
@@ -402,6 +423,8 @@ class EntryRepository(
      * long as the realignment has not run. Deriving under the key keeps every row
      * in the table consistent with every other, and the realignment that is
      * already on its way moves the new row along with the rest a moment later.
+     *
+     * Called inside the caller's transaction only; see [add].
      */
     private suspend fun withDerivedDay(entry: ConsumptionEntry, settings: AppSettings): ConsumptionEntry {
         val key = keyDao.get()

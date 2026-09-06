@@ -165,7 +165,8 @@ Mapped to well-known mobile weakness classes:
   releases"); iOS builds are code-signed and distributed through Apple's App
   Store review and signing chain.
 - **Data integrity across upgrades** — versioned schema migrations on both
-  platforms, validated by Android's `MigrationTest` and cross-checked on iOS by
+  platforms, validated by Android's `MigrationTest` and iOS's `MigrationTests`,
+  which migrate a seeded database across each step, and cross-checked by
   `SchemaParityTests`, which holds the GRDB schema (via `DatabaseMigrator`) in
   step with Room's.
 

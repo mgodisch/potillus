@@ -61,6 +61,27 @@ import androidx.room.PrimaryKey
 //   See Models.kt / ConsumptionEntry for the rationale.
 //   Short version: historical records must not change if the drink definition
 //   is later edited; denormalisation ensures data stability over time.
+//
+// WHY `logicalDate` IS A STORED COLUMN AND NOT DERIVED AT READ TIME
+//   The column is a derivation (see the invariant at the field), and the
+//   obvious simplification is to drop it: derive the day in code whenever a
+//   row is read, and the realignment that keeps it in step with the day-change
+//   setting disappears. That was the design of this feature for most of its
+//   drafting, and it was given up on a measurement, not on taste. Without the
+//   column every date-scoped query becomes a range over `timestampMillis`
+//   with a two-day margin and a grouping in code, and the query behind the
+//   calendar's drink-day dots becomes a projection over the whole table.
+//   Measured with SQLite 3.45 on a desktop, ten thousand rows: the indexed
+//   query on this column, about a thousand rows delivered, 2.0 ms; the
+//   projection, ten thousand rows, 5.5 ms; with the grouping, 8.2 ms. At fifty
+//   thousand rows 7.6 against 41.2 ms, linear. The index covers the projection,
+//   as expected; what the expectation missed is the transport across the
+//   driver boundary, paid per row, and Room and GRDB with their object mapping
+//   do not make it cheaper than the bare `sqlite3` of the measurement. Grouping
+//   in SQL instead would cost 2.9 ms and is ruled out for a different reason —
+//   see `EntryDao`, "the logical day is never expressed in SQL". So the column
+//   stays, the reads keep their index, and the writes pay for it once, in the
+//   realignment.
 // =============================================================================
 
 /**
