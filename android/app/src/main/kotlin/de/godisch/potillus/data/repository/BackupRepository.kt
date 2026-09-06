@@ -75,10 +75,13 @@ import de.godisch.potillus.domain.model.DrinkDefinition
 //   ANY PATH THAT INSERTS ROWS OR MOVES THEIR READING WITHOUT DERIVING THE DAY
 //   INVALIDATES THE KEY.
 //
-// So both import modes end by setting it back to "not computed yet". The next
-// realignment — one settings emission away — then derives every day in the table
-// under THIS device's boundary, which is what makes a backup written under a
-// different day-change time land on the days that hold here.
+// So both import modes end by setting it back to "not computed yet". The caller
+// — `SettingsViewModel.applyImport` — then runs the realignment itself, which
+// derives every day in the table under THIS device's boundary and is what makes
+// a backup written under a different day-change time land on the days that hold
+// here. It does not wait for the settings collector in `PotillusApp` to do it:
+// a MERGE writes no setting, and neither does a REPLACE whose block matches what
+// is stored, so no emission would follow (found in the v0.86.0 QA round).
 //
 // The one thing taken from the file's own boundary is the repair of pre-0.85.0
 // calendar entries: it has to put a wall-clock time back onto the day the file

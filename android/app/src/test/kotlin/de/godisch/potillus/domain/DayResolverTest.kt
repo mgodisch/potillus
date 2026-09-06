@@ -356,4 +356,23 @@ class DayResolverTest {
         assertEquals(2, recorded.hour)
         assertEquals(30, recorded.minute)
     }
+
+    // ── today() and the pinned clock ─────────────────────────────────────────
+
+    @Test fun `today reads the instant and the offset from the same clock`() {
+        // 2026-06-10T01:00Z is 10:00 on the 10th in Tokyo and 21:00 on the 9th
+        // in New York. With a 04:00 boundary the logical day is the 10th in the
+        // one zone and the 9th in the other, whatever zone this JVM runs in —
+        // which is the point: until the v0.86.0 QA round the offset came from
+        // the process default while the instant came from the pinned clock.
+        val instant = Instant.parse("2026-06-10T01:00:00Z")
+        try {
+            DayResolver.clockOverride = java.time.Clock.fixed(instant, ZoneId.of("Asia/Tokyo"))
+            assertEquals("2026-06-10", DayResolver.today(4, 0))
+            DayResolver.clockOverride = java.time.Clock.fixed(instant, ZoneId.of("America/New_York"))
+            assertEquals("2026-06-09", DayResolver.today(4, 0))
+        } finally {
+            DayResolver.clockOverride = null // never leak the pin to other tests
+        }
+    }
 }

@@ -71,11 +71,13 @@ import de.godisch.potillus.data.repository.BackupDayChange
 import de.godisch.potillus.data.repository.IBackupRepository
 import de.godisch.potillus.data.repository.IDrinkRepository
 import de.godisch.potillus.data.repository.IEntryRepository
+import de.godisch.potillus.data.repository.ImportStats
 import de.godisch.potillus.domain.model.*
 import de.godisch.potillus.l10n.perAppLocalizedContext
 import de.godisch.potillus.util.AndroidIoBound
 import de.godisch.potillus.util.BackupManager
 import de.godisch.potillus.util.ExportResult
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -270,9 +272,10 @@ class SettingsViewModel(
     /**
      * Imports a JSON backup from [uri] using the given [mode].
      *
-     * Parsing/validation errors are mapped to a localised message; the actual
-     * write (which spans both tables in one transaction) is delegated to
-     * [backupRepo]. Updates [exportStatus] with a success or error message.
+     * Parsing/validation errors are mapped to a localised message; everything
+     * between the parse and the message — the rows, the settings restore, the
+     * re-derivation of the logical day — is [applyImport]. Updates
+     * [exportStatus] with a success or error message.
      *
      * SETTINGS RESTORE: for [ImportMode.REPLACE] (a full restore) the backup's
      * preferences are applied via [applyImportedSettings]; for [ImportMode.MERGE]
@@ -300,34 +303,8 @@ class SettingsViewModel(
                 return@launch
             }
 
-            // The boundary the file's dates were derived under: the file's own
-            // when it carries a settings block, this device's otherwise. Only
-            // the repair of pre-0.85.0 calendar entries uses it; the days
-            // themselves are re-derived after the import, under whatever is set
-            // here. Read from the flow rather than from the UI state, for the
-            // reason TodayViewModel.addEntry spells out: the state holds the
-            // defaults until the first emission.
-            val local = prefs.settingsFlow.first()
-            val dayChange = BackupDayChange(
-                hour = result.settings?.dayChangeHour ?: local.dayChangeHour,
-                minute = result.settings?.dayChangeMinute ?: local.dayChangeMinute,
-            )
-
-            // the transaction that spans entries + drinks is owned
-            // by BackupRepository, keeping this ViewModel free of AppDatabase.
             try {
-                val stats = when (mode) {
-                    ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries, dayChange)
-                    ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries, dayChange)
-                }
-
-                // Restore the preferences from the backup — but only for a full
-                // REPLACE. MERGE deliberately keeps the local settings (see the
-                // SETTINGS RESTORE note in BackupManager). A pre-v3 backup has
-                // result.settings == null and therefore changes nothing.
-                val restored = result.settings?.takeIf { mode == ImportMode.REPLACE }
-                val lockDropped = restored != null &&
-                    !applyImportedSettings(restored, canAuthenticate = deviceCanAuthenticate())
+                val (stats, lockDropped) = applyImport(result, mode)
 
                 val summary = if (mode == ImportMode.REPLACE) {
                     quantityStr(R.plurals.import_success_replace, stats.imported, stats.imported)
@@ -350,7 +327,11 @@ class SettingsViewModel(
                 // must run on Main; the success state above lives in this ViewModel
                 // (which outlives the Activity), so it survives the recreation.
                 // The call sits in this framework-aware wrapper — not in the
-                // unit-tested applyImportedSettings — so that helper stays pure.
+                // unit-tested applyImport — so that helper stays pure. The same
+                // question applyImport asked, asked again here rather than
+                // handed back: a third value in its result would exist for this
+                // one line only.
+                val restored = result.settings?.takeIf { mode == ImportMode.REPLACE }
                 if (restored != null && restored.language.isNotEmpty()) {
                     withContext(Dispatchers.Main) {
                         AppCompatDelegate.setApplicationLocales(
@@ -366,9 +347,87 @@ class SettingsViewModel(
     }
 
     /**
+     * Writes a parsed backup into the database and the preferences, and puts
+     * the derived logical day back in force over the rows that came in.
+     *
+     * The part of [importBackup] that does not need a `Context`: the parse
+     * before it and the message after it do, so they stay in the caller, and
+     * this helper can run against the fakes on the JVM. It returns what the
+     * caller needs to phrase the outcome — the counts, and whether the backup
+     * asked for the lock and did not get it.
+     *
+     * THREE STEPS, IN THIS ORDER:
+     *
+     *  1. THE ROWS. The transaction that spans entries + drinks is owned by
+     *     [backupRepo], keeping this ViewModel free of AppDatabase. The day-change
+     *     boundary handed in is the one the file's dates were derived under: the
+     *     file's own when it carries a settings block, this device's otherwise.
+     *     Only the repair of pre-0.85.0 calendar entries uses it; the days
+     *     themselves are re-derived in step 3. Read from the flow rather than
+     *     from the UI state, for the reason TodayViewModel.addEntry spells out:
+     *     the state holds the defaults until the first emission.
+     *
+     *  2. THE SETTINGS. Restored from the backup only for a full REPLACE; MERGE
+     *     deliberately keeps the local settings (see the SETTINGS RESTORE note in
+     *     BackupManager). A pre-v3 backup has `result.settings == null` and
+     *     changes nothing in either mode.
+     *
+     *  3. THE DAYS. The import inserts rows without deriving their day and
+     *     invalidates the key in `logical_day_key` (see the header of
+     *     BackupRepository). Until the v0.86.0 QA round nothing here derived
+     *     them afterwards: the collector in PotillusApp was expected to, on the
+     *     next settings emission, and that emission does not come from a MERGE,
+     *     from a REPLACE without a settings block, or from a REPLACE whose block
+     *     matches what is stored — DataStore skips a write that changes nothing
+     *     and emits nothing for it. The imported rows then kept the file's days
+     *     until the next start, wrong by a day wherever the file was written
+     *     under another boundary. So the realignment is run here, under the
+     *     settings in force AFTER step 2, which is why it comes last. The
+     *     collector finds the key current afterwards and does nothing.
+     *
+     *     A failure in step 3 is not an import failure: the rows are in and the
+     *     key still says "not derived", so the collector retries on the next
+     *     emission, exactly as PotillusApp.keepLogicalDaysAligned reasons for its
+     *     own run. Reporting it as an error would tell the user the import
+     *     failed when it did not. `CancellationException` is not a failure and
+     *     is rethrown.
+     *
+     * @param result The parsed backup; [BackupManager.ImportResult.error] must be
+     *               `null`, which [importBackup] has checked.
+     * @param mode   REPLACE (wipe then import) or MERGE (add, skipping duplicates).
+     * @return The import counts, and `true` in the second position when the
+     *         backup's lock was asked for and NOT applied.
+     */
+    @VisibleForTesting
+    internal suspend fun applyImport(result: BackupManager.ImportResult, mode: ImportMode): Pair<ImportStats, Boolean> {
+        val local = prefs.settingsFlow.first()
+        val dayChange = BackupDayChange(
+            hour = result.settings?.dayChangeHour ?: local.dayChangeHour,
+            minute = result.settings?.dayChangeMinute ?: local.dayChangeMinute,
+        )
+        val stats = when (mode) {
+            ImportMode.REPLACE -> backupRepo.importReplace(result.drinks, result.entries, dayChange)
+            ImportMode.MERGE -> backupRepo.importMerge(result.drinks, result.entries, dayChange)
+        }
+
+        val restored = result.settings?.takeIf { mode == ImportMode.REPLACE }
+        val lockDropped = restored != null &&
+            !applyImportedSettings(restored, canAuthenticate = deviceCanAuthenticate())
+
+        try {
+            entryRepo.realignDays(prefs.settingsFlow.first())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            if (BuildConfig.DEBUG) Log.w(TAG, "applyImport: realignDays failed; the next settings emission retries", e)
+        }
+        return stats to lockDropped
+    }
+
+    /**
      * Applies a restored [settings] snapshot to the persistent preferences.
      *
-     * Called from [importBackup] on a REPLACE import. Kept as a small, pure
+     * Called from [applyImport] on a REPLACE import. Kept as a small, pure
      * (framework-free) helper so it can be unit-tested against a fake
      * [IAppPreferences] without an Android runtime — the one framework side
      * effect a language change needs (AppCompatDelegate) stays in the caller.

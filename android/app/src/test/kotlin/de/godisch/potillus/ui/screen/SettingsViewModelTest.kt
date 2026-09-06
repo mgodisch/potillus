@@ -32,7 +32,7 @@ package de.godisch.potillus.ui.screen
 // SettingsViewModel has the most complex logic of all five ViewModels:
 //   - Preference writes (setTheme, setDailyLimit, setWeeklyLimit, setMaxDrinkDaysPerWeek, …)
 //   - Export status / share target state via _exportStatus / _shareTarget
-//   - Backup import in REPLACE and MERGE modes
+//   - Backup import in REPLACE and MERGE modes, and the logical day afterwards
 //   - Error localisation via StringProvider
 //
 // WHY these tests were missing before:
@@ -62,6 +62,7 @@ import de.godisch.potillus.fake.FakeAppPreferences
 import de.godisch.potillus.fake.FakeBackupRepository
 import de.godisch.potillus.fake.FakeDrinkRepository
 import de.godisch.potillus.fake.FakeEntryRepository
+import de.godisch.potillus.util.BackupManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -240,6 +241,112 @@ class SettingsViewModelTest {
             } catch (_: RuntimeException) { /* expected */ }
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // ── The logical day after an import (applyImport) ────────────────────────
+
+    /**
+     * 02:00 UTC on 2 January 2026, read at +00:00. Under a 04:00 boundary this
+     * is the logical 1 January; under a midnight boundary the 2nd.
+     */
+    private val twoAmJan2 = 1_767_319_200_000L
+
+    /**
+     * Adds [twoAmJan2] to the fake under a MIDNIGHT boundary, so it is stored
+     * on the 2nd — the day a backup written under that boundary would carry.
+     * The test's prefs keep the default 04:00, under which the entry belongs
+     * to the 1st; whether it gets there is what each test below asks.
+     */
+    private suspend fun addEntryFiledUnderMidnight() = entryRepo.add(
+        ConsumptionEntry(
+            drinkId = 1,
+            drinkName = "Lager",
+            volumeMl = 500,
+            alcoholPercent = 5.0,
+            gramsAlcohol = 19.7,
+            timestampMillis = twoAmJan2,
+            logicalDate = "",
+            utcOffsetSeconds = 0,
+        ),
+        AppSettings(dayChangeHour = 0, dayChangeMinute = 0),
+    )
+
+    /**
+     * A MERGE writes no setting, so nothing but the import itself can put the
+     * derived day back in force. Until the v0.86.0 QA round nothing did, and
+     * a merged backup kept the file's days until the next start.
+     */
+    @Test fun `applyImport MERGE realigns the days under the local boundary`() = runTest(dispatcher) {
+        addEntryFiledUnderMidnight()
+        assertEquals("2026-01-02", entryRepo.allEntries.single().logicalDate)
+
+        buildVm().applyImport(BackupManager.ImportResult(), ImportMode.MERGE)
+
+        assertEquals("2026-01-01", entryRepo.allEntries.single().logicalDate)
+        assertNotNull(backupRepo.lastMergeCall)
+    }
+
+    /**
+     * A REPLACE with a settings block moves the boundary first and derives the
+     * days under the boundary it RESTORED, not the one that was in force when
+     * the import began.
+     */
+    @Test fun `applyImport REPLACE realigns the days under the restored boundary`() = runTest(dispatcher) {
+        prefs = FakeAppPreferences(AppSettings(dayChangeHour = 4, dayChangeMinute = 0))
+        // Stored on the 1st under the default 04:00 boundary.
+        entryRepo.add(
+            ConsumptionEntry(
+                drinkId = 1,
+                drinkName = "Lager",
+                volumeMl = 500,
+                alcoholPercent = 5.0,
+                gramsAlcohol = 19.7,
+                timestampMillis = twoAmJan2,
+                logicalDate = "",
+                utcOffsetSeconds = 0,
+            ),
+            AppSettings(dayChangeHour = 4, dayChangeMinute = 0),
+        )
+        assertEquals("2026-01-01", entryRepo.allEntries.single().logicalDate)
+
+        val result = BackupManager.ImportResult(
+            settings = AppSettings(dayChangeHour = 0, dayChangeMinute = 0),
+        )
+        val (stats, lockDropped) = buildVm().applyImport(result, ImportMode.REPLACE)
+
+        assertEquals(0, prefs.currentSettings.dayChangeHour)
+        assertEquals("2026-01-02", entryRepo.allEntries.single().logicalDate)
+        assertEquals(backupRepo.replaceResult, stats)
+        assertFalse(lockDropped)
+    }
+
+    /** A REPLACE without a settings block leaves the boundary alone and still derives. */
+    @Test fun `applyImport REPLACE without settings realigns under the local boundary`() = runTest(dispatcher) {
+        addEntryFiledUnderMidnight()
+
+        buildVm().applyImport(BackupManager.ImportResult(), ImportMode.REPLACE)
+
+        assertEquals(4, prefs.currentSettings.dayChangeHour)
+        assertEquals("2026-01-01", entryRepo.allEntries.single().logicalDate)
+    }
+
+    /** The lock verdict travels out of applyImport, as importBackup phrases it. */
+    @Test fun `applyImport reports the lock the device could not take`() = runTest(dispatcher) {
+        val vm = SettingsViewModel(
+            getString = testStrings,
+            appContext = android.app.Application(),
+            prefs = prefs,
+            entryRepo = entryRepo,
+            drinkRepo = drinkRepo,
+            backupRepo = backupRepo,
+            deviceCanAuthenticate = { false },
+        )
+        val result = BackupManager.ImportResult(settings = AppSettings(biometricEnabled = true))
+
+        val (_, lockDropped) = vm.applyImport(result, ImportMode.REPLACE)
+
+        assertTrue(lockDropped)
+        assertFalse(prefs.currentSettings.biometricEnabled)
     }
 
     // ── Settings restore on import (applyImportedSettings) ──────────────────────

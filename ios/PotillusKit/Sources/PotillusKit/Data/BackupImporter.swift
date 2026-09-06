@@ -109,14 +109,24 @@ public struct BackupImporter: Sendable {
 
     private let database: AppDatabase
     private let preferences: (any PreferencesStoring)?
+    private let entries: (any EntryRepositoryProtocol)?
 
     /// - Parameters:
     ///   - database: The live database.
     ///   - preferences: Where a restored `settings` block lands. Pass `nil` to
     ///     import data only — the behaviour of a pre-v3 backup.
-    public init(database: AppDatabase, preferences: (any PreferencesStoring)? = nil) {
+    ///   - entries: The repository that derives the logical day. When both it
+    ///     and `preferences` are present, `restore` ends by realigning the
+    ///     rows it inserted; see there. `nil` leaves that to the collector in
+    ///     `DayRealignment`.
+    public init(
+        database: AppDatabase,
+        preferences: (any PreferencesStoring)? = nil,
+        entries: (any EntryRepositoryProtocol)? = nil
+    ) {
         self.database = database
         self.preferences = preferences
+        self.entries = entries
     }
 
     /// Restores `backup`, returning what it did.
@@ -148,13 +158,41 @@ public struct BackupImporter: Sendable {
         _ backup: BackupFile, mode: ImportMode, deviceCanAuthenticate: Bool = true
     ) async throws -> ImportStats {
         let stats = try importData(backup, mode: mode, dayChange: await fileDayChange(backup))
-        guard mode == .replace else { return stats }
-        let lockNotRestored = try await applySettings(
-            backup, deviceCanAuthenticate: deviceCanAuthenticate
-        )
+        var lockNotRestored = false
+        if mode == .replace {
+            lockNotRestored = try await applySettings(
+                backup, deviceCanAuthenticate: deviceCanAuthenticate
+            )
+        }
+        await realignImportedDays()
         return ImportStats(
             imported: stats.imported, skipped: stats.skipped, lockNotRestored: lockNotRestored
         )
+    }
+
+    /// Puts the derived logical day back in force over the rows that came in.
+    ///
+    /// `importData` inserts rows without deriving their day and invalidates the
+    /// key in `logical_day_key`. Until the v0.86.0 QA round nothing here derived
+    /// them afterwards: `DayRealignment` was expected to, on the next settings
+    /// emission, and that emission does not come from a `.merge` (which writes
+    /// no setting) or from a `.replace` without a settings block. The imported
+    /// rows then kept the file's days until the next launch, wrong by a day
+    /// wherever the file was written under another boundary.
+    ///
+    /// Runs AFTER `applySettings`, so a restored day-change time is the one the
+    /// rows are derived under; `DayRealignment` then finds the key current and
+    /// does nothing. Needs both collaborators: without a store there is no
+    /// boundary to derive under that the key could truthfully name, and the
+    /// collector's next emission does the work instead.
+    ///
+    /// A failure here is not an import failure: the rows are in, the key still
+    /// says "not derived", and the next emission retries — the reasoning of
+    /// `DayRealignment.run`, which swallows the same way.
+    private func realignImportedDays() async {
+        guard let entries, let preferences else { return }
+        let settings = await preferences.load()
+        try? entries.realignDays(settings: settings)
     }
 
     // ── Data ─────────────────────────────────────────────────────────────────
@@ -247,10 +285,10 @@ public struct BackupImporter: Sendable {
             // ROWS WENT IN WITHOUT A DERIVED DAY, so the key goes back to "not
             // computed yet". That is the rule, not a special case for imports:
             // any path that inserts rows or moves their reading without deriving
-            // the day invalidates the key, and the next realignment — one
-            // settings emission away — rebuilds the column under this device's
-            // boundary. Inside the transaction, so a rolled-back import cannot
-            // leave the key claiming something about rows that never landed.
+            // the day invalidates the key, and the realignment `restore` runs
+            // next rebuilds the column under this device's boundary. Inside the
+            // transaction, so a rolled-back import cannot leave the key claiming
+            // something about rows that never landed.
             try LogicalDayKey().save(db)
 
             return ImportStats(imported: imported, skipped: skipped)

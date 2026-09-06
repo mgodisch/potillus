@@ -72,7 +72,7 @@ public struct AppEnvironment: Sendable {
         self.entries = entries
         self.preferences = preferences
         self.clock = clock
-        self.importer = BackupImporter(database: database, preferences: preferences)
+        self.importer = BackupImporter(database: database, preferences: preferences, entries: entries)
         self.realignment = DayRealignment(entries: entries, preferences: preferences)
     }
 

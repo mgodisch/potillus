@@ -176,10 +176,19 @@ object DayResolver {
      * the two is deliberate and its consequence is known: after a flight, entries
      * can drop out of the Today screen or appear on it (see the comment at the
      * call site that determines the screen's day).
+     *
+     * THE ZONE IS THE CLOCK'S, NOT THE PROCESS DEFAULT. In production the two are
+     * the same object, [Clock.systemDefaultZone]. A pinned [clockOverride] carries
+     * a zone of its own, and reading the instant from it while reading the
+     * offset from `ZoneId.systemDefault()` would place "today" in two frames at
+     * once — the pinned clock's midnight, the device's boundary. The screenshot
+     * clock happens to pin the device zone, so nothing showed; the seam is
+     * closed anyway (v0.86.0 QA round).
      */
     fun today(changeHour: Int, changeMinute: Int): String {
-        val now = clock().millis()
-        return resolve(now, utcOffsetSeconds(now), changeHour, changeMinute)
+        val clock = clock()
+        val now = clock.millis()
+        return resolve(now, utcOffsetSeconds(now, clock.zone), changeHour, changeMinute)
     }
 
     // ── The recorded local frame ─────────────────────────────────────────────

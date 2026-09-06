@@ -83,8 +83,7 @@ Derive the logical day from the reading
   bars' rules live in the Android domain.
 - Paging the Android calendar clears the selected day, as iOS does.
 - Starring a drink on iOS leaves its validation untouched.
-- One contrast figure in the Android colour comments named the predecessor
-  shade; corrected.
+- The contrast figures in the Android colour comments name the current shades.
 - The Statistics chart samples its axis labels through the same domain
   function as the report on both platforms.
 - TalkBack announces the selected language in the language picker.
@@ -115,10 +114,13 @@ Derive the logical day from the reading
 - The instrumented tests build against androidx.test 1.7.0, Espresso 3.7.0 and
   ext:junit 1.3.0.
 - The screenshot run waits out an Activity that is being recreated.
+- `DayResolver.today` reads its offset from the zone of the pinned clock.
 
 ### Fixed
 
 - Calendar entries from before v0.85.0 sit on the day they were booked for.
+- Imported entries take this device's logical days at the import, on both
+  platforms.
 
 ## v0.85.0
 

@@ -66,7 +66,7 @@ final class BackupImporterTests: XCTestCase {
     }
 
     private func makeImporter() -> BackupImporter {
-        BackupImporter(database: database, preferences: preferences)
+        BackupImporter(database: database, preferences: preferences, entries: entries)
     }
 
     private func backup(
@@ -439,4 +439,83 @@ extension BackupImporterTests {
             )
         }
     }
+}
+
+// =============================================================================
+// The logical day after an import
+// =============================================================================
+//
+// An extension, not more members: `type_body_length` counts the class body and
+// this suite was already at the limit.
+
+extension BackupImporterTests {
+
+    /// 02:00 UTC on 2 January, read at +00:00, filed under the 2nd — the day a
+    /// backup written under a MIDNIGHT boundary carries. Under this device's
+    /// default 04:00 boundary it belongs to the 1st; whether it gets there is
+    /// what the tests below ask.
+    private func twoAmJan2(drinkId: Int64) -> ConsumptionEntry {
+        ConsumptionEntry(
+            drinkId: drinkId, drinkName: "x", volumeMl: 500, alcoholPercent: 4.9,
+            gramsAlcohol: 19.3, timestampMillis: Self.noonJan1 + 14 * 3_600_000,
+            logicalDate: "2026-01-02", utcOffsetSeconds: 0
+        )
+    }
+
+    /// A MERGE writes no setting, so nothing but the import itself can put the
+    /// derived day back in force. Until the v0.86.0 QA round nothing did, and a
+    /// merged backup kept the file's days until the next launch.
+    func testMergeDerivesTheImportedDaysUnderTheLocalBoundary() async throws {
+        let file = backup(
+            drinks: [DrinkDefinition(id: 1, name: "x", volumeMl: 500, alcoholPercent: 4.9)],
+            entries: [twoAmJan2(drinkId: 1)],
+            settings: BackupSettings(
+                themeMode: "SYSTEM", dayChangeHour: 0, dayChangeMinute: 0,
+                dailyLimitGrams: 24.0, weeklyLimitGrams: 140.0, maxDrinkDaysPerWeek: 5,
+                statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
+                alternativeStatusSymbols: false, language: "", weightKg: 0.0
+            )
+        )
+        try await makeImporter().restore(file, mode: .merge)
+
+        let stored = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-01", "the file's midnight day gives way to the local 04:00")
+    }
+
+    /// A REPLACE with a settings block moves the boundary first and derives the
+    /// days under the boundary it RESTORED, not the one in force when the import
+    /// began.
+    func testReplaceDerivesTheImportedDaysUnderTheRestoredBoundary() async throws {
+        let file = backup(
+            drinks: [DrinkDefinition(id: 1, name: "x", volumeMl: 500, alcoholPercent: 4.9)],
+            entries: [twoAmJan2(drinkId: 1)],
+            settings: BackupSettings(
+                themeMode: "SYSTEM", dayChangeHour: 3, dayChangeMinute: 0,
+                dailyLimitGrams: 24.0, weeklyLimitGrams: 140.0, maxDrinkDaysPerWeek: 5,
+                statsFromDate: "", biometricEnabled: false, allowScreenshots: false,
+                alternativeStatusSymbols: false, language: "", weightKg: 0.0
+            )
+        )
+        try await makeImporter().restore(file, mode: .replace)
+
+        let settings = await preferences.load()
+        XCTAssertEqual(settings.dayChangeHour, 3)
+        let stored = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-01", "02:00 is before the restored 03:00 boundary")
+    }
+
+    /// Without an entry repository the importer leaves the derivation to
+    /// `DayRealignment`, and a settings-less REPLACE still lands.
+    func testAnImporterWithoutEntriesLeavesTheFileDaysStanding() async throws {
+        let importer = BackupImporter(database: database, preferences: preferences)
+        let file = backup(
+            drinks: [DrinkDefinition(id: 1, name: "x", volumeMl: 500, alcoholPercent: 4.9)],
+            entries: [twoAmJan2(drinkId: 1)]
+        )
+        try await importer.restore(file, mode: .replace)
+
+        let stored = try XCTUnwrap(try entries.all().first)
+        XCTAssertEqual(stored.logicalDate, "2026-01-02", "nothing derived: the collector will")
+    }
+
 }
